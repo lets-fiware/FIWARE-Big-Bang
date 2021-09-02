@@ -47,7 +47,7 @@ COMET=
 WIRECLOUD=
 NGSIPROXY=
 NODE_RED=
-GRAFANA=grafana
+GRAFANA=
 ################################
 
 IDM_ADMIN_EMAIL_NAME=admin
