@@ -1,0 +1,11 @@
+FROM nodered/node-red:1.2.9
+
+#
+# Add nodes modules for Node-RED
+#   https://nodered.org/docs/getting-started/docker
+#
+
+RUN npm i git+https://github.com/FIWARE/node-red-contrib-FIWARE_official.git#master && \
+    npm i passport-fiware-oauth@0.3.0
+
+COPY ./settings.js /usr/src/node-red/node_modules/node-red/settings.js

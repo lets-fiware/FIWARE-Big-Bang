@@ -1,0 +1,32 @@
+version: "3"
+
+services:
+
+  keyrock:
+    image: fiware/idm:8.0.0
+    depends_on:
+      - mysql
+    ports:
+      - 127.0.0.1:3000:3000
+    environment:
+      - IDM_HOST=${IDM_HOST}
+      - IDM_PORT=3000
+      - IDM_DB_HOST=${IDM_DB_HOST}
+      - IDM_DB_NAME=${IDM_DB_NAME}
+      - IDM_DB_USER=${IDM_DB_USER}
+      - IDM_DB_PASS=${IDM_DB_PASS}
+
+      - IDM_ADMIN_ID=${IDM_ADMIN_ID}
+      - IDM_ADMIN_USER=${IDM_ADMIN_USER}
+      - IDM_ADMIN_EMAIL=${IDM_ADMIN_EMAIL}
+      - IDM_ADMIN_PASS=${IDM_ADMIN_PASS}
+      - IDM_SESSION_SECRET=${IDM_SESSION_SECRET}
+      - IDM_ENCRYPTION_KEY=${IDM_ENCRYPTION_KEY}
+
+  mysql:
+    image: mysql:5.7
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+    volumes:
+      - ./data/mysql-data:/var/lib/mysql
+      - ./mysql:/docker-entrypoint-initdb.d/:ro

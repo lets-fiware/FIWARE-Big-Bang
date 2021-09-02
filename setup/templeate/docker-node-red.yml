@@ -1,0 +1,16 @@
+  node-red:
+    build: ./config/node-red
+    depends_on:
+      - keyrock
+    volumes:
+      - ./data/node-red:/data
+    environment:
+      - IDM_HOST=${IDM_HOST}
+      - NODE_RED_CLIENT_ID=${NODE_RED_CLIENT_ID}
+      - NODE_RED_CLIENT_SECRET=${NODE_RED_CLIENT_SECRET}
+      - NODE_RED_CALLBACK_URL=${NODE_RED_CALLBACK_URL}
+    restart: always
+    logging:
+      driver: syslog
+      options:
+        tag: "[node-red]"

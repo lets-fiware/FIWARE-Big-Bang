@@ -1,0 +1,44 @@
+  server {
+    listen 80;
+    server_name HOST;
+
+    location / {
+        return 301 https://$host$request_uri;
+    }
+
+    location ^~ /.well-known/acme-challenge/ {
+      default_type "text/plain";
+      root         /opt/acme/HOST;
+    }
+  }
+
+  server {
+    listen 443 http2 ssl;
+    server_name HOST;
+
+    ssl_certificate /etc/letsencrypt/live/HOST/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/HOST/privkey.pem;
+
+    location / {
+        proxy_set_header Host               $http_host;
+        proxy_set_header X-Real-IP          $remote_addr;
+        proxy_set_header X-Forwarded-For    $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto  $scheme;
+        proxy_set_header X-Forwarded-Port   443;
+        proxy_set_header X-Forwarded-Server $http_host;
+        proxy_set_header X-Forwarded-Host   $http_host;
+
+        proxy_set_header Connection '';
+        proxy_pass_header 'X-Accel-Buffering';
+        proxy_buffering off;
+        proxy_cache off;
+        proxy_read_timeout 300;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+
+        proxy_pass http://ngsiproxy:3000/;
+    }
+
+    access_log  /var/log/nginx/HOST.log;
+  }

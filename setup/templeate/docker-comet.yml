@@ -1,0 +1,42 @@
+  cygnus:
+    image: fiware/cygnus-ngsi:2.10.0
+    depends_on:
+      - mongo
+    ports:
+      - 127.0.0.1:5051:5051
+      - 127.0.0.1:5080:5080
+    environment:
+      - CYGNUS_MONGO_SERVICE_PORT=5051
+      - CYGNUS_MONGO_HOSTS=mongo:27017
+      - CYGNUS_SERVICE_PORT=5050
+      - CYGNUS_API_PORT=5080
+      - CYGNUS_LOG_LEVEL=DEBUG # The logging level for Cygnus
+    healthcheck:
+      test: curl --fail -s http://cygnus:5080/v1/version || exit 1
+    restart: always
+    logging:
+      driver: syslog
+      options:
+        tag: "[cygnus]"
+
+  comet:
+    image: fiware/sth-comet:2.8.0
+    depends_on:
+      - cygnus
+      - mongo
+    networks:
+      - default
+    environment:
+      - STH_HOST=0.0.0.0
+      - STH_PORT=8666
+      - DB_PREFIX=sth_
+      - DB_URI=mongo:27017
+      - LOGOPS_LEVEL=DEBUG
+    healthcheck:
+      test: curl --fail -s http://comet:8666/version || exit 1
+    restart: always
+    logging:
+      driver: syslog
+      options:
+        tag: "[comet]"
+

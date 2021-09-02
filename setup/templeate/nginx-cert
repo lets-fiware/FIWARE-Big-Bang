@@ -1,0 +1,13 @@
+  server {
+    listen 80;
+    server_name HOST;
+
+    location =/ {
+        return 404;
+    }
+
+    location / {
+      default_type "text/plain";
+      root         /var/www/html/HOST;
+    }
+  }

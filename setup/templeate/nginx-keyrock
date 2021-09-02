@@ -1,0 +1,35 @@
+  server {
+    listen 80;
+    server_name HOST;
+
+    location / {
+        return 301 https://$host$request_uri;
+    }
+
+    location ^~ /.well-known/acme-challenge/ {
+      default_type "text/plain";
+      root         /opt/acme/HOST;
+    }
+  }
+
+  server {
+    listen 443 http2 ssl;
+    server_name HOST;
+
+    ssl_certificate /etc/letsencrypt/live/HOST/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/HOST/privkey.pem;
+
+    proxy_set_header        Accept-Encoding   "";
+    proxy_set_header        Host            $host;
+    proxy_set_header        X-Real-IP       $remote_addr;
+    proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header        X-Forwarded-Proto $scheme;
+    add_header              Front-End-Https   on;
+    add_header              Strict-Transport-Security 'max-age=15768000; includeSubdomains; always';
+
+    location / {
+      proxy_pass http://keyrock:3000;
+    }
+
+    access_log  /var/log/nginx/HOST.log;
+  }

@@ -1,0 +1,69 @@
+  wirecloud:
+    image: fiware/wirecloud:1.3.1
+    depends_on:
+      - postgres
+      - elasticsearch
+      - memcached
+    environment:
+      - DEBUG=Ture
+      - DB_HOST=postgres
+      - DB_PASSWORD=${POSTGRES_PASSWORD}
+      - FORWARDED_ALLOW_IPS=*
+      - ELASTICSEARCH2_URL=http://elasticsearch:9200/
+      - MEMCACHED_LOCATION=memcached:11211
+      - FIWARE_IDM_SERVER=${IDM_HOST}
+      - SOCIAL_AUTH_FIWARE_KEY=${CLIENT_ID}
+      - SOCIAL_AUTH_FIWARE_SECRET=${CLIENT_SECRET}
+    volumes:
+      - ./data/wirecloud/wirecloud-data:/opt/wirecloud_instance/data
+      - ./data/wirecloud/wirecloud-static:/var/www/static
+    restart: always
+    logging:
+      driver: syslog
+      options:
+        tag: "[wirecloud]"
+
+  postgres:
+    image: postgres:11
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - ./data/wirecloud/postgres-data:/var/lib/postgresql/data
+    restart: always
+    logging:
+      driver: syslog
+      options:
+        tag: "[postgres]"
+
+
+  elasticsearch:
+    image: elasticsearch:2.4
+    volumes:
+      - ./data/wirecloud/elasticsearch-data:/usr/share/elasticsearch/data
+    command: elasticsearch -Des.index.max_result_window=50000
+    restart: always
+    logging:
+      driver: syslog
+      options:
+        tag: "[elasticsearch]"
+
+
+  memcached:
+    image: memcached:1
+    command: memcached -m 2048m
+    restart: always
+    logging:
+      driver: syslog
+      options:
+        tag: "[memcached]"
+
+  ngsiproxy:
+    image: fiware/ngsiproxy:1.2.2
+    environment:
+      - TRUST_PROXY_HEADERS=1
+    restart: always
+    logging:
+      driver: syslog
+      options:
+        tag: "[ngsiproxy]"
+
