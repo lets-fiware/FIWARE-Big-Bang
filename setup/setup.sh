@@ -216,12 +216,6 @@ down_keyrock() {
 # Orion, Wilma and Tokenproxy
 #
 setup_orion() {
-  if [ -z "${WIRECLOUD}" ]; then
-    URL=${ORION}
-  else
-    URL=${WIRECLOUD}
-  fi
-
   cp ${TEMPLEATE}/docker-base.yml ./docker-compose.yml
 
   rm -fr ${NGINX_SITES}
@@ -229,9 +223,17 @@ setup_orion() {
   sed -e "s/HOST/${KEYROCK}/" ${TEMPLEATE}/nginx-keyrock > ${NGINX_SITES}/${KEYROCK}
   sed -e "s/HOST/${ORION}/" ${TEMPLEATE}/nginx-orion > ${NGINX_SITES}/${ORION}
 
-  # Create Applicaton for WireCloud
-  AID=$(${NGSI_GO} applications --host ${IDM} create --name "WireCloud" --description "WireCloud application" --url "https://${URL}/" --redirectUri "https://${URL}/complete/fiware/")
-  SECRET=$(${NGSI_GO} applications --host ${IDM} get --aid ${AID} | jq -r .application.secret )
+  if [ -z "${WIRECLOUD}" ]; then
+    # Create Applicaton for Orion
+    AID=$(${NGSI_GO} applications --host ${IDM} create --name "Orion" --description "Orion application" --url "https://${ORION}/" --redirectUri "https://${ORION}/complete/fiware/")
+    SECRET=$(${NGSI_GO} applications --host ${IDM} get --aid ${AID} | jq -r .application.secret )
+  else
+    # Create Applicaton for WireCloud
+    AID=$(${NGSI_GO} applications --host ${IDM} create --name "WireCloud" --description "WireCloud application" --url "https://${WIRECLOUD}/" --redirectUri "https://${WIRECLOUD}/complete/fiware/")
+    SECRET=$(${NGSI_GO} applications --host ${IDM} get --aid ${AID} | jq -r .application.secret )
+    RID=$(${NGSI_GO} applications --host ${IDM} roles --aid ${AID} create --name Admin)
+    ${NGSI_GO} applications --host ${IDM} users --aid ${AID} assign --rid ${RID} --uid admin > /dev/null
+  fi
 
   # Create PEP Proxy for FIWARE Orion
   PEP_PASSWORD=$(${NGSI_GO} applications --host ${IDM} pep --aid ${AID} create --run | jq -r .pep_proxy.password)
