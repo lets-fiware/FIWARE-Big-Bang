@@ -2,13 +2,13 @@
     listen 80;
     server_name HOST;
 
-    location / {
+    location =/ {
         return 301 https://$host$request_uri;
     }
 
-    location ^~ /.well-known/acme-challenge/ {
+    location / {
       default_type "text/plain";
-      root         /opt/acme/HOST;
+      root         /var/www/html/HOST;
     }
   }
 
