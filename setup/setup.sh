@@ -113,7 +113,7 @@ cert() {
 
 EOF
 
-  for name in KEYROCK ORION COMET WIRECLOUD NGSIPROXY NODE_RED
+  for name in KEYROCK ORION COMET WIRECLOUD NGSIPROXY NODE_RED GRAFANA
   do
     eval val=\"\$${name}\"
     if [ -n "${val}" ]; then
