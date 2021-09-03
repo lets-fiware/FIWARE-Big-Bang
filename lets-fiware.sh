@@ -50,13 +50,15 @@ NODE_RED=
 GRAFANA=
 ################################
 
+SETUP_DIR=./setup
+${SETUP_DIR}/prepare.sh
+
 IDM_ADMIN_EMAIL_NAME=admin
 IDM_ADMIN_PASS=$(pwgen -s 16 1)
 
 DATA_DIR=./data
 CERT_DIR=$(pwd)/data/cert
 CONFIG_DIR=./config
-SETUP_DIR=./setup
 
 DOCKER_COMPOSE=/usr/local/bin/docker-compose
 CERTBOT=certbot/certbot:v1.18.0
@@ -101,7 +103,6 @@ done
 
 echo -e -n "\n" >> .env
 
-${SETUP_DIR}/prepare.sh
 
 ${SETUP_DIR}/setup.sh
 
