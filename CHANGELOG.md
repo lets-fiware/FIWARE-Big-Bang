@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.1.0-next
 
+-   Fix missing pwgen command
 -   Add Admin role for WireCloud (#4)
 -   Update template for nginx (#3)
 -   Update default settings (#1)
