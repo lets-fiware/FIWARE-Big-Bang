@@ -102,10 +102,13 @@ wait() {
 }
 
 cert() {
+  if [ -d "/etc/letsencrypt/live/\$1" ] && ${CERT_REVOKE}; then
+    sudo docker run --rm -v /etc/letsencrypt:/etc/letsencrypt \${CERTBOT} revoke -n -v --cert-path /etc/letsencrypt/live/\$1/cert.pem
+  fi
+
   if [ ! -d "/etc/letsencrypt/live/\$1" ]; then
     wait \$1
-    echo "sudo docker run --rm -v \${CERT_DIR}/\$1:/var/www/html/\$1 -v /etc/letsencrypt:/etc/letsencrypt \${CERTBOT} certonly --webroot -w /var/www/html/\$1 -d \$1"
-    sudo docker run --rm -v \${CERT_DIR}/\$1:/var/www/html/\$1 -v /etc/letsencrypt:/etc/letsencrypt \${CERTBOT} certonly --webroot -w /var/www/html/\$1 -d \$1
+    sudo docker run --rm -v \${CERT_DIR}/\$1:/var/www/html/\$1 -v /etc/letsencrypt:/etc/letsencrypt \${CERTBOT} certonly --agree-tos -m \${CERT_EMAIL} --webroot -w /var/www/html/\$1 -d \$1
   else
     echo "Skip: /etc/letsencrypt/live/\$1 direcotry already exits"
   fi
