@@ -33,32 +33,52 @@ if [ -d ./data ]; then
   exit
 fi
 
-DOMAIN_NAME=${1:?domain name missing}
+if [ $# -eq 0 ] || [ $# -ge 3 ]; then
+  echo "$0 DOMAIN_NAME [GLOBAL_IP_ADDRESS]"
+  exit 1
+fi
+
+DOMAIN_NAME=$1
 IP_ADDRESS=
 
 if [ $# -ge 2 ]; then
   IP_ADDRESS=$2
 fi
 
-################################
-KEYROCK=keyrock
-ORION=orion
-COMET=
-QUANTUMLEAP=
-WIRECLOUD=
-NGSIPROXY=
-NODE_RED=
-GRAFANA=
-################################
+if [ ! -e ./config.sh ]; then
+  echo "config.sh file not found"
+  exit 1
+fi
+
+. ./config.sh
+
+for NAME in KEYROCK ORION
+do
+  eval VAL=\"\$$NAME\"
+  if [ "$VAL" = "" ]; then
+      echo "${NAME} is empty"
+      exit 1
+  fi
+done
 
 SETUP_DIR=./setup
 ${SETUP_DIR}/prepare.sh
 
-IDM_ADMIN_EMAIL_NAME=admin
-IDM_ADMIN_PASS=$(pwgen -s 16 1)
+if [ -z "${IDM_ADMIN_EMAIL_NAME}" ]; then
+  IDM_ADMIN_EMAIL_NAME=admin
+fi
 
-CERT_EMAIL=${IDM_ADMIN_EMAIL_NAME}@${DOMAIN_NAME}
-CERT_REVOKE=false
+if [ -z "${IDM_ADMIN_PASS}" ]; then
+  IDM_ADMIN_PASS=$(pwgen -s 16 1)
+fi
+
+if [ -z "${CERT_EMAIL}" ]; then
+  CERT_EMAIL=${IDM_ADMIN_EMAIL_NAME}@${DOMAIN_NAME}
+fi
+
+if [ -z "${CERT_REVOKE}" ]; then
+  CERT_REVOKE=false
+fi
 
 DATA_DIR=./data
 CERT_DIR=$(pwd)/data/cert
@@ -109,7 +129,6 @@ do
 done
 
 echo -e -n "\n" >> .env
-
 
 ${SETUP_DIR}/setup.sh
 
