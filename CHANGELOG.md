@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.1.0-next
 
+-   Improve Nginx configuration (#13)
 -   Add NGSI Go settings (#12)
 -   Fix template for nginx (#11)
 -   Improve Configuration (#10)
