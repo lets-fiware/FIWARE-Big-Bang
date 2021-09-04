@@ -35,9 +35,18 @@ if [ -d ${DATA_DIR} ]; then
   exit 1
 fi
 
-NGSI_GO="/usr/local/bin/ngsi --batch"
+WORK_DIR=./.work
+MYSQL_DIR="${WORK_DIR}/mysql"
+
+if [ -d "${WORK_DIR}" ]; then
+  rm -fr "${WORK_DIR}"
+fi
+
+mkdir "${WORK_DIR}"
+mkdir "${MYSQL_DIR}"
+
+NGSI_GO="/usr/local/bin/ngsi --batch --config ${WORK_DIR}/ngsi-go-config.json --cache ${WORK_DIR}/ngsi-go-token-cache.json"
 IDM=keyrock-`date +%Y%m%d_%H-%M-%S`
-MYSQL_DIR=./mysql
 
 #
 # Validate domain
@@ -146,11 +155,6 @@ EOF
 # Keyrock
 #
 setup_keyrock() {
-  if [ -d ${MYSQL_DIR} ]; then
-    rm -fr ${MYSQL_DIR}
-  fi
-
-  mkdir ${MYSQL_DIR}
 
   MYSQL_ROOT_PASSWORD=$(pwgen -s 16 1)
 
@@ -211,8 +215,6 @@ EOF
 #
 down_keyrock() {
   sudo ${DOCKER_COMPOSE} -f docker-keyrock.yml down
-  
-  rm -fr ${MYSQL_DIR}
 }
 
 #
@@ -396,13 +398,45 @@ EOF
   fi
 }
 
+setup_ngsi_go() {
+  NGSI_GO="/usr/local/bin/ngsi --batch"
+  SERVERS=($(${NGSI_GO} server list --all -1))
+
+  for NAME in KEYROCK ORION COMET WIRECLOUD NGSIPROXY NODE_RED GRAFANA QUANTUMLEAP
+  do
+    eval VAL=\"\$$NAME\"
+    if [ -n "$VAL" ]; then
+      for name in "${SERVERS[@]}"
+      do
+        if [ "${VAL}" = "${name}" ]; then
+          ngsi server delete --host ${name}
+        fi
+      done
+    fi
+  done
+
+  for NAME in KEYROCK ORION COMET WIRECLOUD NGSIPROXY NODE_RED GRAFANA QUANTUMLEAP
+  do
+    eval VAL=\"\$$NAME\"
+    if [ -n "$VAL" ]; then
+      case "${NAME}" in
+          "KEYROCK" ) ${NGSI_GO} server add --host "${VAL}" --serverType keyrock --serverHost "https://${VAL}" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" ;;
+          "ORION" )  ${NGSI_GO} broker add --host "${VAL}" --ngsiType v2 --brokerHost "https://${VAL}" --idmType tokenproxy --idmHost "https://${ORION}/token" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" ;;
+          "COMET" ) ${NGSI_GO} server add --host "${VAL}" --serverType comet --serverHost "https://${VAL}" --idmType tokenproxy --idmHost "https://${ORION}/token" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" ;;
+          "WIRECLOUD" ) ${NGSI_GO} server add --host "${VAL}" --serverType wirecloud --serverHost "https://${VAL}" --idmType tokenproxy --idmHost "https://${ORION}/token" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" ;;
+          "QUANTUMLEAP" ) ${NGSI_GO} server add --host "${VAL}" --serverType quantumleap --serverHost "https://${VAL}" --idmType tokenproxy --idmHost "https://${ORION}/token" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" ;;
+      esac
+    fi
+  done
+}
+
 #
 # clean up
 #
 clean_up() {
-  ${NGSI_GO} server delete --host ${IDM}
   rm -f docker-keyrock.yml
   rm -f docker-cert.yml
+  rm -fr "${WORK_DIR}"
 }
 
 #
@@ -422,6 +456,8 @@ setup_main() {
   setup_grafana
 
   down_keyrock
+
+  setup_ngsi_go
 }
 
 setup_main

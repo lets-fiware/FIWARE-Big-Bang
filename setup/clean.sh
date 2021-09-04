@@ -14,4 +14,5 @@ do
 done
 
 rm -fr ./config
+rm -fr ./.work
 rm -f ./.env

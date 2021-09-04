@@ -1,6 +1,7 @@
 ## FIWARE Big Bang v0.1.0-next
 
--   Fix template for nginx
+-   Add NGSI Go settings (#12)
+-   Fix template for nginx (#11)
 -   Improve Configuration (#10)
 -   Integrate QuantumLeap (#9)
 -   Fix missing parameters for certbot (#8)
