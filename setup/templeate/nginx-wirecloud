@@ -10,6 +10,9 @@
       default_type "text/plain";
       root         /var/www/html/HOST;
     }
+
+    access_log /var/log/nginx/HOST-access-http.log;
+    error_log /var/log/nginx/HOST-error-http.log;
   }
 
   server {
@@ -39,5 +42,6 @@
       proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     }
 
-    access_log  /var/log/nginx/HOST.log;
+    access_log /var/log/nginx/HOST-access.log;
+    error_log /var/log/nginx/HOST-error.log;
   }

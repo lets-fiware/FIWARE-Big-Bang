@@ -1,5 +1,5 @@
   server {
-    listen 80;
+    listen 80 default_server;
     server_name HOST;
 
     location / {
@@ -10,10 +10,13 @@
       default_type "text/plain";
       root         /var/www/html/HOST;
     }
+
+    access_log /var/log/nginx/HOST-access-http.log;
+    error_log /var/log/nginx/HOST-error-http.log;
   }
 
   server {
-    listen 443 http2 ssl;
+    listen 443 http2 ssl default_server;
     server_name HOST;
 
     ssl_certificate /etc/letsencrypt/live/HOST/fullchain.pem;
@@ -31,5 +34,6 @@
       proxy_pass http://keyrock:3000;
     }
 
-    access_log  /var/log/nginx/HOST.log;
+    access_log /var/log/nginx/HOST-access.log;
+    error_log /var/log/nginx/HOST-error.log;
   }

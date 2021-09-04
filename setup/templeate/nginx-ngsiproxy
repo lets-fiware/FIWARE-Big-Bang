@@ -10,6 +10,9 @@
       default_type "text/plain";
       root         /var/www/html/HOST;
     }
+
+    access_log /var/log/nginx/HOST-access-http.log;
+    error_log /var/log/nginx/HOST-error-http.log;
   }
 
   server {
@@ -40,5 +43,6 @@
         proxy_pass http://ngsiproxy:3000/;
     }
 
-    access_log  /var/log/nginx/HOST.log;
+    access_log /var/log/nginx/HOST-access.log;
+    error_log /var/log/nginx/HOST-error.log;
   }
