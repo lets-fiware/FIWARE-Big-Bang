@@ -51,6 +51,39 @@ cd ./FIWARE-Big-Bang
 ./lets-fiware.sh letsfiware.jp
 ```
 
+## Command syntax
+
+The `lets-fiware.sh` command accepts two arguments. The first argument is a domain name. The second one is
+a global ip address. It's a optional.
+
+```
+./lets-fiware.sh DOMAIN_NAME [GLOBAL_IP_ADDRESS]
+```
+
+Examples:
+
+-   ./lets-fiware.sh letsfiware.jp
+-   ./lets-fiware.sh letsfiware.jp XX:XX:XX:XX
+
+## Configuration
+
+You can specify configurations by editing the `config.sh` file.
+
+| Variable name           | Description                                   | Default value                                   |
+| ----------------------- | --------------------------------------------- | ----------------------------------------------- |
+| KEYROCK                 | A sub-domain name of Keyrock (Required)       | keyrock                                         |
+| ORION                   | A sub-domain name of Orion (Required)         | orion                                           |
+| COMET                   | A sub-domain name of Comet                    | (empty)                                         |
+| QUANTUMLEAP             | A sub-domain name of QuantumLeap              | (empty)                                         |
+| WIRECLOUD               | A sub-domain name of WireCloud                | (empty)                                         |
+| NGSIPROXY               | A sub-domain name of Ngsiproxy                | (empty)                                         |
+| NODE\_RED               | A sub-domain name of Node-RED                 | (empty)                                         |
+| GRAFANA                 | A sub-domain name of Grafana                  | (empty)                                         |
+| IDM\_ADMIN\_EMAIL\_NAME | A name of e-mail of an admin user for Keyrock | admin                                           |
+| IDM\_ADMIN\_PASS        | A password of an admin user for Keyrock       | (automatically generated)                       |
+| CERT\_EMAIL             | A e-mail address for certbot                  | (a e-mail address of an admin user for Keyrock) |
+| CERT\_REVOKE            | Whether to revoke and reacquire the certificate: true or false | false                          |
+
 ## Copyright and License
 
 Copyright (c) 2021 Kazuhito Suda<br>

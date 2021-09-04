@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.1.0-next
 
+-   Improve Configuration
 -   Integrate QuantumLeap (#9)
 -   Fix missing parameters for certbot (#8)
 -   Fix missing pwgen command (#7)
