@@ -49,7 +49,7 @@ validate_domain() {
       IP_ADDRESS=("${IP_ADDRESS}")
   fi
 
-  for name in KEYROCK ORION COMET WIRECLOUD NGSIPROXY NODE_RED
+  for name in KEYROCK ORION COMET WIRECLOUD NGSIPROXY NODE_RED GRAFANA QUANTUMLEAP
   do
     eval val=\"\$${name}\"
     if [ -n "${val}" ]; then
@@ -116,7 +116,7 @@ cert() {
 
 EOF
 
-  for name in KEYROCK ORION COMET WIRECLOUD NGSIPROXY NODE_RED GRAFANA
+  for name in KEYROCK ORION COMET WIRECLOUD NGSIPROXY NODE_RED GRAFANA QUANTUMLEAP
   do
     eval val=\"\$${name}\"
     if [ -n "${val}" ]; then
@@ -276,6 +276,22 @@ setup_comet() {
 }
 
 #
+# QuantumLeap
+#
+setup_quantumleap() {
+  if [ -n "${QUANTUMLEAP}" ]; then
+    sed -e "s/HOST/${QUANTUMLEAP}/" ${TEMPLEATE}/nginx-quantumleap > ${NGINX_SITES}/${QUANTUMLEAP}
+
+    cat ${TEMPLEATE}/docker-quantumleap.yml >> ./docker-compose.yml
+
+    sed -i -e "/ __NGINX_DEPENDS_ON__/ i \      - quantumleap" ./docker-compose.yml
+
+    # Workaround for CrateDB. See https://crate.io/docs/crate/howtos/en/latest/deployment/containers/docker.html#troubleshooting
+    sudo sysctl -w vm.max_map_count=262144
+  fi
+}
+
+#
 # WireCLoud and ngsiproxy
 #
 setup_wirecloud() {
@@ -374,6 +390,8 @@ GF_AUTH_GENERIC_OAUTH_EMAIL_ATTRIBUTE_NAME=email
 GF_AUTH_GENERIC_OAUTH_AUTH_URL=https://${KEYROCK}/oauth2/authorize
 GF_AUTH_GENERIC_OAUTH_TOKEN_URL=https://${KEYROCK}/oauth2/token
 GF_AUTH_GENERIC_OAUTH_API_URL=https://${KEYROCK}/user
+
+GF_INSTALL_PLUGINS="https://github.com/orchestracities/grafana-map-plugin/archive/master.zip;grafana-map-plugin,grafana-clock-panel,grafana-worldmap-panel"
 EOF
   fi
 }
@@ -398,6 +416,7 @@ setup_main() {
 
   setup_orion
   setup_comet
+  setup_quantumleap
   setup_wirecloud
   setup_node_red
   setup_grafana
