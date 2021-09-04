@@ -26,6 +26,7 @@ FI-BB stands for FIWARE Big Bang.
     -   Orion
     -   Cygnus
     -   Comet
+    -   QuantumLeap
     -   WireCloud
     -   Ngsiproxy
     -   Node-RED

@@ -1,0 +1,44 @@
+  quantumleap:
+    image: orchestracities/quantumleap:0.8.1
+    depends_on:
+      - crate
+      - redis
+    environment:
+      - CRATE_HOST=crate
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - LOGLEVEL=DEBUG
+    healthcheck:
+      test: curl --fail -s http://quantumleap:8668/version || exit 1
+    restart: always
+    logging:
+      driver: syslog
+      options:
+        tag: "[quantumleap]"
+
+  redis:
+    image: redis:6
+    volumes:
+      - ./data/redis:/data
+    restart: always
+    logging:
+      driver: syslog
+      options:
+        tag: "[redis]"
+
+  crate:
+    image: crate:4.1.4
+    ports:
+      # Admin UI
+      - "127.0.0.1:4200:4200"
+    command: crate -Cauth.host_based.enabled=false  -Ccluster.name=democluster -Chttp.cors.enabled=true -Chttp.cors.allow-origin="*"
+    environment:
+      - CRATE_HEAP_SIZE=2g # see https://crate.io/docs/crate/howtos/en/latest/deployment/containers/docker.html#troubleshooting
+    volumes:
+      - ./data/crate:/data
+    restart: always
+    logging:
+      driver: syslog
+      options:
+        tag: "[crate]"
+

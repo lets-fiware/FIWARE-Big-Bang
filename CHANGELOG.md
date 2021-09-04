@@ -1,7 +1,8 @@
 ## FIWARE Big Bang v0.1.0-next
 
--   Fix missing parameters for certbot
--   Fix missing pwgen command (#5)
+-   Integrate QuantumLeap (#9)
+-   Fix missing parameters for certbot (#8)
+-   Fix missing pwgen command (#7)
 -   Add Admin role for WireCloud (#4)
 -   Update template for nginx (#3)
 -   Update default settings (#1)
