@@ -90,6 +90,21 @@ install_commands() {
   fi
 }
 
+setup_firewall() {
+  if "${FIREWALL}"; then
+    case "${DISTRO}" in
+      "Ubuntu" ) sudo apt install -y firewalld ;;
+      "CentOS" ) sudo yum -y install firewalld ;;
+      *) return ;;
+    esac
+    sudo systemctl start firewalld
+    sudo systemctl enable firewalld
+    sudo firewall-cmd --zone=public --add-service=http --permanent
+    sudo firewall-cmd --zone=public --add-service=https --permanent
+    sudo firewall-cmd --reload
+  fi
+}
+
 install_docker_ubuntu() {
   sudo cp -p /etc/apt/sources.list{,.bak}
   sudo apt-get update
@@ -166,6 +181,8 @@ check_ngsi_go() {
 check_machine
 get_distro
 install_commands
+
+setup_firewall
 
 check_docker
 check_docker_compose

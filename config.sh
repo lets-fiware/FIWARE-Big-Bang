@@ -24,8 +24,11 @@ IDM_ADMIN_EMAIL_NAME=
 # Set a password of an admin user for Keyrock. Default: automatically generated
 IDM_ADMIN_PASS=
 
+# Enable firewall. (true or false) Default: false
+FIREWALL=
+
 # Set a e-mail address for certbot. Defaul: a e-mail address of an admin user for Keyrock.
 CERT_EMAIL=
 
-# Whether to revoke and reacquire the certificate. Default: false
+# Revoke and reacquire the certificate. (true or false) Default: false
 CERT_REVOKE=

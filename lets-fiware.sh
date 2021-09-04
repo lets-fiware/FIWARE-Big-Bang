@@ -61,6 +61,12 @@ do
   fi
 done
 
+if [ -z "${FIREWALL}" ]; then
+  FIREWALL=false
+fi
+
+export FIREWALL
+
 SETUP_DIR=./setup
 ${SETUP_DIR}/prepare.sh
 
@@ -109,6 +115,8 @@ IP_ADDRESS=${IP_ADDRESS}
 
 DOCKER_COMPOSE=${DOCKER_COMPOSE}
 CERTBOT=${CERTBOT}
+
+FIREWALL=${FIREWALL}
 
 CERT_EMAIL=${CERT_EMAIL}
 CERT_REVOKE=${CERT_REVOKE}
