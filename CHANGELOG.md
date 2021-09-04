@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.1.0-next
 
+-   Add firewall settings (#15)
 -   Fix installing Docker on Ubuntu (#14)
 -   Improve Nginx configuration (#13)
 -   Add NGSI Go settings (#12)
