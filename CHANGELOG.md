@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.1.0-next
 
+-   Fix owner, group and mode bits of log files on CentOS (#17)
 -   Add syslog settings (#16)
 -   Add firewall settings (#15)
 -   Fix installing Docker on Ubuntu (#14)

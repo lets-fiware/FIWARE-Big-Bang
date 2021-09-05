@@ -182,7 +182,12 @@ setup_logging() {
       for file in "${files[@]}"
       do
         sudo touch "${file}"
-        sudo chown syslog:adm "${file}"
+        if [ "${DISTRO}" = "Ubuntu" ]; then
+          sudo chown syslog:adm "${file}"
+        else
+          sudo chown root:root "${file}"
+          sudo chmod 0644 "${file}"
+        fi
       done
       if [ "${DISTRO}" = "Ubuntu" ]; then
         sudo cp "${RSYSLOG_CONF}" /etc/rsyslog.d/10-fiware.conf
