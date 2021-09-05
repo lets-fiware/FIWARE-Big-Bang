@@ -50,6 +50,9 @@ get_distro() {
     echo "Unknown distro" 
     exit 1
   fi
+
+  echo "DISTRO=${DISTRO}" >> .env
+  echo -e -n "\n" >> .env
 }
 
 check_machine() {

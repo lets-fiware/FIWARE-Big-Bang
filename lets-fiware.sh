@@ -86,6 +86,10 @@ if [ -z "${CERT_REVOKE}" ]; then
   CERT_REVOKE=false
 fi
 
+if [ -z "${LOGGING}" ]; then
+  LOGGING=true
+fi
+
 DATA_DIR=./data
 CERT_DIR=$(pwd)/data/cert
 CONFIG_DIR=./config
@@ -102,7 +106,7 @@ if [ "${WIRECLOUD}" != "" -a "${NGSIPROXY}" = "" ]; then
   exit 1
 fi
 
-cat <<EOF > .env
+cat <<EOF >> .env
 DATA_DIR=${DATA_DIR}
 CERT_DIR=${CERT_DIR}
 CONFIG_DIR=${CONFIG_DIR}
@@ -117,6 +121,7 @@ DOCKER_COMPOSE=${DOCKER_COMPOSE}
 CERTBOT=${CERTBOT}
 
 FIREWALL=${FIREWALL}
+LOGGING=${LOGGING}
 
 CERT_EMAIL=${CERT_EMAIL}
 CERT_REVOKE=${CERT_REVOKE}
