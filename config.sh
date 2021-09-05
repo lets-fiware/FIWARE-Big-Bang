@@ -11,12 +11,12 @@ ORION=orion
 #
 
 # Set a sub-domain name of the FIWARE GE you want to set.
-COMET=comet
-QUANTUMLEAP=quantumleap
-WIRECLOUD=wirecloud
-NGSIPROXY=ngsiproxy
-NODE_RED=node-red
-GRAFANA=grafana
+COMET=
+QUANTUMLEAP=
+WIRECLOUD=
+NGSIPROXY=
+NODE_RED=
+GRAFANA=
 
 # Set a name of e-mail of an admin user for Keyrock. Default: admin
 IDM_ADMIN_EMAIL_NAME=
