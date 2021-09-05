@@ -37,6 +37,7 @@ fi
 
 WORK_DIR=./.work
 MYSQL_DIR="${WORK_DIR}/mysql"
+LOG_DIR=/var/log/fiware
 
 if [ -d "${WORK_DIR}" ]; then
   rm -fr "${WORK_DIR}"
@@ -44,6 +45,9 @@ fi
 
 mkdir "${WORK_DIR}"
 mkdir "${MYSQL_DIR}"
+
+RSYSLOG_CONF=${WORK_DIR}/rsyslog.conf
+LOGROTATE_CONF=${WORK_DIR}/logrotate.conf
 
 NGSI_GO="/usr/local/bin/ngsi --batch --config ${WORK_DIR}/ngsi-go-config.json --cache ${WORK_DIR}/ngsi-go-token-cache.json"
 IDM=keyrock-`date +%Y%m%d_%H-%M-%S`
@@ -149,6 +153,64 @@ EOF
   sudo ${DOCKER_COMPOSE} -f docker-cert.yml down
 
   rm -f ${CERT_SH}
+}
+
+#
+# Add fiware.conf
+#
+add_rsyslog_conf() {
+  cat <<EOF >> ${RSYSLOG_CONF}
+:syslogtag,startswith,"[$1]" /var/log/fiware/$1.log
+& stop
+
+EOF
+
+  echo "${LOG_DIR}/$1.log" >> "${LOGROTATE_CONF}"
+}
+
+#
+# setup_logging
+#
+setup_logging() {
+  if "${LOGGING}"; then
+      if [ -d "${LOG_DIR}" ]; then
+          sudo rm -fr "${LOG_DIR}"
+      fi
+      sudo mkdir "${LOG_DIR}"
+      sudo chown syslog:adm "${LOG_DIR}"
+      files=($(cat "${LOGROTATE_CONF}" | sed -z -e "s/\n/ /g"))
+      for file in "${files[@]}"
+      do
+        sudo touch "${file}"
+        sudo chown syslog:adm "${file}"
+      done
+      if [ "${DISTRO}" = "Ubuntu" ]; then
+        sudo cp "${RSYSLOG_CONF}" /etc/rsyslog.d/10-fiware.conf
+        ROTATE_CMD="/usr/lib/rsyslog/rsyslog-rotate"
+      else
+        sudo cp "${RSYSLOG_CONF}" /etc/rsyslog.d/fiware.conf
+        ROTATE_CMD="/bin/kill -HUP \`cat /var/run/syslogd.pid 2> /dev/null\` 2> /dev/null || true"
+      fi
+      sudo systemctl restart rsyslog.service
+
+      cat <<EOF >> "${LOGROTATE_CONF}"
+{
+        rotate 4
+        weekly
+        dateext
+        missingok
+        notifempty
+        compress
+        delaycompress
+        sharedscripts
+        postrotate
+                ${ROTATE_CMD}
+        endscript
+}
+EOF
+      sudo cp "${LOGROTATE_CONF}" /etc/logrotate.d/fiware
+  fi
+
 }
 
 #
@@ -261,6 +323,14 @@ EOF
 
   mkdir -p ${CONFIG_DIR}/tokenproxy
   cp ${TEMPLEATE}/Dockerfile.tokenproxy ${CONFIG_DIR}/tokenproxy/Dockerfile
+
+  add_rsyslog_conf "nginx"
+  add_rsyslog_conf "orion"
+  add_rsyslog_conf "mongo"
+  add_rsyslog_conf "keyrock"
+  add_rsyslog_conf "mysql"
+  add_rsyslog_conf "pep-proxy"
+  add_rsyslog_conf "tokenproxy"
 }
 
 #
@@ -274,6 +344,9 @@ setup_comet() {
 
     sed -i -e "/ __NGINX_DEPENDS_ON__/ i \      - comet" ./docker-compose.yml
     sed -i -e "/ __NGINX_DEPENDS_ON__/ i \      - cygnus" ./docker-compose.yml
+
+    add_rsyslog_conf "cygnus"
+    add_rsyslog_conf "comet"
   fi
 }
 
@@ -290,6 +363,10 @@ setup_quantumleap() {
 
     # Workaround for CrateDB. See https://crate.io/docs/crate/howtos/en/latest/deployment/containers/docker.html#troubleshooting
     sudo sysctl -w vm.max_map_count=262144
+
+    add_rsyslog_conf "quantumleap"
+    add_rsyslog_conf "redis"
+    add_rsyslog_conf "crate"
   fi
 }
 
@@ -312,6 +389,12 @@ setup_wirecloud() {
 
 POSTGRES_PASSWORD=$(pwgen -s 16 1)
 EOF
+
+    add_rsyslog_conf "wirecloud"
+    add_rsyslog_conf "postgres"
+    add_rsyslog_conf "elasticsearch"
+    add_rsyslog_conf "memcached"
+    add_rsyslog_conf "ngsiproxy"
   fi
 }
 
@@ -347,6 +430,8 @@ NODE_RED_CLIENT_ID=${NODE_RED_CLIENT_ID}
 NODE_RED_CLIENT_SECRET=${NODE_RED_CLIENT_SECRET}
 NODE_RED_CALLBACK_URL=${NODE_RED_CALLBACK_URL}
 EOF
+
+    add_rsyslog_conf "node-red"
   fi
 }
 
@@ -395,6 +480,8 @@ GF_AUTH_GENERIC_OAUTH_API_URL=https://${KEYROCK}/user
 
 GF_INSTALL_PLUGINS="https://github.com/orchestracities/grafana-map-plugin/archive/master.zip;grafana-map-plugin,grafana-clock-panel,grafana-worldmap-panel"
 EOF
+
+    add_rsyslog_conf "grafana"
   fi
 }
 
@@ -458,6 +545,7 @@ setup_main() {
   down_keyrock
 
   setup_ngsi_go
+  setup_logging
 }
 
 setup_main
