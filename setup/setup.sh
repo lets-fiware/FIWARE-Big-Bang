@@ -177,7 +177,9 @@ setup_logging() {
           sudo rm -fr "${LOG_DIR}"
       fi
       sudo mkdir "${LOG_DIR}"
-      sudo chown syslog:adm "${LOG_DIR}"
+      if [ "${DISTRO}" = "Ubuntu" ]; then
+        sudo chown syslog:adm "${LOG_DIR}"
+      fi 
       files=($(cat "${LOGROTATE_CONF}" | sed -z -e "s/\n/ /g"))
       for file in "${files[@]}"
       do
