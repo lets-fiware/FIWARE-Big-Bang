@@ -20,7 +20,7 @@ FI-BB stands for FIWARE Big Bang.
 -   Supported Linux distribution:
     -   Ubuntu 18.04, 20.04
     -   CentOS 7, 8
--   Supported FIWARE GEs and other OSS:
+-   Supported FIWARE GEs:
     -   Keyrock
     -   Wilma
     -   Orion
