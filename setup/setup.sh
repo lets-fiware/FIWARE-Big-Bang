@@ -43,8 +43,15 @@ if [ -d "${WORK_DIR}" ]; then
   rm -fr "${WORK_DIR}"
 fi
 
+mkdir "${DATA_DIR}"
 mkdir "${WORK_DIR}"
 mkdir "${MYSQL_DIR}"
+
+mkdir -p ${CONFIG_DIR}/nginx
+mkdir -p ${NGINX_SITES}
+
+rm -fr ${CERTBOT_DIR}
+mkdir -p ${CERTBOT_DIR}
 
 RSYSLOG_CONF=${WORK_DIR}/rsyslog.conf
 LOGROTATE_CONF=${WORK_DIR}/logrotate.conf
@@ -53,6 +60,25 @@ NGSI_GO="/usr/local/bin/ngsi --batch --config ${WORK_DIR}/ngsi-go-config.json --
 IDM=keyrock-`date +%Y%m%d_%H-%M-%S`
 
 #
+# Add /etc/hosts
+#
+add_etc_hosts() {
+  for name in KEYROCK ORION COMET WIRECLOUD NGSIPROXY NODE_RED GRAFANA QUANTUMLEAP
+  do
+    eval val=\"\$${name}\"
+    if [ -n "${val}" ]; then
+      result=0
+      output=$(grep ${val} /etc/hosts 2> /dev/null) || result=$?
+      if [ ! "$result" = "0" ]; then
+        sudo bash -c "echo $1 ${val} >> /etc/hosts"
+        echo "Add '$1 ${val}' to /etc/hosts"
+      fi
+    fi
+  done
+}
+
+#
+#
 # Validate domain
 #
 validate_domain() {
@@ -60,6 +86,11 @@ validate_domain() {
       IP_ADDRESS=($(hostname -I))
   else
       IP_ADDRESS=("${IP_ADDRESS}")
+  fi
+
+  if "$FIBB_TEST"; then
+    add_etc_hosts "${IP_ADDRESS[0]}"
+    return
   fi
 
   for name in KEYROCK ORION COMET WIRECLOUD NGSIPROXY NODE_RED GRAFANA QUANTUMLEAP
@@ -83,14 +114,52 @@ validate_domain() {
 }
 
 #
+# create test_cert
+#
+create_test_cert() {
+  openssl genrsa 2048 > $2/server.key
+  openssl req -new -key $2/server.key << EOF > $2/server.csr
+JP
+Tokyo
+Smart city
+Let's FIWARE
+FI-BB
+$1
+fiware@example.com
+fiware
+ 
+EOF
+  openssl x509 -days 3650 -req -signkey $2/server.key < $2/server.csr > $2/server.crt
+  openssl rsa -in $2/server.key -out $2/server.key << EOF
+fiware
+EOF
+}
+
+
+#
+# setup test cert
+#
+setup_test_cert() {
+  mkdir -p ${CERT_DIR}/live
+  for name in KEYROCK ORION COMET WIRECLOUD NGSIPROXY NODE_RED GRAFANA QUANTUMLEAP
+  do
+    eval val=\"\$${name}\"
+    if [ -n "${val}" ]; then
+      mkdir ${CERT_DIR}/live/${val}
+      create_test_cert "${val}.${DOMAIN_NAME}" "${CERT_DIR}/live/${val}"
+    fi 
+  done
+  cp ${TEMPLEATE}/nginx.conf ${CONFIG_DIR}/nginx/
+}
+
+#
 # setup cert
 #
 setup_cert() {
-  rm -fr ${NGINX_SITES}
-  mkdir -p ${NGINX_SITES}
-
-  rm -fr ${CERT_DIR}
-  mkdir -p ${CERT_DIR}
+  if "$FIBB_TEST"; then
+    setup_test_cert
+    return
+  fi
 
   CERT_SH=./cert.sh
   touch ${CERT_SH}
@@ -115,15 +184,15 @@ wait() {
 }
 
 cert() {
-  if [ -d "/etc/letsencrypt/live/\$1" ] && ${CERT_REVOKE}; then
-    sudo docker run --rm -v /etc/letsencrypt:/etc/letsencrypt \${CERTBOT} revoke -n -v --cert-path /etc/letsencrypt/live/\$1/cert.pem
+  if [ -d "${CERT_DIR}/live/\$1" ] && ${CERT_REVOKE}; then
+    sudo docker run --rm -v ${CERT_DIR}:/etc/letsencrypt \${CERTBOT} revoke -n -v --cert-path ${CERT_DIR}/live/\$1/cert.pem
   fi
 
-  if [ ! -d "/etc/letsencrypt/live/\$1" ]; then
+  if [ ! -d "${CERT_DIR}/live/\$1" ]; then
     wait \$1
-    sudo docker run --rm -v \${CERT_DIR}/\$1:/var/www/html/\$1 -v /etc/letsencrypt:/etc/letsencrypt \${CERTBOT} certonly --agree-tos -m \${CERT_EMAIL} --webroot -w /var/www/html/\$1 -d \$1
+    sudo docker run --rm -v \${CERTBOT_DIR}/\$1:/var/www/html/\$1 -v ${CERT_DIR}:/etc/letsencrypt \${CERTBOT} certonly --agree-tos -m \${CERT_EMAIL} --webroot -w /var/www/html/\$1 -d \$1
   else
-    echo "Skip: /etc/letsencrypt/live/\$1 direcotry already exits"
+    echo "Skip: ${CERT_DIR}/live/\$1 direcotry already exits"
   fi
 }
 
@@ -133,8 +202,8 @@ EOF
   do
     eval val=\"\$${name}\"
     if [ -n "${val}" ]; then
-      if [ ! -d ${CERT_DIR}/${val} ]; then
-        mkdir ${CERT_DIR}/${val}
+      if [ ! -d ${CERTBOT_DIR}/${val} ]; then
+        mkdir ${CERTBOT_DIR}/${val}
       fi
       echo "cert ${val}" >> ${CERT_SH}
       sed -e "s/HOST/${val}/" ${TEMPLEATE}/nginx-cert > ${NGINX_SITES}/${val}
@@ -142,8 +211,6 @@ EOF
   done
 
   cp ${TEMPLEATE}/setup-cert.yml ./docker-cert.yml
-
-  mkdir -p ${CONFIG_DIR}/nginx
   cp ${TEMPLEATE}/nginx.conf ${CONFIG_DIR}/nginx/
 
   sudo ${DOCKER_COMPOSE} -f docker-cert.yml up -d

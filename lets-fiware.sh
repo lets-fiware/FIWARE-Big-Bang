@@ -65,10 +65,22 @@ if [ -z "${FIREWALL}" ]; then
   FIREWALL=false
 fi
 
+if ! [ "${FIBB_TEST:+false}" ]; then
+  FIBB_TEST=false
+  export FIBB_TEST
+fi
+
 export FIREWALL
 
 SETUP_DIR=./setup
 ${SETUP_DIR}/prepare.sh
+
+DATA_DIR=./data
+CERTBOT_DIR=$(pwd)/data/cert
+CONFIG_DIR=./config
+
+DOCKER_COMPOSE=/usr/local/bin/docker-compose
+CERTBOT=certbot/certbot:v1.18.0
 
 if [ -z "${IDM_ADMIN_EMAIL_NAME}" ]; then
   IDM_ADMIN_EMAIL_NAME=admin
@@ -86,16 +98,15 @@ if [ -z "${CERT_REVOKE}" ]; then
   CERT_REVOKE=false
 fi
 
+if "${FIBB_TEST}"; then
+  CERT_DIR=${CONFIG_DIR}/cert
+else
+  CERT_DIR=/etc/letsencrypt 
+fi
+
 if [ -z "${LOGGING}" ]; then
   LOGGING=true
 fi
-
-DATA_DIR=./data
-CERT_DIR=$(pwd)/data/cert
-CONFIG_DIR=./config
-
-DOCKER_COMPOSE=/usr/local/bin/docker-compose
-CERTBOT=certbot/certbot:v1.18.0
 
 if [ "${WIRECLOUD}" = "" ]; then
   NGSIPROXY=""
@@ -108,7 +119,7 @@ fi
 
 cat <<EOF >> .env
 DATA_DIR=${DATA_DIR}
-CERT_DIR=${CERT_DIR}
+CERTBOT_DIR=${CERTBOT_DIR}
 CONFIG_DIR=${CONFIG_DIR}
 NGINX_SITES=${CONFIG_DIR}/nginx/sites-enable
 SETUP_DIR=${SETUP_DIR}
@@ -118,6 +129,7 @@ DOMAIN_NAME=${DOMAIN_NAME}
 IP_ADDRESS=${IP_ADDRESS}
 
 DOCKER_COMPOSE=${DOCKER_COMPOSE}
+CERT_DIR=${CERT_DIR}
 CERTBOT=${CERTBOT}
 
 FIREWALL=${FIREWALL}
