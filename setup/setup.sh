@@ -419,7 +419,7 @@ setup_node_red() {
     NODE_RED_CALLBACK_URL=https://${NODE_RED}/auth/strategy/callback
   
     # Create application for Node-RED
-    NODE_RED_CLIENT_ID=$(${NGSI_GO} applications --host ${IDM} create --name "node-RED" --description "nore-RED application" --url "${NODE_RED_URL}" --redirectUri "${NODE_RED_CALLBACK_URL}")
+    NODE_RED_CLIENT_ID=$(${NGSI_GO} applications --host ${IDM} create --name "Node-RED" --description "Node-RED application" --url "${NODE_RED_URL}" --redirectUri "${NODE_RED_CALLBACK_URL}")
     NODE_RED_CLIENT_SECRET=$(${NGSI_GO} applications --host ${IDM} get --aid ${NODE_RED_CLIENT_ID} | jq -r .application.secret )
 
     mkdir ${DATA_DIR}/node-red
