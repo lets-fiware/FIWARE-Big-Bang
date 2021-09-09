@@ -25,7 +25,7 @@ services:
         tag: "[nginx]"
 
   orion:
-    image: fiware/orion:3.1.0
+    image: telefonicaiot/fiware-orion
     depends_on:
       - mongo
     entrypoint: ["sh", "-c", "rm /tmp/contextBroker.pid; /usr/bin/contextBroker -fg -multiservice -dbhost mongo"]
