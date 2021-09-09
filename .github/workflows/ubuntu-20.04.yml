@@ -1,0 +1,21 @@
+name: Ubuntu 20.04
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  setup-test:
+    name: setup test
+
+    runs-on: ubuntu-20.04
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Run setup test
+      run: make setup-test

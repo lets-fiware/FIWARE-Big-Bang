@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.1.0-next
 
+-   Add setup test to GitHub Actions (#21)
 -   Update Orion version to 3.2.0 (#20)
 -   Fix owner of log directory on CentOS (#19)
 -   Update config.sh (#18)

@@ -16,3 +16,5 @@ log:
 	ls -l /var/log/fiware
 logrotation:
 	sudo logrotate -dv /etc/logrotate.d/fiware
+setup-test:
+	./test/script/setup_test.sh
