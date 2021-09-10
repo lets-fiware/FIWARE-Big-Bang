@@ -30,8 +30,17 @@ FIREWALL=
 # Enable log file creation in /var/log/fiware. (true of false) Default: true
 LOGGING=
 
+#
+# Certbot options
+#
 # Set a e-mail address for certbot. Defaul: a e-mail address of an admin user for Keyrock.
 CERT_EMAIL=
 
 # Revoke and reacquire the certificate. (true or false) Default: false
 CERT_REVOKE=
+
+# Use --test-cert option. (true or false) Default: false
+CERT_TEST=
+
+# Use --force-renewal option. (true or false) Default: false
+CERT_FORCE_RENEWAL=
