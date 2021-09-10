@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.1.0-next
 
+-   Add bind-utils for CentOS (#23)
 -   Add GitHub Actions Badge (#22)
 -   Add setup test to GitHub Actions (#21)
 -   Update Orion version to 3.2.0 (#20)
