@@ -161,6 +161,10 @@ setup_cert() {
     return
   fi
 
+  if [ -n "${CERT_TEST}" ]; then
+    CERT_TEST=--test-cert
+  fi
+
   CERT_SH=./cert.sh
   touch ${CERT_SH}
   chmod +x ${CERT_SH}
@@ -171,7 +175,7 @@ setup_cert() {
 . ./.env
 
 if [ \${EUID:-\${UID}} != 0 ]; then
-  echo 'run as root.'
+  echo "This script must be run as root"
   exit 1
 fi
 
@@ -185,16 +189,23 @@ wait() {
 
 cert() {
   if [ -d "${CERT_DIR}/live/\$1" ] && ${CERT_REVOKE}; then
-    sudo docker run --rm -v ${CERT_DIR}:/etc/letsencrypt \${CERTBOT} revoke -n -v --cert-path ${CERT_DIR}/live/\$1/cert.pem
+    sudo docker run --rm -v ${CERT_DIR}:/etc/letsencrypt \${CERTBOT} revoke -n -v ${CERT_TEST} --cert-path ${CERT_DIR}/live/\$1/cert.pem
   fi
 
   if [ ! -d "${CERT_DIR}/live/\$1" ]; then
     wait \$1
-    sudo docker run --rm -v \${CERTBOT_DIR}/\$1:/var/www/html/\$1 -v ${CERT_DIR}:/etc/letsencrypt \${CERTBOT} certonly --agree-tos -m \${CERT_EMAIL} --webroot -w /var/www/html/\$1 -d \$1
+    sudo docker run --rm -v \${CERTBOT_DIR}/\$1:/var/www/html/\$1 -v ${CERT_DIR}:/etc/letsencrypt \${CERTBOT} certonly ${CERT_TEST} --non-interactive --agree-tos -m \${CERT_EMAIL} --webroot -w /var/www/html/\$1 -d \$1
   else
     echo "Skip: ${CERT_DIR}/live/\$1 direcotry already exits"
   fi
 }
+
+RND=\$(od -An -tu1 -N1 /dev/urandom)
+HOUR=\$(( \$RND % 5 ))
+RND=\$(od -An -tu1 -N1 /dev/urandom)
+MINUTE=\$(( \$RND % 60 ))
+
+echo "\${MINUTE} \${HOUR} * * * root \${PWD}/config/script/renew.sh > /dev/null 2>&1" > /etc/cron.d/fiware-big-bang
 
 EOF
 
@@ -247,6 +258,15 @@ setup_logging() {
       if [ "${DISTRO}" = "Ubuntu" ]; then
         sudo chown syslog:adm "${LOG_DIR}"
       fi 
+
+      # FI-BB log
+      echo "${LOG_DIR}/fi-bb.log" >> "${LOGROTATE_CONF}"
+      cat <<EOF >> ${RSYSLOG_CONF}
+:syslogtag,contains,"FI-BB" /var/log/fiware/fi-bb.log
+& stop
+
+EOF
+
       files=($(cat "${LOGROTATE_CONF}" | sed -z -e "s/\n/ /g"))
       for file in "${files[@]}"
       do
@@ -592,6 +612,15 @@ setup_ngsi_go() {
 }
 
 #
+# copy scripts
+#
+copy_scripts() {
+  mkdir "${CONFIG_DIR}/script"
+  cp "${SETUP_DIR}/script/"* "${CONFIG_DIR}/script/"
+  chmod o+x "${CONFIG_DIR}/script/"*
+}
+
+#
 # clean up
 #
 clean_up() {
@@ -620,6 +649,7 @@ setup_main() {
 
   setup_ngsi_go
   setup_logging
+  copy_scripts
 }
 
 setup_main

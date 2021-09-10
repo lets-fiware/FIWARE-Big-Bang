@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.1.0-next
 
+-   Improve cert process (#24)
 -   Add bind-utils for CentOS (#23)
 -   Add GitHub Actions Badge (#22)
 -   Add setup test to GitHub Actions (#21)

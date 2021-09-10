@@ -88,7 +88,9 @@ You can specify configurations by editing the `config.sh` file.
 | FIREWALL                | Enable firewall. true or false                             | false                                            |
 | LOGGING                 | Enable log file creation in /var/log/fiware. true of false | true                                             |
 | CERT\_EMAIL             | An e-mail address for certbot                              | (an e-mail address of an admin user for Keyrock) |
-| CERT\_REVOKE            | Revoke and reacquire the certificate: true or false        | false                                            |
+| CERT\_REVOKE            | Revoke and reacquire the certificate. true or false        | false                                            |
+| CERT\_TEST              | Use --test-cert option. true or false                      | false                                            |
+| CERT\_FORCE\_RENEWAL    | Use --force-renewal option. true or false                  | false                                            |
 
 ## Copyright and License
 
