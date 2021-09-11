@@ -398,6 +398,8 @@ setup_orion() {
     ${NGSI_GO} applications --host ${IDM} users --aid ${AID} assign --rid ${RID} --uid admin > /dev/null
   fi
 
+  ORION_CLIENT_ID=${AID}
+
   # Create PEP Proxy for FIWARE Orion
   PEP_PASSWORD=$(${NGSI_GO} applications --host ${IDM} pep --aid ${AID} create --run | jq -r .pep_proxy.password)
   PEP_ID=$(${NGSI_GO} applications --host ${IDM} pep --aid ${AID} list | jq -r .pep_proxy.id)
@@ -498,27 +500,45 @@ EOF
 # Node-RED
 #
 setup_node_red() {
-  if [ -n "${NODE_RED}" ]; then
-    cat ${TEMPLEATE}/docker-node-red.yml >> ./docker-compose.yml
-    sed -i -e "/ __NGINX_DEPENDS_ON__/ i \      - node-red" ./docker-compose.yml
+  if [ -z "${NODE_RED}" ]; then
+    return
+  fi
 
-    sed -e "s/HOST/${NODE_RED}/" ${TEMPLEATE}/nginx-node-red > ${NGINX_SITES}/${NODE_RED}
+  cat ${TEMPLEATE}/docker-node-red.yml >> ./docker-compose.yml
+  sed -i -e "/ __NGINX_DEPENDS_ON__/ i \      - node-red" ./docker-compose.yml
+
+  sed -e "s/HOST/${NODE_RED}/" ${TEMPLEATE}/nginx-node-red > ${NGINX_SITES}/${NODE_RED}
   
-    NODE_RED_URL=https://${NODE_RED}/
-    NODE_RED_CALLBACK_URL=https://${NODE_RED}/auth/strategy/callback
+  NODE_RED_URL=https://${NODE_RED}/
+  NODE_RED_CALLBACK_URL=https://${NODE_RED}/auth/strategy/callback
   
-    # Create application for Node-RED
-    NODE_RED_CLIENT_ID=$(${NGSI_GO} applications --host ${IDM} create --name "Node-RED" --description "Node-RED application" --url "${NODE_RED_URL}" --redirectUri "${NODE_RED_CALLBACK_URL}")
-    NODE_RED_CLIENT_SECRET=$(${NGSI_GO} applications --host ${IDM} get --aid ${NODE_RED_CLIENT_ID} | jq -r .application.secret )
+  # Create application for Node-RED
+  NODE_RED_CLIENT_ID=$(${NGSI_GO} applications --host ${IDM} create --name "Node-RED" --description "Node-RED application" --url "${NODE_RED_URL}" --redirectUri "${NODE_RED_CALLBACK_URL}")
+  NODE_RED_CLIENT_SECRET=$(${NGSI_GO} applications --host ${IDM} get --aid ${NODE_RED_CLIENT_ID} | jq -r .application.secret )
 
-    mkdir ${DATA_DIR}/node-red
-    sudo chown 1000:1000 ${DATA_DIR}/node-red
+  # Create roles and add them to Admin
+  RID=$(${NGSI_GO} applications --host ${IDM} roles --aid ${NODE_RED_CLIENT_ID} create --name "/node-red/full")
+  ${NGSI_GO} applications --host ${IDM} users --aid ${NODE_RED_CLIENT_ID} assign --rid ${RID} --uid admin > /dev/null
+  RID=$(${NGSI_GO} applications --host ${IDM} roles --aid ${NODE_RED_CLIENT_ID} create --name "/node-red/read")
+  ${NGSI_GO} applications --host ${IDM} users --aid ${NODE_RED_CLIENT_ID} assign --rid ${RID} --uid admin > /dev/null
+  RID=$(${NGSI_GO} applications --host ${IDM} roles --aid ${NODE_RED_CLIENT_ID} create --name "/node-red/api")
+  ${NGSI_GO} applications --host ${IDM} users --aid ${NODE_RED_CLIENT_ID} assign --rid ${RID} --uid admin > /dev/null
 
-    mkdir ${CONFIG_DIR}/node-red
-    cp ${TEMPLEATE}/Dockerfile.node-red ${CONFIG_DIR}/node-red/Dockerfile
-    cp ${TEMPLEATE}/settings.js.node-red ${CONFIG_DIR}/node-red/settings.js
+  # Add Orion (or Wirecloud) application as a trusted application to Node-RED application
+  ${NGSI_GO} applications --host ${IDM} trusted --aid ${NODE_RED_CLIENT_ID} add --tid ${ORION_CLIENT_ID}  > /dev/null
+  RID=$(${NGSI_GO} applications --host ${IDM} roles --aid ${ORION_CLIENT_ID} create --name "/node-red/api")
+  ${NGSI_GO} applications --host ${IDM} users --aid ${ORION_CLIENT_ID} assign --rid ${RID} --uid admin > /dev/null
 
-    cat <<EOF >> .env
+  mkdir ${DATA_DIR}/node-red
+  sudo chown 1000:1000 ${DATA_DIR}/node-red
+
+  mkdir ${CONFIG_DIR}/node-red
+  cp ${TEMPLEATE}/Dockerfile.node-red ${CONFIG_DIR}/node-red/Dockerfile
+  cp ${TEMPLEATE}/settings.js.node-red ${CONFIG_DIR}/node-red/settings.js
+
+  add_rsyslog_conf "node-red"
+
+  cat <<EOF >> .env
 
 # Node-RED
 
@@ -526,9 +546,6 @@ NODE_RED_CLIENT_ID=${NODE_RED_CLIENT_ID}
 NODE_RED_CLIENT_SECRET=${NODE_RED_CLIENT_SECRET}
 NODE_RED_CALLBACK_URL=${NODE_RED_CALLBACK_URL}
 EOF
-
-    add_rsyslog_conf "node-red"
-  fi
 }
 
 #
