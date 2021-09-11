@@ -11,7 +11,7 @@ services:
       - ./config/nginx/sites-enable:/etc/nginx/sites-enable
       - ${CERTBOT_DIR}:/var/www/html
       - ${CERT_DIR}:/etc/letsencrypt
-      - ./data/log/nginx:/var/log/nginx
+      - ${NGINX_LOG_DIR}:/var/log/nginx
     logging:
       driver: syslog
       options:

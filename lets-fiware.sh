@@ -28,6 +28,17 @@
 
 set -ue
 
+setup_log_directory() {
+  if [ -d "${LOG_DIR}" ]; then
+    sudo rm -fr "${LOG_DIR}"
+  fi
+  sudo mkdir "${LOG_DIR}"
+  sudo mkdir "${NGINX_LOG_DIR}"
+  if [ "${DISTRO}" = "Ubuntu" ]; then
+    sudo chown syslog:adm "${LOG_DIR}"
+  fi
+}
+
 if [ -d ./data ]; then
   sudo /usr/local/bin/docker-compose up -d --build
   exit
@@ -75,12 +86,18 @@ export FIREWALL
 SETUP_DIR=./setup
 ${SETUP_DIR}/prepare.sh
 
+. ./.env
+
 DATA_DIR=./data
 CERTBOT_DIR=$(pwd)/data/cert
 CONFIG_DIR=./config
 
 DOCKER_COMPOSE=/usr/local/bin/docker-compose
 CERTBOT=certbot/certbot:v1.18.0
+
+LOG_DIR=/var/log/fiware
+NGINX_LOG_DIR=${LOG_DIR}/nginx
+setup_log_directory
 
 if [ -z "${IDM_ADMIN_EMAIL_NAME}" ]; then
   IDM_ADMIN_EMAIL_NAME=admin
@@ -124,6 +141,9 @@ CONFIG_DIR=${CONFIG_DIR}
 NGINX_SITES=${CONFIG_DIR}/nginx/sites-enable
 SETUP_DIR=${SETUP_DIR}
 TEMPLEATE=${SETUP_DIR}/templeate
+
+LOG_DIR=${LOG_DIR}
+NGINX_LOG_DIR=${NGINX_LOG_DIR}
 
 DOMAIN_NAME=${DOMAIN_NAME}
 IP_ADDRESS=${IP_ADDRESS}

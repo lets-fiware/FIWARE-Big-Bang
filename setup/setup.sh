@@ -38,7 +38,6 @@ fi
 
 WORK_DIR=./.work
 MYSQL_DIR="${WORK_DIR}/mysql"
-LOG_DIR=/var/log/fiware
 
 if [ -d "${WORK_DIR}" ]; then
   rm -fr "${WORK_DIR}"
@@ -169,7 +168,11 @@ setup_cert() {
   fi
 
   if [ -n "${CERT_TEST}" ]; then
-    CERT_TEST=--test-cert
+    if "${CERT_TEST}"; then
+      CERT_TEST=--test-cert
+    else
+      CERT_TEST=
+    fi
   fi
 
   CERT_SH=./cert.sh
@@ -258,14 +261,6 @@ EOF
 #
 setup_logging() {
   if "${LOGGING}"; then
-      if [ -d "${LOG_DIR}" ]; then
-          sudo rm -fr "${LOG_DIR}"
-      fi
-      sudo mkdir "${LOG_DIR}"
-      if [ "${DISTRO}" = "Ubuntu" ]; then
-        sudo chown syslog:adm "${LOG_DIR}"
-      fi 
-
       # FI-BB log
       echo "${LOG_DIR}/fi-bb.log" >> "${LOGROTATE_CONF}"
       cat <<EOF >> ${RSYSLOG_CONF}
