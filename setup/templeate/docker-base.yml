@@ -19,6 +19,7 @@ services:
       - ${CERT_DIR}:/etc/letsencrypt
       - ${NGINX_LOG_DIR}:/var/log/nginx
       # __NGINX_VOLUMES__
+    restart: always
     logging:
       driver: syslog
       options:
@@ -57,7 +58,7 @@ services:
       - IDM_DB_NAME=${IDM_DB_NAME}
       - IDM_DB_USER=${IDM_DB_USER}
       - IDM_DB_PASS=${IDM_DB_PASS}
-      - IDM_ADMIN_ID=${IDM_ADMIN_ID}
+      - IDM_ADMIN_UID=${IDM_ADMIN_UID}
       - IDM_ADMIN_USER=${IDM_ADMIN_USER}
       - IDM_ADMIN_EMAIL=${IDM_ADMIN_EMAIL}
       - IDM_ADMIN_PASS=${IDM_ADMIN_PASS}

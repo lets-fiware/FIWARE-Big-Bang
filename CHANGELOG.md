@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.1.0-next
 
+-   Improve admin user definition (#28)
 -   Add role-based access control to Node-RED (#27)
 -   Replace nginx log directory with /var/log/fiware/nginx (#26)
 -   Fix server certificate files for setup test (#25)
