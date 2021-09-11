@@ -18,8 +18,11 @@ NGSIPROXY=
 NODE_RED=
 GRAFANA=
 
-# Set a name of e-mail of an admin user for Keyrock. Default: admin
-IDM_ADMIN_EMAIL_NAME=
+# Set a name of an admin user for Keyrock. Default: admin
+IDM_ADMIN_USER=
+
+# Set an e-mail address of an admin user for Keyrock. Default: IDM_ADMIN_NAME @ DOMAIN_NAME
+IDM_ADMIN_EMAIL=
 
 # Set a password of an admin user for Keyrock. Default: automatically generated
 IDM_ADMIN_PASS=

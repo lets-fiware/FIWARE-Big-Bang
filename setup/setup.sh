@@ -324,8 +324,6 @@ setup_keyrock() {
   IDM_DB_USER=idm
   IDM_DB_PASS=$(pwgen -s 16 1)
 
-  IDM_ADMIN_USER=admin
-
   cat <<EOF >> .env
 IDM_HOST=${IDM_HOST}
 CB_HOST=${CB_HOST}
@@ -341,7 +339,7 @@ IDM_DB_PASS=${IDM_DB_PASS}
 
 # Keyrock
 
-IDM_ADMIN_ID=admin
+IDM_ADMIN_UID=${IDM_ADMIN_UID}
 IDM_ADMIN_USER=${IDM_ADMIN_USER}
 IDM_ADMIN_EMAIL=${IDM_ADMIN_EMAIL}
 IDM_ADMIN_PASS=${IDM_ADMIN_PASS}
@@ -395,7 +393,7 @@ setup_orion() {
     AID=$(${NGSI_GO} applications --host ${IDM} create --name "WireCloud" --description "WireCloud application" --url "https://${WIRECLOUD}/" --redirectUri "https://${WIRECLOUD}/complete/fiware/")
     SECRET=$(${NGSI_GO} applications --host ${IDM} get --aid ${AID} | jq -r .application.secret )
     RID=$(${NGSI_GO} applications --host ${IDM} roles --aid ${AID} create --name Admin)
-    ${NGSI_GO} applications --host ${IDM} users --aid ${AID} assign --rid ${RID} --uid admin > /dev/null
+    ${NGSI_GO} applications --host ${IDM} users --aid ${AID} assign --rid ${RID} --uid ${IDM_ADMIN_UID} > /dev/null
   fi
 
   ORION_CLIENT_ID=${AID}
@@ -518,16 +516,16 @@ setup_node_red() {
 
   # Create roles and add them to Admin
   RID=$(${NGSI_GO} applications --host ${IDM} roles --aid ${NODE_RED_CLIENT_ID} create --name "/node-red/full")
-  ${NGSI_GO} applications --host ${IDM} users --aid ${NODE_RED_CLIENT_ID} assign --rid ${RID} --uid admin > /dev/null
+  ${NGSI_GO} applications --host ${IDM} users --aid ${NODE_RED_CLIENT_ID} assign --rid ${RID} --uid ${IDM_ADMIN_UID} > /dev/null
   RID=$(${NGSI_GO} applications --host ${IDM} roles --aid ${NODE_RED_CLIENT_ID} create --name "/node-red/read")
-  ${NGSI_GO} applications --host ${IDM} users --aid ${NODE_RED_CLIENT_ID} assign --rid ${RID} --uid admin > /dev/null
+  ${NGSI_GO} applications --host ${IDM} users --aid ${NODE_RED_CLIENT_ID} assign --rid ${RID} --uid ${IDM_ADMIN_UID} > /dev/null
   RID=$(${NGSI_GO} applications --host ${IDM} roles --aid ${NODE_RED_CLIENT_ID} create --name "/node-red/api")
-  ${NGSI_GO} applications --host ${IDM} users --aid ${NODE_RED_CLIENT_ID} assign --rid ${RID} --uid admin > /dev/null
+  ${NGSI_GO} applications --host ${IDM} users --aid ${NODE_RED_CLIENT_ID} assign --rid ${RID} --uid ${IDM_ADMIN_UID} > /dev/null
 
   # Add Orion (or Wirecloud) application as a trusted application to Node-RED application
   ${NGSI_GO} applications --host ${IDM} trusted --aid ${NODE_RED_CLIENT_ID} add --tid ${ORION_CLIENT_ID}  > /dev/null
   RID=$(${NGSI_GO} applications --host ${IDM} roles --aid ${ORION_CLIENT_ID} create --name "/node-red/api")
-  ${NGSI_GO} applications --host ${IDM} users --aid ${ORION_CLIENT_ID} assign --rid ${RID} --uid admin > /dev/null
+  ${NGSI_GO} applications --host ${IDM} users --aid ${ORION_CLIENT_ID} assign --rid ${RID} --uid ${IDM_ADMIN_UID} > /dev/null
 
   mkdir ${DATA_DIR}/node-red
   sudo chown 1000:1000 ${DATA_DIR}/node-red

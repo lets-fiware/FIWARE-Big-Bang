@@ -87,6 +87,7 @@ SETUP_DIR=./setup
 ${SETUP_DIR}/prepare.sh
 
 . ./.env
+. ./setup/constant.sh
 
 DATA_DIR=./data
 CERTBOT_DIR=$(pwd)/data/cert
@@ -99,8 +100,12 @@ LOG_DIR=/var/log/fiware
 NGINX_LOG_DIR=${LOG_DIR}/nginx
 setup_log_directory
 
-if [ -z "${IDM_ADMIN_EMAIL_NAME}" ]; then
-  IDM_ADMIN_EMAIL_NAME=admin
+if [ -z "${IDM_ADMIN_USER}" ]; then
+  IDM_ADMIN_USER=admin
+fi
+
+if [ -z "${IDM_ADMIN_EMAIL}" ]; then
+  IDM_ADMIN_EMAIL=${IDM_ADMIN_USER}@${DOMAIN_NAME}
 fi
 
 if [ -z "${IDM_ADMIN_PASS}" ]; then
@@ -108,7 +113,7 @@ if [ -z "${IDM_ADMIN_PASS}" ]; then
 fi
 
 if [ -z "${CERT_EMAIL}" ]; then
-  CERT_EMAIL=${IDM_ADMIN_EMAIL_NAME}@${DOMAIN_NAME}
+  CERT_EMAIL=${IDM_ADMIN_EMAIL}
 fi
 
 if [ -z "${CERT_REVOKE}" ]; then
@@ -160,7 +165,9 @@ CERT_REVOKE=${CERT_REVOKE}
 CERT_TEST=${CERT_TEST}
 CERT_FORCE_RENEWAL=${CERT_FORCE_RENEWAL}
 
-IDM_ADMIN_EMAIL=${IDM_ADMIN_EMAIL_NAME}@${DOMAIN_NAME}
+IDM_ADMIN_UID=${IDM_ADMIN_UID}
+IDM_ADMIN_USER=${IDM_ADMIN_USER}
+IDM_ADMIN_EMAIL=${IDM_ADMIN_EMAIL}
 IDM_ADMIN_PASS=${IDM_ADMIN_PASS}
 
 EOF
