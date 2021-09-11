@@ -23,12 +23,20 @@ fi
 
 . ./.env
 
-if [ -n "${CERT_TEST}" ] && "${CERT_TEST}"; then
-  CERT_TEST=--test-cert
+if [ -n "${CERT_TEST}" ]; then
+  if "${CERT_TEST}"; then
+    CERT_TEST=--test-cert
+  else
+    CERT_TEST=
+  fi
 fi
 
-if [ -n "${CERT_FORCE_RENEWAL}" ] && "${CERT_FORCE_RENEWAL}"; then
-  CERT_FORCE_RENEWAL=--force-renewal
+if [ -n "${CERT_FORCE_RENEWAL}" ]; then
+  if "${CERT_FORCE_RENEWAL}"; then
+    CERT_FORCE_RENEWAL=--force-renewal
+  else
+    CERT_FORCE_RENEWAL=
+  fi
 fi
 
 result=$(sudo docker run --rm -v ${CERTBOT_DIR}:/var/www/html -v ${CERT_DIR}:/etc/letsencrypt certbot/certbot:v1.18.0 renew --webroot -w /var/www/html ${CERT_TEST} --post-hook='echo FI-BB' $CERT_FORCE_RENEWAL)

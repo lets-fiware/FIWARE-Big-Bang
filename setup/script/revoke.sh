@@ -23,8 +23,12 @@ fi
 
 . ./.env
 
-if [ -n "${CERT_TEST}" ] && "${CERT_TEST}"; then
-  CERT_TEST=--test-cert
+if [ -n "${CERT_TEST}" ]; then
+  if "${CERT_TEST}"; then
+    CERT_TEST=--test-cert
+  else
+    CERT_TEST=
+  fi
 fi
 
 /usr/local/bin/docker-compose down

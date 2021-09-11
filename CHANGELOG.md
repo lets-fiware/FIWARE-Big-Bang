@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.1.0-next
 
+-   Replace nginx log directory with /var/log/fiware/nginx (#26)
 -   Fix server certificate files for setup test (#25)
 -   Improve cert process (#24)
 -   Add bind-utils for CentOS (#23)
