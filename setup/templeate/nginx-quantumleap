@@ -19,8 +19,8 @@
     listen 443 http2 ssl;
     server_name HOST;
 
-    ssl_certificate /etc/letsencrypt/live/HOST/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/HOST/privkey.pem;
+    ssl_certificate /etc/letsencrypt/live/HOST/SSL_CERTIFICATE;
+    ssl_certificate_key /etc/letsencrypt/live/HOST/SSL_CERTIFICATE_KEY;
 
     proxy_set_header        Accept-Encoding   "";
     proxy_set_header        Host            $host;

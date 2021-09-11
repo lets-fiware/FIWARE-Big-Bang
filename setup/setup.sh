@@ -29,6 +29,7 @@
 set -ue
 
 . ./.env
+. ./setup/constant.sh
 
 if [ -d ${DATA_DIR} ]; then
   echo "${DATA_DIR} - directory already exists"
@@ -141,6 +142,12 @@ EOF
 #
 setup_test_cert() {
   mkdir -p ${CERT_DIR}/live
+
+  if "$FIBB_TEST"; then
+    SSL_CERTIFICATE=server.crt
+    SSL_CERTIFICATE_KEY=server.key
+  fi
+
   for name in KEYROCK ORION COMET WIRECLOUD NGSIPROXY NODE_RED GRAFANA QUANTUMLEAP
   do
     eval val=\"\$${name}\"
@@ -612,6 +619,20 @@ setup_ngsi_go() {
 }
 
 #
+# update nginx file
+#
+update_nginx_file() {
+  for name in KEYROCK ORION COMET WIRECLOUD NGSIPROXY NODE_RED GRAFANA QUANTUMLEAP
+  do
+    eval val=\"\$${name}\"
+    if [ -n "${val}" ]; then
+      sed -i -e "s/SSL_CERTIFICATE_KEY/${SSL_CERTIFICATE_KEY}/" ${NGINX_SITES}/${val}
+      sed -i -e "s/SSL_CERTIFICATE/${SSL_CERTIFICATE}/" ${NGINX_SITES}/${val}
+    fi
+  done
+}
+
+#
 # copy scripts
 #
 copy_scripts() {
@@ -647,6 +668,7 @@ setup_main() {
 
   down_keyrock
 
+  update_nginx_file
   setup_ngsi_go
   setup_logging
   copy_scripts
