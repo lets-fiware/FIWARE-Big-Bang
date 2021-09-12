@@ -1,0 +1,19 @@
+name: Config
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  lint-docs:
+    name: Lint config.sh
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v2
+
+      - name: Run lint config
+        run: test/script/lint-config.sh

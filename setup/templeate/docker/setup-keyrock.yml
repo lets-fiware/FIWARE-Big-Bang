@@ -1,7 +1,5 @@
 version: "3"
-
 services:
-
   keyrock:
     image: fiware/idm:8.0.0
     depends_on:

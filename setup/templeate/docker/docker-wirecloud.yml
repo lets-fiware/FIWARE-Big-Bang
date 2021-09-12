@@ -1,3 +1,5 @@
+version: "3" 
+services:
   wirecloud:
     image: fiware/wirecloud:1.3.1
     depends_on:
@@ -35,7 +37,6 @@
       options:
         tag: "[postgres]"
 
-
   elasticsearch:
     image: elasticsearch:2.4
     volumes:
@@ -46,7 +47,6 @@
       driver: syslog
       options:
         tag: "[elasticsearch]"
-
 
   memcached:
     image: memcached:1

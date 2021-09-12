@@ -1,5 +1,3 @@
-#!/bin/sh
-
 # MIT License
 #
 # Copyright (c) 2021 Kazuhito Suda
@@ -26,16 +24,14 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-set -ue
+FROM node:14
 
-cd $(dirname $0)
-cd ../..
+WORKDIR /
+COPY package.json .
+COPY package-lock.json .
+RUN npm ci && \
+    ln -s /node_modules/remark-cli/cli.js /usr/local/bin/remark
 
-echo "*** lint config.sh ***"
-./test/script/lint-config.sh
+WORKDIR /work
 
-echo "*** lint dockerfile ***"
-./test/script/lint-dockerfile.sh
-
-echo "*** lint documentation ***"
-./test/script/lint-docs.sh
+ENTRYPOINT ["/usr/local/bin/remark"]

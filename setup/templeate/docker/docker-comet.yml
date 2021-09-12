@@ -1,3 +1,5 @@
+version: "3"
+services:
   cygnus:
     image: fiware/cygnus-ngsi:2.10.0
     depends_on:

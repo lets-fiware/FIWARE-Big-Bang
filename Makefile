@@ -16,8 +16,6 @@ log-dir:
 	ls -l /var/log/fiware
 logrotation:
 	sudo logrotate -dv /etc/logrotate.d/fiware
-setup-test:
-	./test/script/setup_test.sh
 cert-renew:
 	sudo ./config/script/renew.sh
 cert-revoke:
@@ -26,3 +24,5 @@ cert-list:
 	sudo ls -l /etc/letsencrypt/live/
 log:
 	cat /var/log/fiware/fi-bb.log
+setup-test:
+	./test/script/setup_test.sh

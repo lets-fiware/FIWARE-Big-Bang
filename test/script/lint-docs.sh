@@ -31,11 +31,14 @@ set -ue
 cd $(dirname $0)
 cd ../..
 
-echo "*** lint config.sh ***"
-./test/script/lint-config.sh
+# md lint
+cd ./test/tools/mdlint
+make build
+cd -
+make -f ./test/tools/mdlint/Makefile run
 
-echo "*** lint dockerfile ***"
-./test/script/lint-dockerfile.sh
-
-echo "*** lint documentation ***"
-./test/script/lint-docs.sh
+# textfile lint
+cd ./test/tools/textlint
+make build
+cd -
+make -f ./test/tools/textlint/Makefile run
