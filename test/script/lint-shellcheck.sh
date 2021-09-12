@@ -31,6 +31,4 @@ set -ue
 cd "$(dirname "$0")"
 cd ../..
 
-docker pull hadolint/hadolint
-docker run --rm -i hadolint/hadolint < ./setup/templeate/docker/Dockerfile.node-red
-docker run --rm -i hadolint/hadolint < ./setup/templeate/docker/Dockerfile.tokenproxy
+find . -name "*.sh" -exec shellcheck -e SC1091,SC2034 \{\} \;

@@ -26,7 +26,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-set -ue
+set -Ceuo pipefail
 
 setup_log_directory() {
   if [ -d "${LOG_DIR}" ]; then
@@ -87,6 +87,7 @@ SETUP_DIR=./setup
 ${SETUP_DIR}/prepare.sh
 
 . ./.env
+
 . ./setup/constant.sh
 
 DATA_DIR=./data
@@ -101,7 +102,7 @@ NGINX_LOG_DIR=${LOG_DIR}/nginx
 setup_log_directory
 
 if [ -z "${IDM_ADMIN_USER}" ]; then
-  IDM_ADMIN_USER=admin
+  IDM_ADMIN_USER="admin"
 fi
 
 if [ -z "${IDM_ADMIN_EMAIL}" ]; then
@@ -134,7 +135,7 @@ if [ "${WIRECLOUD}" = "" ]; then
   NGSIPROXY=""
 fi
 
-if [ "${WIRECLOUD}" != "" -a "${NGSIPROXY}" = "" ]; then
+if [ "${WIRECLOUD}" != "" ] && [ "${NGSIPROXY}" = "" ]; then
   echo "error: NGSIPROXY is empty"
   exit 1
 fi
@@ -176,7 +177,7 @@ for NAME in KEYROCK ORION COMET WIRECLOUD NGSIPROXY NODE_RED GRAFANA QUANTUMLEAP
 do
   eval VAL=\"\$$NAME\"
   if [ -n "$VAL" ]; then
-      eval echo ${NAME}=\"\$${NAME}.${DOMAIN_NAME}\" >> .env
+      eval echo ${NAME}=\"\$${NAME}."${DOMAIN_NAME}"\" >> .env
   else
       echo ${NAME}= >> .env
   fi 

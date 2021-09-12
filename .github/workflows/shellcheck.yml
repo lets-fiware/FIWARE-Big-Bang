@@ -1,0 +1,24 @@
+name: Shellcheck
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  e2e-test:
+    name: e2e test
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Install shellcheck
+      run: sudo apt install -y shellcheck
+
+    - name: Run shellcheck
+      run: ./test/script/lint-shellcheck.sh

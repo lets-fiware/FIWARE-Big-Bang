@@ -26,57 +26,83 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-set -ue
+set -Ceuo pipefail
 
 DISTRO=
 
+logging_info() {
+  echo "prepare.sh: $1"
+  /usr/bin/logger -i -p "user.info" -t "FI-BB" "prepare.sh: $1"
+}
+
+logging_err() {
+  echo "prepare.sh: $1"
+  /usr/bin/logger -i -p "user.err" -t "FI-BB" "prepare.sh: $1"
+}
+
 get_distro() {
+  logging_info "${FUNCNAME[0]}"
+
   if [ -e /etc/debian_version ] || [ -e /etc/debian_release ]; then
     if [ -e /etc/lsb-release ]; then
       ver="$(sed -n -e "/DISTRIB_RELEASE=/s/DISTRIB_RELEASE=\(.*\)/\1/p" /etc/lsb-release | awk -F. '{printf "%2d%02d", $1,$2}')"
       if [ "${ver}" -ge 1804 ]; then
         DISTRO="Ubuntu"
       else
-        echo "Error: Ubuntu ${ver} not supported"
+        MSG="Error: Ubuntu ${ver} not supported"
+        logging_err "${FUNCNAME[0]} ${MSG}"
         exit 1
       fi
     else
-      echo "Error: not Ubuntu"
+      MSG="Error: not Ubuntu"
+      logging_err "${FUNCNAME[0]} ${MSG}"
       exit 1
     fi
   elif [ -e /etc/redhat-release ]; then
     DISTRO="CentOS"
   else
-    echo "Unknown distro" 
+    MSG="Unknown distro"
+    logging_err "${FUNCNAME[0]} ${MSG}"
     exit 1
   fi
 
   echo "DISTRO=${DISTRO}" >> .env
   echo -e -n "\n" >> .env
+  logging_info "${FUNCNAME[0]} ${DISTRO}"
 }
 
 check_machine() {
+  logging_info "${FUNCNAME[0]}"
+
   machine=$(uname -m)
   if [ "${machine}" = "x86_64" ]; then
+    logging_info "${FUNCNAME[0]} ${machine}"
     return
   fi
 
-  echo "Error: ${machine} not supported"
+  MSG="Error: ${machine} not supported"
+  logging_err "${FUNCNAME[0]} ${MSG}"
   exit 1
 
 }
 
 install_commands_ubuntu() {
+  logging_info "${FUNCNAME[0]}"
+
   sudo apt-get update
   sudo apt-get install -y curl pwgen jq
 }
 
 install_commands_centos() {
+  logging_info "${FUNCNAME[0]}"
+
   sudo yum install -y epel-release
   sudo yum install -y curl pwgen jq bind-utils
 }
 
 install_commands() {
+  logging_info "${FUNCNAME[0]}"
+
   update=false
   for cmd in curl pwgen jq
   do
@@ -94,6 +120,8 @@ install_commands() {
 }
 
 setup_firewall() {
+  logging_info "${FUNCNAME[0]}"
+
   if "${FIREWALL}"; then
     case "${DISTRO}" in
       "Ubuntu" ) sudo apt install -y firewalld ;;
@@ -109,6 +137,8 @@ setup_firewall() {
 }
 
 install_docker_ubuntu() {
+  logging_info "${FUNCNAME[0]}"
+
   sudo cp -p /etc/apt/sources.list{,.bak}
   sudo apt-get update
   sudo apt-get install -y \
@@ -123,21 +153,25 @@ install_docker_ubuntu() {
      $(lsb_release -cs) \
      stable"
   sudo apt-get install -y docker-ce
- sudo systemctl start docker
- sudo systemctl enable docker
+  sudo systemctl start docker
+  sudo systemctl enable docker
 }
 
 install_docker_centos() {
- sudo yum install -y yum-utils
- sudo yum-config-manager \
+  logging_info "${FUNCNAME[0]}"
+
+  sudo yum install -y yum-utils
+  sudo yum-config-manager \
     --add-repo \
     https://download.docker.com/linux/centos/docker-ce.repo
- sudo yum install -y docker-ce docker-ce-cli containerd.io
- sudo systemctl start docker
- sudo systemctl enable docker
+  sudo yum install -y docker-ce docker-ce-cli containerd.io
+  sudo systemctl start docker
+  sudo systemctl enable docker
 }
 
 check_docker() {
+  logging_info "${FUNCNAME[0]}"
+
   if ! type docker >/dev/null 2>&1; then
     case "${DISTRO}" in
        "Ubuntu" ) install_docker_ubuntu ;;
@@ -148,17 +182,22 @@ check_docker() {
 
   ver=$(sudo docker version -f "{{.Server.Version}}" | awk -F. '{printf "%2d%02d%02d", $1,$2,$3}')
   if [ "${ver}" -ge 201006 ]; then
+      logging_info "${FUNCNAME[0]} ver ${ver}"
       return
   fi
 
-  echo "Docker engine requires equal or higher version than 20.10.6"
+  MSG="Docker engine requires equal or higher version than 20.10.6"
+  logging_err "${FUNCNAME[0]} ${MSG}"
   exit 1
 }
 
 check_docker_compose() {
+  logging_info "${FUNCNAME[0]}"
+
   if [ -e /usr/local/bin/docker-compose ]; then
     ver=$(sudo /usr/local/bin/docker-compose version --short | awk -F. '{printf "%2d%02d%02d", $1,$2,$3}')
     if [ "${ver}" -ge 11700 ]; then
+      logging_info "${FUNCNAME[0]} ver ${ver}"
       return
     fi
   fi
@@ -169,9 +208,12 @@ check_docker_compose() {
 }
 
 check_ngsi_go() {
+  logging_info "${FUNCNAME[0]}"
+
   if [ -e /usr/local/bin/ngsi ]; then
     ver=$(/usr/local/bin/ngsi --version | sed -e "s/ngsi version \([^ ]*\) .*/\1/" | awk -F. '{printf "%2d%02d%02d", $1,$2,$3}')
     if [ "${ver}" -ge 900 ]; then
+        logging_info "${FUNCNAME[0]} ver ${ver}"
         return
     fi
   fi
