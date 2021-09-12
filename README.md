@@ -3,9 +3,14 @@
 
 ![FIWARE: Tools](https://nexus.lab.fiware.org/repository/raw/public/badges/chapters/deployment-tools.svg)
 [![License: MIT](https://img.shields.io/github/license/lets-fiware/FIWARE-Big-Bang.svg)](https://opensource.org/licenses/MIT)
+[![Support badge](https://img.shields.io/badge/tag-fiware-orange.svg?logo=stackoverflow)](https://stackoverflow.com/questions/tagged/fiware+fi-bb)
 <br/>
 [![Ubuntu 18.04](https://github.com/lets-fiware/FIWARE-Big-Bang/actions/workflows/ubuntu-18.04.yml/badge.svg)](https://github.com/lets-fiware/FIWARE-Big-Bang/actions/workflows/ubuntu-18.04.yml)
 [![Ubuntu 20.04](https://github.com/lets-fiware/FIWARE-Big-Bang/actions/workflows/ubuntu-20.04.yml/badge.svg)](https://github.com/lets-fiware/FIWARE-Big-Bang/actions/workflows/ubuntu-20.04.yml)
+<br/>
+[![Config](https://github.com/lets-fiware/FIWARE-Big-Bang/actions/workflows/config-lint.yml/badge.svg)](https://github.com/lets-fiware/FIWARE-Big-Bang/actions/workflows/config-lint.yml)
+[![Dockerfile](https://github.com/lets-fiware/FIWARE-Big-Bang/actions/workflows/dockerfile.yml/badge.svg)](https://github.com/lets-fiware/FIWARE-Big-Bang/actions/workflows/dockerfile.yml)
+[![Docs](https://github.com/lets-fiware/FIWARE-Big-Bang/actions/workflows/docs.yml/badge.svg)](https://github.com/lets-fiware/FIWARE-Big-Bang/actions/workflows/docs.yml)
 <br/>
 
 The FIWARE Big Bang is a turnkey solution for setting up a FIWARE instance in the cloud.
