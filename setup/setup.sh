@@ -59,6 +59,8 @@ LOGROTATE_CONF=${WORK_DIR}/logrotate.conf
 NGSI_GO="/usr/local/bin/ngsi --batch --config ${WORK_DIR}/ngsi-go-config.json --cache ${WORK_DIR}/ngsi-go-token-cache.json"
 IDM=keyrock-`date +%Y%m%d_%H-%M-%S`
 
+DOCKER_COMPOSE_YML=./docker-compose.yml
+
 #
 # Add /etc/hosts
 #
@@ -231,7 +233,7 @@ EOF
     fi 
   done
 
-  cp ${TEMPLEATE}/setup-cert.yml ./docker-cert.yml
+  cp ${TEMPLEATE}/docker/setup-cert.yml ./docker-cert.yml
   cp ${TEMPLEATE}/nginx.conf ${CONFIG_DIR}/nginx/
 
   sudo ${DOCKER_COMPOSE} -f docker-cert.yml up -d
@@ -354,7 +356,7 @@ GRANT ALL PRIVILEGES ON ${IDM_DB_NAME}.* TO '${IDM_DB_USER}'@'%';
 flush PRIVILEGES;
 EOF
 
-  cp -a ${TEMPLEATE}/setup-keyrock.yml ./docker-keyrock.yml
+  cp -a ${TEMPLEATE}/docker/setup-keyrock.yml ./docker-keyrock.yml
 
   sudo ${DOCKER_COMPOSE} -f docker-keyrock.yml up -d
 
@@ -374,10 +376,17 @@ down_keyrock() {
 }
 
 #
+# Add docker-compose.yml
+#
+add_docker_compose_yml() {
+  cat ${TEMPLEATE}/docker/$1 | sed -e '/^version:/,/services:/d' >> ${DOCKER_COMPOSE_YML}
+}
+
+#
 # Orion, Wilma and Tokenproxy
 #
 setup_orion() {
-  cp ${TEMPLEATE}/docker-base.yml ./docker-compose.yml
+  cp ${TEMPLEATE}/docker/docker-base.yml ${DOCKER_COMPOSE_YML}
 
   rm -fr ${NGINX_SITES}
   mkdir -p ${NGINX_SITES}
@@ -418,7 +427,7 @@ EOF
   cp ${TEMPLEATE}/mongo-init.js ${CONFIG_DIR}/mongo/
 
   mkdir -p ${CONFIG_DIR}/tokenproxy
-  cp ${TEMPLEATE}/Dockerfile.tokenproxy ${CONFIG_DIR}/tokenproxy/Dockerfile
+  cp ${TEMPLEATE}/docker/Dockerfile.tokenproxy ${CONFIG_DIR}/tokenproxy/Dockerfile
 
   add_rsyslog_conf "nginx"
   add_rsyslog_conf "orion"
@@ -436,10 +445,10 @@ setup_comet() {
   if [ -n "${COMET}" ]; then
     sed -e "s/HOST/${COMET}/" ${TEMPLEATE}/nginx-comet > ${NGINX_SITES}/${COMET}
 
-    cat ${TEMPLEATE}/docker-comet.yml >> ./docker-compose.yml
+    add_docker_compose_yml "docker-comet.yml"
 
-    sed -i -e "/ __NGINX_DEPENDS_ON__/ i \      - comet" ./docker-compose.yml
-    sed -i -e "/ __NGINX_DEPENDS_ON__/ i \      - cygnus" ./docker-compose.yml
+    sed -i -e "/ __NGINX_DEPENDS_ON__/ i \      - comet" ${DOCKER_COMPOSE_YML}
+    sed -i -e "/ __NGINX_DEPENDS_ON__/ i \      - cygnus" ${DOCKER_COMPOSE_YML}
 
     add_rsyslog_conf "cygnus"
     add_rsyslog_conf "comet"
@@ -453,9 +462,9 @@ setup_quantumleap() {
   if [ -n "${QUANTUMLEAP}" ]; then
     sed -e "s/HOST/${QUANTUMLEAP}/" ${TEMPLEATE}/nginx-quantumleap > ${NGINX_SITES}/${QUANTUMLEAP}
 
-    cat ${TEMPLEATE}/docker-quantumleap.yml >> ./docker-compose.yml
+    add_docker_compose_yml "docker-quantumleap.yml"
 
-    sed -i -e "/ __NGINX_DEPENDS_ON__/ i \      - quantumleap" ./docker-compose.yml
+    sed -i -e "/ __NGINX_DEPENDS_ON__/ i \      - quantumleap" ${DOCKER_COMPOSE_YML}
 
     # Workaround for CrateDB. See https://crate.io/docs/crate/howtos/en/latest/deployment/containers/docker.html#troubleshooting
     sudo sysctl -w vm.max_map_count=262144
@@ -471,10 +480,11 @@ setup_quantumleap() {
 #
 setup_wirecloud() {
   if [ -n "${WIRECLOUD}" ]; then
-    cat ${TEMPLEATE}/docker-wirecloud.yml >> ./docker-compose.yml
-    sed -i -e "/ __NGINX_DEPENDS_ON__/ i \      - wirecloud" ./docker-compose.yml
-    sed -i -e "/ __NGINX_DEPENDS_ON__/ i \      - ngsiproxy" ./docker-compose.yml
-    sed -i -e "/ __NGINX_VOLUMES__/ i \      - ./data/wirecloud/wirecloud-static:/var/www/static:ro" ./docker-compose.yml
+    add_docker_compose_yml "docker-wirecloud.yml"
+
+    sed -i -e "/ __NGINX_DEPENDS_ON__/ i \      - wirecloud" ${DOCKER_COMPOSE_YML}
+    sed -i -e "/ __NGINX_DEPENDS_ON__/ i \      - ngsiproxy" ${DOCKER_COMPOSE_YML}
+    sed -i -e "/ __NGINX_VOLUMES__/ i \      - ./data/wirecloud/wirecloud-static:/var/www/static:ro" ${DOCKER_COMPOSE_YML}
 
     sed -e "s/HOST/${WIRECLOUD}/" ${TEMPLEATE}/nginx-wirecloud > ${NGINX_SITES}/${WIRECLOUD}
     sed -e "s/HOST/${NGSIPROXY}/" ${TEMPLEATE}/nginx-ngsiproxy > ${NGINX_SITES}/${NGSIPROXY}
@@ -502,8 +512,9 @@ setup_node_red() {
     return
   fi
 
-  cat ${TEMPLEATE}/docker-node-red.yml >> ./docker-compose.yml
-  sed -i -e "/ __NGINX_DEPENDS_ON__/ i \      - node-red" ./docker-compose.yml
+  add_docker_compose_yml "docker-node-red.yml"
+
+  sed -i -e "/ __NGINX_DEPENDS_ON__/ i \      - node-red" ${DOCKER_COMPOSE_YML}
 
   sed -e "s/HOST/${NODE_RED}/" ${TEMPLEATE}/nginx-node-red > ${NGINX_SITES}/${NODE_RED}
   
@@ -531,7 +542,7 @@ setup_node_red() {
   sudo chown 1000:1000 ${DATA_DIR}/node-red
 
   mkdir ${CONFIG_DIR}/node-red
-  cp ${TEMPLEATE}/Dockerfile.node-red ${CONFIG_DIR}/node-red/Dockerfile
+  cp ${TEMPLEATE}/docker/Dockerfile.node-red ${CONFIG_DIR}/node-red/Dockerfile
   cp ${TEMPLEATE}/settings.js.node-red ${CONFIG_DIR}/node-red/settings.js
 
   add_rsyslog_conf "node-red"
@@ -551,8 +562,9 @@ EOF
 #
 setup_grafana() {
   if [ -n "${GRAFANA}" ]; then
-    cat ${TEMPLEATE}/docker-grafana.yml>> ./docker-compose.yml
-    sed -i -e "/ __NGINX_DEPENDS_ON__/ i \      - grafana" ./docker-compose.yml
+    add_docker_compose_yml "/docker-grafana.yml"
+
+    sed -i -e "/ __NGINX_DEPENDS_ON__/ i \      - grafana" ${DOCKER_COMPOSE_YML}
 
     sed -e "s/HOST/${GRAFANA}/" ${TEMPLEATE}/nginx-grafana > ${NGINX_SITES}/${GRAFANA}
 
@@ -652,6 +664,13 @@ copy_scripts() {
 }
 
 #
+# Setup end
+#
+setup_end() {
+  sed -i -e "/# __NGINX_/d" ${DOCKER_COMPOSE_YML}
+}
+
+#
 # clean up
 #
 clean_up() {
@@ -682,6 +701,8 @@ setup_main() {
   setup_ngsi_go
   setup_logging
   copy_scripts
+
+  setup_end
 }
 
 setup_main

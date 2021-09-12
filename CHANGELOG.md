@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.1.0-next
 
+-   Improve linting process (#30)
 -   Add FIWARE Big Bang logo mark (#29)
 -   Improve admin user definition (#28)
 -   Add role-based access control to Node-RED (#27)

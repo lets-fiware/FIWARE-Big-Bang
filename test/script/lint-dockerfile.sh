@@ -31,11 +31,6 @@ set -ue
 cd $(dirname $0)
 cd ../..
 
-echo "*** lint config.sh ***"
-./test/script/lint-config.sh
-
-echo "*** lint dockerfile ***"
-./test/script/lint-dockerfile.sh
-
-echo "*** lint documentation ***"
-./test/script/lint-docs.sh
+docker pull hadolint/hadolint
+docker run --rm -i hadolint/hadolint < ./setup/templeate/docker/Dockerfile.node-red
+docker run --rm -i hadolint/hadolint < ./setup/templeate/docker/Dockerfile.tokenproxy

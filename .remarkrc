@@ -1,0 +1,9 @@
+{
+  "settings": {
+    "bullet": "-",
+    "paddedTable": true
+  },
+  "plugins": [
+    "remark-preset-lint-recommended"
+  ]
+}

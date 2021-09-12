@@ -27,15 +27,26 @@
 # SOFTWARE.
 
 set -ue
-
 cd $(dirname $0)
 cd ../..
 
-echo "*** lint config.sh ***"
-./test/script/lint-config.sh
+. ./config.sh
 
-echo "*** lint dockerfile ***"
-./test/script/lint-dockerfile.sh
+if [ "${ORION}" != "orion" ]; then
+  echo "Error ORION value in config.sh"
+  exit 1
+fi
 
-echo "*** lint documentation ***"
-./test/script/lint-docs.sh
+if [ "${KEYROCK}" != "keyrock" ]; then
+  echo "Error ORION value in config.sh"
+  exit 1
+fi
+
+for NAME in COMET QUANTUMLEAP WIRECLOUD NGSIPROXY NODE_RED GRAFANA IDM_ADMIN_USER IDM_ADMIN_EMAIL IDM_ADMIN_PASS FIREWALL LOGGING CERT_EMAIL CERT_REVOKE CERT_TEST CERT_FORCE_RENEWAL
+do
+  eval VAL=\"\$$NAME\"
+  if [ -n "$VAL" ]; then
+    echo "${NAME} not empty: ${VAL}"
+    exit 1
+  fi
+done

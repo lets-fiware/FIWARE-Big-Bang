@@ -35,7 +35,7 @@ If you don't see your idea listed, and you think it fits into the goals of this 
 ## Community
 
 Discussions about the Open Source Guides take place on this repository's
-[Issues](https://github.com/lets-fiware/FIWARE-Big-Bang/issues) and [Pull Requests](https://github.com/lets-fiware/ngsi-go/pulls)
+[Issues](https://github.com/lets-fiware/FIWARE-Big-Bang/issues) and [Pull Requests](https://github.com/lets-fiware/FIWARE-Big-Bang/pulls)
 sections. Anybody is welcome to join these conversations.
 
 Wherever possible, do not take these conversations to private channels, including contacting the maintainers directly.

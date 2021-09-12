@@ -1,3 +1,5 @@
+version: "3" 
+services:
   quantumleap:
     image: orchestracities/quantumleap:0.8.1
     depends_on:

@@ -1,3 +1,5 @@
+version: "3" 
+services:
   node-red:
     build: ./config/node-red
     depends_on:
@@ -14,3 +16,4 @@
       driver: syslog
       options:
         tag: "[node-red]"
+
