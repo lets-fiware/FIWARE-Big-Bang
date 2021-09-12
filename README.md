@@ -21,7 +21,7 @@ The FIWARE Big Bang is a turnkey solution for setting up a FIWARE instance in th
 >
 > — Albert Einstein
 
-The FIWARE Big Bang allows you to install FIWARE Generic enablers easily into your virtual mache in the cloud.
+The FIWARE Big Bang allows you to install FIWARE Generic enablers easily into your virtual machine in the cloud.
 FI-BB stands for FIWARE Big Bang.
 
 ## Requirements
@@ -46,7 +46,7 @@ FI-BB stands for FIWARE Big Bang.
 
 ## Prerequisite
 
-Before run the setup script, you need to register sub-domain names of FIWARE GEs that you want to use as shown:
+Before running the setup script, you need to register sub-domain names of FIWARE GEs that you want to use as shown:
 
 -   keyrock.letsfiware.jp
 -   orion.letsfiware.jp
@@ -55,7 +55,7 @@ Before run the setup script, you need to register sub-domain names of FIWARE GEs
 
 ## Getting Started
 
-Clone the FIWARE Big Bang repogitry and run the `lets-fiware.sh` script with your domain name.
+Clone the FIWARE Big Bang repository and run the `lets-fiware.sh` script with your domain name.
 
 ```
 git clone https://github.com/lets-fiware/FIWARE-Big-Bang.git
@@ -66,7 +66,7 @@ cd ./FIWARE-Big-Bang
 ## Command syntax
 
 The `lets-fiware.sh` command accepts two arguments. The first argument is a domain name. The second one is
-a global ip address. It's a optional.
+a global IP address. It's an optional.
 
 ```
 ./lets-fiware.sh DOMAIN_NAME [GLOBAL_IP_ADDRESS]
@@ -93,10 +93,10 @@ You can specify configurations by editing the `config.sh` file.
 | GRAFANA              | A sub-domain name of Grafana                               | (empty)                                          |
 | IDM\_ADMIN\_NAME     | A name of an admin user for Keyrock                        | admin                                            |
 | IDM\_ADMIN\_EMAIL    | An email address of an admin user for Keyrock              | IDM\_ADMIN\_NAME @ DOMAIN\_NAME                  |
-| IDM\_ADMIN\_PASS     | A password of an admin user for Keyrock                    | (automatically generated)                        |
+| IDM\_ADMIN\_PASS     | A password of an admin user for Keyrock                    | (Automatically generated)                        |
 | FIREWALL             | Enable firewall. true or false                             | false                                            |
 | LOGGING              | Enable log file creation in /var/log/fiware. true of false | true                                             |
-| CERT\_EMAIL          | An email address for certbot                               | (an email address of an admin user for Keyrock)  |
+| CERT\_EMAIL          | An email address for certbot                               | (An email address of an admin user for Keyrock)  |
 | CERT\_REVOKE         | Revoke and reacquire the certificate. true or false        | false                                            |
 | CERT\_TEST           | Use --test-cert option. true or false                      | false                                            |
 | CERT\_FORCE\_RENEWAL | Use --force-renewal option. true or false                  | false                                            |
