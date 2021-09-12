@@ -7,6 +7,7 @@
 <br/>
 [![Ubuntu 18.04](https://github.com/lets-fiware/FIWARE-Big-Bang/actions/workflows/ubuntu-18.04.yml/badge.svg)](https://github.com/lets-fiware/FIWARE-Big-Bang/actions/workflows/ubuntu-18.04.yml)
 [![Ubuntu 20.04](https://github.com/lets-fiware/FIWARE-Big-Bang/actions/workflows/ubuntu-20.04.yml/badge.svg)](https://github.com/lets-fiware/FIWARE-Big-Bang/actions/workflows/ubuntu-20.04.yml)
+[![Shellcheck](https://github.com/lets-fiware/FIWARE-Big-Bang/actions/workflows/shellcheck.yml/badge.svg)](https://github.com/lets-fiware/FIWARE-Big-Bang/actions/workflows/shellcheck.yml)
 <br/>
 [![Config](https://github.com/lets-fiware/FIWARE-Big-Bang/actions/workflows/config-lint.yml/badge.svg)](https://github.com/lets-fiware/FIWARE-Big-Bang/actions/workflows/config-lint.yml)
 [![Dockerfile](https://github.com/lets-fiware/FIWARE-Big-Bang/actions/workflows/dockerfile.yml/badge.svg)](https://github.com/lets-fiware/FIWARE-Big-Bang/actions/workflows/dockerfile.yml)

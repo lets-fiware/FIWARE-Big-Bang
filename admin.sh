@@ -1,4 +1,5 @@
 #!/bin/sh
+
 . ./.env
 
 echo "IDM: https://${KEYROCK}"

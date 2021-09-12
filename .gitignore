@@ -7,3 +7,4 @@ docker-compose.yml
 docker-keyrock.yml
 docker-cert.yml
 cert.sh
+.vscode/

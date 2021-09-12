@@ -28,7 +28,7 @@
 
 set -ue
 
-cd $(dirname $0)
+cd "$(dirname "$0")"
 cd ../..
 
 echo "*** lint config.sh ***"
@@ -39,3 +39,6 @@ echo "*** lint dockerfile ***"
 
 echo "*** lint documentation ***"
 ./test/script/lint-docs.sh
+
+echo "*** lint shellcheck ***"
+./test/script/lint-shellcheck.sh

@@ -28,7 +28,7 @@
 
 set -ue
 
-cd $(dirname $0)
+cd "$(dirname "$0")"
 cd ../..
 
 # md lint

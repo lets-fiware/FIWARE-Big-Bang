@@ -26,51 +26,85 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-set -ue
+#set -Ceuo pipefail
+set -Ceu
 
 . ./.env
+
 . ./setup/constant.sh
 
-if [ -d ${DATA_DIR} ]; then
-  echo "${DATA_DIR} - directory already exists"
+logging_info() {
+  echo "setup.sh: $1"
+  /usr/bin/logger -i -p "user.info" -t "FI-BB" "setup.sh: $1"
+}
+
+logging_err() {
+  echo "setup.sh: $1"
+  /usr/bin/logger -i -p "user.err" -t "FI-BB" "setup.sh: $1"
+}
+
+if [ -d "${DATA_DIR}" ]; then
+  MSG="${DATA_DIR} - directory already exists"
+  logging_err "${MSG}"
   exit 1
 fi
 
-WORK_DIR=./.work
-MYSQL_DIR="${WORK_DIR}/mysql"
+#
+# Setup init
+#
+setup_init() {
+  logging_info "${FUNCNAME[0]}"
 
-if [ -d "${WORK_DIR}" ]; then
-  rm -fr "${WORK_DIR}"
-fi
+  WORK_DIR=./.work
+  MYSQL_DIR="${WORK_DIR}/mysql"
 
-mkdir "${DATA_DIR}"
-mkdir "${WORK_DIR}"
-mkdir "${MYSQL_DIR}"
+  RSYSLOG_CONF=${WORK_DIR}/rsyslog.conf
+  LOGROTATE_CONF=${WORK_DIR}/logrotate.conf
 
-mkdir -p ${CONFIG_DIR}/nginx
-mkdir -p ${NGINX_SITES}
+  NGSI_GO="/usr/local/bin/ngsi --batch --config ${WORK_DIR}/ngsi-go-config.json --cache ${WORK_DIR}/ngsi-go-token-cache.json"
+  IDM=keyrock-$(date +%Y%m%d_%H-%M-%S)
 
-rm -fr ${CERTBOT_DIR}
-mkdir -p ${CERTBOT_DIR}
+  DOCKER_COMPOSE_YML=./docker-compose.yml
 
-RSYSLOG_CONF=${WORK_DIR}/rsyslog.conf
-LOGROTATE_CONF=${WORK_DIR}/logrotate.conf
+  APPS=(KEYROCK ORION COMET WIRECLOUD NGSIPROXY NODE_RED GRAFANA QUANTUMLEAP)
 
-NGSI_GO="/usr/local/bin/ngsi --batch --config ${WORK_DIR}/ngsi-go-config.json --cache ${WORK_DIR}/ngsi-go-token-cache.json"
-IDM=keyrock-`date +%Y%m%d_%H-%M-%S`
+  val=
+}
 
-DOCKER_COMPOSE_YML=./docker-compose.yml
+#
+# Make dir
+#
+make_dir() {
+  logging_info "${FUNCNAME[0]}"
+
+  if [ -d "${WORK_DIR}" ]; then
+    rm -fr "${WORK_DIR}"
+  fi
+
+  mkdir "${DATA_DIR}"
+  mkdir "${WORK_DIR}"
+  mkdir "${MYSQL_DIR}"
+
+  mkdir -p "${CONFIG_DIR}"/nginx
+  mkdir -p "${NGINX_SITES}"
+
+  rm -fr "${CERTBOT_DIR}"
+  mkdir -p "${CERTBOT_DIR}"
+}
 
 #
 # Add /etc/hosts
 #
 add_etc_hosts() {
-  for name in KEYROCK ORION COMET WIRECLOUD NGSIPROXY NODE_RED GRAFANA QUANTUMLEAP
+  logging_info "${FUNCNAME[0]}"
+
+  for name in "${APPS[@]}"
   do
-    eval val=\"\$${name}\"
+    eval val=\"\$"${name}"\"
     if [ -n "${val}" ]; then
       result=0
-      output=$(grep ${val} /etc/hosts 2> /dev/null) || result=$?
+      output=$(grep "${val}" /etc/hosts 2> /dev/null) || result=$?
+      echo "${output}"
       if [ ! "$result" = "0" ]; then
         sudo bash -c "echo $1 ${val} >> /etc/hosts"
         echo "Add '$1 ${val}' to /etc/hosts"
@@ -80,14 +114,15 @@ add_etc_hosts() {
 }
 
 #
-#
 # Validate domain
 #
 validate_domain() {
-  if [ -z "${IP_ADDRESS}" ]; then
-      IP_ADDRESS=($(hostname -I))
-  else
+  logging_info "${FUNCNAME[0]}"
+
+  if [ -n "${IP_ADDRESS}" ]; then
       IP_ADDRESS=("${IP_ADDRESS}")
+  else
+      IP_ADDRESS=("$(hostname -I)")
   fi
 
   if "$FIBB_TEST"; then
@@ -95,20 +130,22 @@ validate_domain() {
     return
   fi
 
-  for name in KEYROCK ORION COMET WIRECLOUD NGSIPROXY NODE_RED GRAFANA QUANTUMLEAP
+  for name in "${APPS[@]}"
   do
-    eval val=\"\$${name}\"
+    eval val=\"\$"${name}"\"
     if [ -n "${val}" ]; then
         IP=$(host -4 ${val} | awk 'match($0,/[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/) { print substr($0, RSTART, RLENGTH) }')
         found=false
-        for ip_addr in "${IP_ADDRESS[@]}"
+        # shellcheck disable=SC2068
+        for ip_addr in ${IP_ADDRESS[@]}
         do
-          if [ "${IP}" = "${ip_addr[@]}" ] ; then
+          if [ "${IP}" = "${ip_addr}" ] ; then
             found=true
           fi
         done
         if ! "${found}"; then
-            echo "IP address error: ${val}, ${IP_ADDRESS}"
+            MSG="IP address error: ${val}," "${IP_ADDRESS[@]}"
+            logging_err "${MSG}"
             exit 1
         fi 
     fi 
@@ -119,8 +156,10 @@ validate_domain() {
 # create test_cert
 #
 create_test_cert() {
-  openssl genrsa 2048 > $2/server.key
-  openssl req -new -key $2/server.key << EOF > $2/server.csr
+  logging_info "${FUNCNAME[0]}"
+
+  openssl genrsa 2048 > "$2"/server.key
+  openssl req -new -key "$2"/server.key << EOF > "$2"/server.csr
 JP
 Tokyo
 Smart city
@@ -131,8 +170,8 @@ fiware@example.com
 fiware
  
 EOF
-  openssl x509 -days 3650 -req -signkey $2/server.key < $2/server.csr > $2/server.crt
-  openssl rsa -in $2/server.key -out $2/server.key << EOF
+  openssl x509 -days 3650 -req -signkey "$2"/server.key < "$2"/server.csr > "$2"/server.crt
+  openssl rsa -in "$2"/server.key -out "$2"/server.key << EOF
 fiware
 EOF
 }
@@ -142,28 +181,32 @@ EOF
 # setup test cert
 #
 setup_test_cert() {
-  mkdir -p ${CERT_DIR}/live
+  logging_info "${FUNCNAME[0]}"
+
+  mkdir -p "${CERT_DIR}"/live
 
   if "$FIBB_TEST"; then
     SSL_CERTIFICATE=server.crt
     SSL_CERTIFICATE_KEY=server.key
   fi
 
-  for name in KEYROCK ORION COMET WIRECLOUD NGSIPROXY NODE_RED GRAFANA QUANTUMLEAP
+  for name in "${APPS[@]}"
   do
-    eval val=\"\$${name}\"
+    eval val=\"\$"${name}"\"
     if [ -n "${val}" ]; then
-      mkdir ${CERT_DIR}/live/${val}
+      mkdir "${CERT_DIR}"/live/"${val}"
       create_test_cert "${val}.${DOMAIN_NAME}" "${CERT_DIR}/live/${val}"
     fi 
   done
-  cp ${TEMPLEATE}/nginx.conf ${CONFIG_DIR}/nginx/
+  cp "${TEMPLEATE}"/nginx.conf "${CONFIG_DIR}"/nginx/
 }
 
 #
 # setup cert
 #
 setup_cert() {
+  logging_info "${FUNCNAME[0]}"
+
   if "$FIBB_TEST"; then
     setup_test_cert
     return
@@ -178,8 +221,9 @@ setup_cert() {
   fi
 
   CERT_SH=./cert.sh
-  touch ${CERT_SH}
-  chmod +x ${CERT_SH}
+  if [ -e "${CERT_SH}" ]; then
+    rm -f "${CERT_SH}"
+  fi 
 
   cat <<EOF > ${CERT_SH}
 #!/bin/bash
@@ -221,26 +265,28 @@ echo "\${MINUTE} \${HOUR} * * * root \${PWD}/config/script/renew.sh > /dev/null 
 
 EOF
 
-  for name in KEYROCK ORION COMET WIRECLOUD NGSIPROXY NODE_RED GRAFANA QUANTUMLEAP
+  chmod +x ${CERT_SH}
+
+  for name in "${APPS[@]}"
   do
-    eval val=\"\$${name}\"
+    eval val=\"\$"${name}"\"
     if [ -n "${val}" ]; then
-      if [ ! -d ${CERTBOT_DIR}/${val} ]; then
-        mkdir ${CERTBOT_DIR}/${val}
+      if [ ! -d "${CERTBOT_DIR}"/"${val}" ]; then
+        mkdir "${CERTBOT_DIR}"/"${val}"
       fi
       echo "cert ${val}" >> ${CERT_SH}
-      sed -e "s/HOST/${val}/" ${TEMPLEATE}/nginx-cert > ${NGINX_SITES}/${val}
+      sed -e "s/HOST/${val}/" "${TEMPLEATE}"/nginx-cert > "${NGINX_SITES}"/"${val}"
     fi 
   done
 
-  cp ${TEMPLEATE}/docker/setup-cert.yml ./docker-cert.yml
-  cp ${TEMPLEATE}/nginx.conf ${CONFIG_DIR}/nginx/
+  cp "${TEMPLEATE}"/docker/setup-cert.yml ./docker-cert.yml
+  cp "${TEMPLEATE}"/nginx.conf "${CONFIG_DIR}"/nginx/
 
-  sudo ${DOCKER_COMPOSE} -f docker-cert.yml up -d
+  sudo "${DOCKER_COMPOSE}" -f docker-cert.yml up -d
 
   sudo ./cert.sh
 
-  sudo ${DOCKER_COMPOSE} -f docker-cert.yml down
+  sudo "${DOCKER_COMPOSE}" -f docker-cert.yml down
 
   rm -f ${CERT_SH}
 }
@@ -249,19 +295,28 @@ EOF
 # Add fiware.conf
 #
 add_rsyslog_conf() {
-  cat <<EOF >> ${RSYSLOG_CONF}
+  logging_info "${FUNCNAME[0]}"
+
+  set +u
+  while [ "$1" ]
+  do
+    cat <<EOF >> ${RSYSLOG_CONF}
 :syslogtag,startswith,"[$1]" /var/log/fiware/$1.log
 & stop
 
 EOF
-
-  echo "${LOG_DIR}/$1.log" >> "${LOGROTATE_CONF}"
+    echo "${LOG_DIR}/$1.log" >> "${LOGROTATE_CONF}"
+    shift
+  done
+  set -u
 }
 
 #
 # setup_logging
 #
 setup_logging() {
+  logging_info "${FUNCNAME[0]}"
+
   if "${LOGGING}"; then
       # FI-BB log
       echo "${LOG_DIR}/fi-bb.log" >> "${LOGROTATE_CONF}"
@@ -271,8 +326,9 @@ setup_logging() {
 
 EOF
 
-      files=($(cat "${LOGROTATE_CONF}" | sed -z -e "s/\n/ /g"))
-      for file in "${files[@]}"
+      files=("$(sed -z -e "s/\n/ /g" ${LOGROTATE_CONF})")
+      # shellcheck disable=SC2068
+      for file in ${files[@]}
       do
         sudo touch "${file}"
         if [ "${DISTRO}" = "Ubuntu" ]; then
@@ -315,6 +371,7 @@ EOF
 # Keyrock
 #
 setup_keyrock() {
+  logging_info "${FUNCNAME[0]}"
 
   MYSQL_ROOT_PASSWORD=$(pwgen -s 16 1)
 
@@ -356,60 +413,108 @@ GRANT ALL PRIVILEGES ON ${IDM_DB_NAME}.* TO '${IDM_DB_USER}'@'%';
 flush PRIVILEGES;
 EOF
 
-  cp -a ${TEMPLEATE}/docker/setup-keyrock.yml ./docker-keyrock.yml
+  cp -a "${TEMPLEATE}"/docker/setup-keyrock.yml ./docker-keyrock.yml
 
-  sudo ${DOCKER_COMPOSE} -f docker-keyrock.yml up -d
+  sudo "${DOCKER_COMPOSE}" -f docker-keyrock.yml up -d
 
-  while [ "200" != $(curl http://localhost:3000/ -o /dev/null -w '%{http_code}\n' -s) ]
+  while [ "200" != "$(curl http://localhost:3000/ -o /dev/null -w '%{http_code}\n' -s)" ]
   do
     sleep 1
   done
 
-  ${NGSI_GO} server add --host ${IDM} --serverType keyrock --serverHost http://localhost:3000 --idmType idm --username ${IDM_ADMIN_EMAIL} --password ${IDM_ADMIN_PASS}
+  ${NGSI_GO} server add --host "${IDM}" --serverType keyrock --serverHost http://localhost:3000 --idmType idm --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}"
 }
 
 #
 # Tear down Keyrock
 #
 down_keyrock() {
-  sudo ${DOCKER_COMPOSE} -f docker-keyrock.yml down
+  logging_info "${FUNCNAME[0]}"
+
+  sudo "${DOCKER_COMPOSE}" -f docker-keyrock.yml down
 }
 
 #
 # Add docker-compose.yml
 #
 add_docker_compose_yml() {
-  cat ${TEMPLEATE}/docker/$1 | sed -e '/^version:/,/services:/d' >> ${DOCKER_COMPOSE_YML}
+  logging_info "${FUNCNAME[0]} $1"
+
+  sed -e '/^version:/,/services:/d' "${TEMPLEATE}"/docker/"$1" >> ${DOCKER_COMPOSE_YML}
+}
+
+#
+# Create nginx conf
+#
+create_nginx_conf() {
+  sed -e "s/HOST/$1/" "${TEMPLEATE}/$2" > "${NGINX_SITES}/$1"
+}
+
+#
+# Add nginx depends_on
+#
+add_nginx_depends_on() {
+  set +u
+  while [ "$1" ]
+  do
+    sed -i -e "/ __NGINX_DEPENDS_ON__/ i \      - $1" ${DOCKER_COMPOSE_YML}
+    shift
+  done
+  set -u
+}
+
+#
+# Add nginx volumes
+#
+add_nginx_volumes() {
+  set +u
+  while [ "$1" ]
+  do
+    sed -i -e "/ __NGINX_VOLUMES__/ i \      - $1" "${DOCKER_COMPOSE_YML}"
+    shift
+  done
+  set -u
 }
 
 #
 # Orion, Wilma and Tokenproxy
 #
 setup_orion() {
-  cp ${TEMPLEATE}/docker/docker-base.yml ${DOCKER_COMPOSE_YML}
+  logging_info "${FUNCNAME[0]}"
 
-  rm -fr ${NGINX_SITES}
-  mkdir -p ${NGINX_SITES}
-  sed -e "s/HOST/${KEYROCK}/" ${TEMPLEATE}/nginx-keyrock > ${NGINX_SITES}/${KEYROCK}
-  sed -e "s/HOST/${ORION}/" ${TEMPLEATE}/nginx-orion > ${NGINX_SITES}/${ORION}
+  cp "${TEMPLEATE}"/docker/docker-base.yml "${DOCKER_COMPOSE_YML}"
+
+  rm -fr "${NGINX_SITES}"
+  mkdir -p "${NGINX_SITES}"
+
+  create_nginx_conf "${KEYROCK}" "nginx-keyrock"
+  create_nginx_conf "${ORION}" "nginx-orion"
+
+  add_rsyslog_conf "nginx" "orion" "mongo" "keyrock" "mysql" "pep-proxy" "tokenproxy"
 
   if [ -z "${WIRECLOUD}" ]; then
     # Create Applicaton for Orion
-    AID=$(${NGSI_GO} applications --host ${IDM} create --name "Orion" --description "Orion application" --url "https://${ORION}/" --redirectUri "https://${ORION}/complete/fiware/")
-    SECRET=$(${NGSI_GO} applications --host ${IDM} get --aid ${AID} | jq -r .application.secret )
+    AID=$(${NGSI_GO} applications --host "${IDM}" create --name "Orion" --description "Orion application" --url "https://${ORION}/" --redirectUri "https://${ORION}/complete/fiware/")
+    SECRET=$(${NGSI_GO} applications --host "${IDM}" get --aid "${AID}" | jq -r .application.secret )
   else
     # Create Applicaton for WireCloud
-    AID=$(${NGSI_GO} applications --host ${IDM} create --name "WireCloud" --description "WireCloud application" --url "https://${WIRECLOUD}/" --redirectUri "https://${WIRECLOUD}/complete/fiware/")
-    SECRET=$(${NGSI_GO} applications --host ${IDM} get --aid ${AID} | jq -r .application.secret )
-    RID=$(${NGSI_GO} applications --host ${IDM} roles --aid ${AID} create --name Admin)
-    ${NGSI_GO} applications --host ${IDM} users --aid ${AID} assign --rid ${RID} --uid ${IDM_ADMIN_UID} > /dev/null
+    AID=$(${NGSI_GO} applications --host "${IDM}" create --name "WireCloud" --description "WireCloud application" --url "https://${WIRECLOUD}/" --redirectUri "https://${WIRECLOUD}/complete/fiware/")
+    SECRET=$(${NGSI_GO} applications --host "${IDM}" get --aid "${AID}" | jq -r .application.secret )
+    RID=$(${NGSI_GO} applications --host "${IDM}" roles --aid "${AID}" create --name Admin)
+    ${NGSI_GO} applications --host "${IDM}" users --aid "${AID}" assign --rid "${RID}" --uid "${IDM_ADMIN_UID}" > /dev/null
   fi
 
   ORION_CLIENT_ID=${AID}
 
   # Create PEP Proxy for FIWARE Orion
-  PEP_PASSWORD=$(${NGSI_GO} applications --host ${IDM} pep --aid ${AID} create --run | jq -r .pep_proxy.password)
-  PEP_ID=$(${NGSI_GO} applications --host ${IDM} pep --aid ${AID} list | jq -r .pep_proxy.id)
+  PEP_PASSWORD=$(${NGSI_GO} applications --host "${IDM}" pep --aid "${AID}" create --run | jq -r .pep_proxy.password)
+  PEP_ID=$(${NGSI_GO} applications --host "${IDM}" pep --aid "${AID}" list | jq -r .pep_proxy.id)
+
+  mkdir -p "${CONFIG_DIR}/mongo"
+  cp "${TEMPLEATE}/mongo-init.js" "${CONFIG_DIR}/mongo/"
+
+  mkdir -p "${CONFIG_DIR}/tokenproxy"
+  cp "${TEMPLEATE}/docker/Dockerfile.tokenproxy" "${CONFIG_DIR}/tokenproxy/Dockerfile"
 
   cat <<EOF >> .env
 
@@ -422,86 +527,77 @@ PEP_PROXY_APP_ID=${AID}
 PEP_PROXY_USERNAME=${PEP_ID}
 PEP_PASSWORD=${PEP_PASSWORD}
 EOF
-
-  mkdir -p ${CONFIG_DIR}/mongo
-  cp ${TEMPLEATE}/mongo-init.js ${CONFIG_DIR}/mongo/
-
-  mkdir -p ${CONFIG_DIR}/tokenproxy
-  cp ${TEMPLEATE}/docker/Dockerfile.tokenproxy ${CONFIG_DIR}/tokenproxy/Dockerfile
-
-  add_rsyslog_conf "nginx"
-  add_rsyslog_conf "orion"
-  add_rsyslog_conf "mongo"
-  add_rsyslog_conf "keyrock"
-  add_rsyslog_conf "mysql"
-  add_rsyslog_conf "pep-proxy"
-  add_rsyslog_conf "tokenproxy"
 }
 
 #
 # Cygnus and Comet
 #
 setup_comet() {
-  if [ -n "${COMET}" ]; then
-    sed -e "s/HOST/${COMET}/" ${TEMPLEATE}/nginx-comet > ${NGINX_SITES}/${COMET}
+  if [ -z "${COMET}" ]; then
+    return
+  fi 
 
-    add_docker_compose_yml "docker-comet.yml"
+  logging_info "${FUNCNAME[0]}"
 
-    sed -i -e "/ __NGINX_DEPENDS_ON__/ i \      - comet" ${DOCKER_COMPOSE_YML}
-    sed -i -e "/ __NGINX_DEPENDS_ON__/ i \      - cygnus" ${DOCKER_COMPOSE_YML}
+  add_docker_compose_yml "docker-comet.yml"
 
-    add_rsyslog_conf "cygnus"
-    add_rsyslog_conf "comet"
-  fi
+  create_nginx_conf "${COMET}" "nginx-comet"
+
+  add_nginx_depends_on "comet" "cygnus"
+
+  add_rsyslog_conf "cygnus" "comet"
 }
 
 #
 # QuantumLeap
 #
 setup_quantumleap() {
-  if [ -n "${QUANTUMLEAP}" ]; then
-    sed -e "s/HOST/${QUANTUMLEAP}/" ${TEMPLEATE}/nginx-quantumleap > ${NGINX_SITES}/${QUANTUMLEAP}
-
-    add_docker_compose_yml "docker-quantumleap.yml"
-
-    sed -i -e "/ __NGINX_DEPENDS_ON__/ i \      - quantumleap" ${DOCKER_COMPOSE_YML}
-
-    # Workaround for CrateDB. See https://crate.io/docs/crate/howtos/en/latest/deployment/containers/docker.html#troubleshooting
-    sudo sysctl -w vm.max_map_count=262144
-
-    add_rsyslog_conf "quantumleap"
-    add_rsyslog_conf "redis"
-    add_rsyslog_conf "crate"
+  if [ -z "${QUANTUMLEAP}" ]; then
+    return
   fi
+
+  logging_info "${FUNCNAME[0]}"
+
+  add_docker_compose_yml "docker-quantumleap.yml"
+
+  create_nginx_conf "${QUANTUMLEAP}" "nginx-quantumleap"
+
+  add_nginx_depends_on  "quantumleap"
+
+  add_rsyslog_conf "quantumleap" "redis" "crate"
+
+  # Workaround for CrateDB. See https://crate.io/docs/crate/howtos/en/latest/deployment/containers/docker.html#troubleshooting
+  sudo sysctl -w vm.max_map_count=262144
 }
 
 #
 # WireCLoud and ngsiproxy
 #
 setup_wirecloud() {
-  if [ -n "${WIRECLOUD}" ]; then
-    add_docker_compose_yml "docker-wirecloud.yml"
+  if [ -z "${WIRECLOUD}" ]; then
+    return
+  fi
 
-    sed -i -e "/ __NGINX_DEPENDS_ON__/ i \      - wirecloud" ${DOCKER_COMPOSE_YML}
-    sed -i -e "/ __NGINX_DEPENDS_ON__/ i \      - ngsiproxy" ${DOCKER_COMPOSE_YML}
-    sed -i -e "/ __NGINX_VOLUMES__/ i \      - ./data/wirecloud/wirecloud-static:/var/www/static:ro" ${DOCKER_COMPOSE_YML}
+  logging_info "${FUNCNAME[0]}"
 
-    sed -e "s/HOST/${WIRECLOUD}/" ${TEMPLEATE}/nginx-wirecloud > ${NGINX_SITES}/${WIRECLOUD}
-    sed -e "s/HOST/${NGSIPROXY}/" ${TEMPLEATE}/nginx-ngsiproxy > ${NGINX_SITES}/${NGSIPROXY}
+  add_docker_compose_yml "docker-wirecloud.yml"
 
-    cat <<EOF >> .env
+  create_nginx_conf "${WIRECLOUD}" "nginx-wirecloud"
+  create_nginx_conf "${NGSIPROXY}" "nginx-ngsiproxy"
+
+  add_nginx_depends_on "wirecloud" "ngsiproxy"
+
+  add_nginx_volumes "./data/wirecloud/wirecloud-static:/var/www/static:ro"
+
+  add_rsyslog_conf "wirecloud" "postgres" "elasticsearch" "memcached" "ngsiproxy"
+
+  cat <<EOF >> .env
 
 # Postgres
 
 POSTGRES_PASSWORD=$(pwgen -s 16 1)
 EOF
 
-    add_rsyslog_conf "wirecloud"
-    add_rsyslog_conf "postgres"
-    add_rsyslog_conf "elasticsearch"
-    add_rsyslog_conf "memcached"
-    add_rsyslog_conf "ngsiproxy"
-  fi
 }
 
 #
@@ -512,40 +608,42 @@ setup_node_red() {
     return
   fi
 
+  logging_info "${FUNCNAME[0]}"
+
   add_docker_compose_yml "docker-node-red.yml"
 
-  sed -i -e "/ __NGINX_DEPENDS_ON__/ i \      - node-red" ${DOCKER_COMPOSE_YML}
+  create_nginx_conf "${NODE_RED}" "nginx-node-red"
 
-  sed -e "s/HOST/${NODE_RED}/" ${TEMPLEATE}/nginx-node-red > ${NGINX_SITES}/${NODE_RED}
-  
+  add_nginx_depends_on  "node-red"
+
+  add_rsyslog_conf "node-red"
+
   NODE_RED_URL=https://${NODE_RED}/
   NODE_RED_CALLBACK_URL=https://${NODE_RED}/auth/strategy/callback
   
   # Create application for Node-RED
-  NODE_RED_CLIENT_ID=$(${NGSI_GO} applications --host ${IDM} create --name "Node-RED" --description "Node-RED application" --url "${NODE_RED_URL}" --redirectUri "${NODE_RED_CALLBACK_URL}")
-  NODE_RED_CLIENT_SECRET=$(${NGSI_GO} applications --host ${IDM} get --aid ${NODE_RED_CLIENT_ID} | jq -r .application.secret )
+  NODE_RED_CLIENT_ID=$(${NGSI_GO} applications --host "${IDM}" create --name "Node-RED" --description "Node-RED application" --url "${NODE_RED_URL}" --redirectUri "${NODE_RED_CALLBACK_URL}")
+  NODE_RED_CLIENT_SECRET=$(${NGSI_GO} applications --host "${IDM}" get --aid "${NODE_RED_CLIENT_ID}" | jq -r .application.secret )
 
   # Create roles and add them to Admin
-  RID=$(${NGSI_GO} applications --host ${IDM} roles --aid ${NODE_RED_CLIENT_ID} create --name "/node-red/full")
-  ${NGSI_GO} applications --host ${IDM} users --aid ${NODE_RED_CLIENT_ID} assign --rid ${RID} --uid ${IDM_ADMIN_UID} > /dev/null
-  RID=$(${NGSI_GO} applications --host ${IDM} roles --aid ${NODE_RED_CLIENT_ID} create --name "/node-red/read")
-  ${NGSI_GO} applications --host ${IDM} users --aid ${NODE_RED_CLIENT_ID} assign --rid ${RID} --uid ${IDM_ADMIN_UID} > /dev/null
-  RID=$(${NGSI_GO} applications --host ${IDM} roles --aid ${NODE_RED_CLIENT_ID} create --name "/node-red/api")
-  ${NGSI_GO} applications --host ${IDM} users --aid ${NODE_RED_CLIENT_ID} assign --rid ${RID} --uid ${IDM_ADMIN_UID} > /dev/null
+  RID=$(${NGSI_GO} applications --host "${IDM}" roles --aid "${NODE_RED_CLIENT_ID}" create --name "/node-red/full")
+  ${NGSI_GO} applications --host "${IDM}" users --aid "${NODE_RED_CLIENT_ID}" assign --rid "${RID}" --uid "${IDM_ADMIN_UID}" > /dev/null
+  RID=$(${NGSI_GO} applications --host "${IDM}" roles --aid "${NODE_RED_CLIENT_ID}" create --name "/node-red/read")
+  ${NGSI_GO} applications --host "${IDM}" users --aid "${NODE_RED_CLIENT_ID}" assign --rid "${RID}" --uid "${IDM_ADMIN_UID}" > /dev/null
+  RID=$(${NGSI_GO} applications --host "${IDM}" roles --aid "${NODE_RED_CLIENT_ID}" create --name "/node-red/api")
+  ${NGSI_GO} applications --host "${IDM}" users --aid "${NODE_RED_CLIENT_ID}" assign --rid "${RID}" --uid "${IDM_ADMIN_UID}" > /dev/null
 
   # Add Orion (or Wirecloud) application as a trusted application to Node-RED application
-  ${NGSI_GO} applications --host ${IDM} trusted --aid ${NODE_RED_CLIENT_ID} add --tid ${ORION_CLIENT_ID}  > /dev/null
-  RID=$(${NGSI_GO} applications --host ${IDM} roles --aid ${ORION_CLIENT_ID} create --name "/node-red/api")
-  ${NGSI_GO} applications --host ${IDM} users --aid ${ORION_CLIENT_ID} assign --rid ${RID} --uid ${IDM_ADMIN_UID} > /dev/null
+  ${NGSI_GO} applications --host "${IDM}" trusted --aid "${NODE_RED_CLIENT_ID}" add --tid "${ORION_CLIENT_ID}"  > /dev/null
+  RID=$(${NGSI_GO} applications --host "${IDM}" roles --aid "${ORION_CLIENT_ID}" create --name "/node-red/api")
+  ${NGSI_GO} applications --host "${IDM}" users --aid "${ORION_CLIENT_ID}" assign --rid "${RID}" --uid "${IDM_ADMIN_UID}" > /dev/null
 
-  mkdir ${DATA_DIR}/node-red
-  sudo chown 1000:1000 ${DATA_DIR}/node-red
+  mkdir "${DATA_DIR}"/node-red
+  sudo chown 1000:1000 "${DATA_DIR}"/node-red
 
-  mkdir ${CONFIG_DIR}/node-red
-  cp ${TEMPLEATE}/docker/Dockerfile.node-red ${CONFIG_DIR}/node-red/Dockerfile
-  cp ${TEMPLEATE}/settings.js.node-red ${CONFIG_DIR}/node-red/settings.js
-
-  add_rsyslog_conf "node-red"
+  mkdir "${CONFIG_DIR}"/node-red
+  cp "${TEMPLEATE}"/docker/Dockerfile.node-red "${CONFIG_DIR}"/node-red/Dockerfile
+  cp "${TEMPLEATE}"/settings.js.node-red "${CONFIG_DIR}"/node-red/settings.js
 
   cat <<EOF >> .env
 
@@ -561,23 +659,30 @@ EOF
 # Grafana
 #
 setup_grafana() {
-  if [ -n "${GRAFANA}" ]; then
-    add_docker_compose_yml "/docker-grafana.yml"
+  if [ -z "${GRAFANA}" ]; then
+    return
+  fi
 
-    sed -i -e "/ __NGINX_DEPENDS_ON__/ i \      - grafana" ${DOCKER_COMPOSE_YML}
+  logging_info "${FUNCNAME[0]}"
 
-    sed -e "s/HOST/${GRAFANA}/" ${TEMPLEATE}/nginx-grafana > ${NGINX_SITES}/${GRAFANA}
+  add_docker_compose_yml "/docker-grafana.yml"
 
-    # Create application for Grafana
-    GF_SERVER_ROOT_URL=https://${GRAFANA}/
-    GF_SERVER_REDIRECT_URL=https://${GRAFANA}/login/generic_oauth
-    GRAFANA_CLIENT_ID=$(${NGSI_GO} applications --host ${IDM} create --name "Grafana" --description "Grafana application" --url "${GF_SERVER_ROOT_URL}" --redirectUri "${GF_SERVER_REDIRECT_URL}" --responseType "code,token,id_token")
-    GRAFANA_CLIENT_SECRET=$(${NGSI_GO} applications --host ${IDM} get --aid ${GRAFANA_CLIENT_ID} | jq -r .application.secret )
+  create_nginx_conf "${GRAFANA}" "nginx-grafana"
 
-    mkdir -p ${DATA_DIR}/grafana
-    sudo chown 472:472 ${DATA_DIR}/grafana
+  add_nginx_depends_on  "grafana"
 
-    cat <<EOF >> .env
+  add_rsyslog_conf "grafana"
+
+  # Create application for Grafana
+  GF_SERVER_ROOT_URL=https://${GRAFANA}/
+  GF_SERVER_REDIRECT_URL=https://${GRAFANA}/login/generic_oauth
+  GRAFANA_CLIENT_ID=$(${NGSI_GO} applications --host "${IDM}" create --name "Grafana" --description "Grafana application" --url "${GF_SERVER_ROOT_URL}" --redirectUri "${GF_SERVER_REDIRECT_URL}" --responseType "code,token,id_token")
+  GRAFANA_CLIENT_SECRET=$(${NGSI_GO} applications --host "${IDM}" get --aid "${GRAFANA_CLIENT_ID}" | jq -r .application.secret )
+
+  mkdir -p "${DATA_DIR}"/grafana
+  sudo chown 472:472 "${DATA_DIR}"/grafana
+
+  cat <<EOF >> .env
 
 # Grafana
 
@@ -603,31 +708,31 @@ GF_AUTH_GENERIC_OAUTH_API_URL=https://${KEYROCK}/user
 
 GF_INSTALL_PLUGINS="https://github.com/orchestracities/grafana-map-plugin/archive/master.zip;grafana-map-plugin,grafana-clock-panel,grafana-worldmap-panel"
 EOF
-
-    add_rsyslog_conf "grafana"
-  fi
 }
 
 setup_ngsi_go() {
-  NGSI_GO="/usr/local/bin/ngsi --batch"
-  SERVERS=($(${NGSI_GO} server list --all -1))
+  logging_info "${FUNCNAME[0]}"
 
-  for NAME in KEYROCK ORION COMET WIRECLOUD NGSIPROXY NODE_RED GRAFANA QUANTUMLEAP
+  NGSI_GO="/usr/local/bin/ngsi --batch"
+  SERVERS=("$(${NGSI_GO} server list --all -1)")
+
+  for NAME in "${APPS[@]}"
   do
-    eval VAL=\"\$$NAME\"
+    eval VAL=\"\$"$NAME"\"
     if [ -n "$VAL" ]; then
-      for name in "${SERVERS[@]}"
+      # shellcheck disable=SC2068
+      for name in ${SERVERS[@]}
       do
         if [ "${VAL}" = "${name}" ]; then
-          ngsi server delete --host ${name}
+          ngsi server delete --host "${name}"
         fi
       done
     fi
   done
 
-  for NAME in KEYROCK ORION COMET WIRECLOUD NGSIPROXY NODE_RED GRAFANA QUANTUMLEAP
+  for NAME in "${APPS[@]}"
   do
-    eval VAL=\"\$$NAME\"
+    eval VAL=\"\$"$NAME"\"
     if [ -n "$VAL" ]; then
       case "${NAME}" in
           "KEYROCK" ) ${NGSI_GO} server add --host "${VAL}" --serverType keyrock --serverHost "https://${VAL}" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" ;;
@@ -644,12 +749,14 @@ setup_ngsi_go() {
 # update nginx file
 #
 update_nginx_file() {
-  for name in KEYROCK ORION COMET WIRECLOUD NGSIPROXY NODE_RED GRAFANA QUANTUMLEAP
+  logging_info "${FUNCNAME[0]}"
+
+  for name in "${APPS[@]}"
   do
-    eval val=\"\$${name}\"
+    eval val=\"\$"${name}"\"
     if [ -n "${val}" ]; then
-      sed -i -e "s/SSL_CERTIFICATE_KEY/${SSL_CERTIFICATE_KEY}/" ${NGINX_SITES}/${val}
-      sed -i -e "s/SSL_CERTIFICATE/${SSL_CERTIFICATE}/" ${NGINX_SITES}/${val}
+      sed -i -e "s/SSL_CERTIFICATE_KEY/${SSL_CERTIFICATE_KEY}/" "${NGINX_SITES}"/"${val}"
+      sed -i -e "s/SSL_CERTIFICATE/${SSL_CERTIFICATE}/" "${NGINX_SITES}"/"${val}"
     fi
   done
 }
@@ -658,6 +765,8 @@ update_nginx_file() {
 # copy scripts
 #
 copy_scripts() {
+  logging_info "${FUNCNAME[0]}"
+
   mkdir "${CONFIG_DIR}/script"
   cp "${SETUP_DIR}/script/"* "${CONFIG_DIR}/script/"
   chmod o+x "${CONFIG_DIR}/script/"*
@@ -667,6 +776,8 @@ copy_scripts() {
 # Setup end
 #
 setup_end() {
+  logging_info "${FUNCNAME[0]}"
+
   sed -i -e "/# __NGINX_/d" ${DOCKER_COMPOSE_YML}
 }
 
@@ -674,6 +785,8 @@ setup_end() {
 # clean up
 #
 clean_up() {
+  logging_info "${FUNCNAME[0]}"
+
   rm -f docker-keyrock.yml
   rm -f docker-cert.yml
   rm -fr "${WORK_DIR}"
@@ -683,6 +796,11 @@ clean_up() {
 # main
 #
 setup_main() {
+  logging_info "${FUNCNAME[0]}"
+
+  setup_init
+  make_dir
+
   validate_domain
   setup_cert
 
@@ -707,6 +825,7 @@ setup_main() {
 
 setup_main
 
-sudo ${DOCKER_COMPOSE} up -d --build
+logging_info "docker-compose up -d --build"
+sudo "${DOCKER_COMPOSE}" up -d --build
 
 clean_up
