@@ -1,4 +1,4 @@
-version: "3" 
+version: "3"
 services:
   node-red:
     build: ./config/node-red
@@ -16,4 +16,3 @@ services:
       driver: syslog
       options:
         tag: "[node-red]"
-

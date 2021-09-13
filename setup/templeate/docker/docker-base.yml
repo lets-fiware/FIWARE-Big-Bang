@@ -124,4 +124,3 @@ services:
       --clientSecret
       ${CLIENT_SECRET}
       --verbose
-

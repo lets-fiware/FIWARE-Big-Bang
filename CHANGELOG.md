@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.1.0-next
 
+-   Add yamllint feature (#34)
 -   Add shellcheck feature (#33)
 -   Fix typos in README.md (#32)
 -   Add status badges (#31)
