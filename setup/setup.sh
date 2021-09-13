@@ -440,6 +440,7 @@ down_keyrock() {
 add_docker_compose_yml() {
   logging_info "${FUNCNAME[0]} $1"
 
+  echo "" >> ${DOCKER_COMPOSE_YML}
   sed -e '/^version:/,/services:/d' "${TEMPLEATE}"/docker/"$1" >> ${DOCKER_COMPOSE_YML}
 }
 

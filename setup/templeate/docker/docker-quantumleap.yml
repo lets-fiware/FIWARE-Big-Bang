@@ -1,4 +1,4 @@
-version: "3" 
+version: "3"
 services:
   quantumleap:
     image: orchestracities/quantumleap:0.8.1
@@ -35,7 +35,8 @@ services:
       - "127.0.0.1:4200:4200"
     command: crate -Cauth.host_based.enabled=false  -Ccluster.name=democluster -Chttp.cors.enabled=true -Chttp.cors.allow-origin="*"
     environment:
-      - CRATE_HEAP_SIZE=2g # see https://crate.io/docs/crate/howtos/en/latest/deployment/containers/docker.html#troubleshooting
+      # see https://crate.io/docs/crate/howtos/en/latest/deployment/containers/docker.html#troubleshooting
+      - CRATE_HEAP_SIZE=2g
     volumes:
       - ./data/crate:/data
     restart: always
@@ -43,4 +44,3 @@ services:
       driver: syslog
       options:
         tag: "[crate]"
-
