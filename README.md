@@ -98,7 +98,6 @@ You can specify configurations by editing the `config.sh` file.
 | IDM\_ADMIN\_EMAIL    | An email address of an admin user for Keyrock              | IDM\_ADMIN\_NAME @ DOMAIN\_NAME                  |
 | IDM\_ADMIN\_PASS     | A password of an admin user for Keyrock                    | (Automatically generated)                        |
 | FIREWALL             | Enable firewall. true or false                             | false                                            |
-| LOGGING              | Enable log file creation in /var/log/fiware. true of false | true                                             |
 | CERT\_EMAIL          | An email address for certbot                               | (An email address of an admin user for Keyrock)  |
 | CERT\_REVOKE         | Revoke and reacquire the certificate. true or false        | false                                            |
 | CERT\_TEST           | Use --test-cert option. true or false                      | false                                            |

@@ -6,6 +6,8 @@ down:
 	sudo /usr/local/bin/docker-compose down
 ps:
 	sudo /usr/local/bin/docker-compose ps
+setup-test:
+	./test/script/setup_test.sh
 clean:
 	./setup/clean.sh
 nginx-test:
@@ -24,5 +26,7 @@ cert-list:
 	sudo ls -l /etc/letsencrypt/live/
 log:
 	cat /var/log/fiware/fi-bb.log
-setup-test:
-	./test/script/setup_test.sh
+admin:
+	./config/script/admin.sh
+get_token:
+	./config/script/get_token.sh
