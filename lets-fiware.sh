@@ -67,7 +67,7 @@ setup_logging_step1() {
 
   # FI-BB log
   echo "${LOG_DIR}/fi-bb.log" >> "${LOGROTATE_CONF}"
-  cat <<EOF >> ${RSYSLOG_CONF}
+  cat <<EOF >> "${RSYSLOG_CONF}"
 :syslogtag,contains,"FI-BB" ${LOG_DIR}/fi-bb.log
 & stop
 
@@ -222,12 +222,12 @@ add_domain_to_env() {
 
   for NAME in "${APPS[@]}"
   do
-    eval VAL=\"\$$NAME\"
+    eval VAL=\"\$"$NAME"\"
     if [ -n "$VAL" ]; then
-        eval echo ${NAME}=\"\$${NAME}."${DOMAIN_NAME}"\" >> .env
-        eval ${NAME}=\"\$${NAME}."${DOMAIN_NAME}"\"
+        eval echo "${NAME}"=\"\$"${NAME}"."${DOMAIN_NAME}"\" >> .env
+        eval "${NAME}"=\"\$"${NAME}"."${DOMAIN_NAME}"\"
     else
-        echo ${NAME}= >> .env
+        echo "${NAME}"= >> .env
     fi 
   done
 
@@ -422,7 +422,8 @@ check_docker() {
     return
   fi
 
-  local ver=$(sudo docker --version)
+  local ver
+  ver=$(sudo docker --version)
   logging_info "${FUNCNAME[0]} ${ver}"
 
   ver=$(sudo docker version -f "{{.Server.Version}}" | awk -F. '{printf "%2d%02d%02d", $1,$2,$3}')
@@ -442,7 +443,8 @@ check_docker_compose() {
   logging_info "${FUNCNAME[0]}"
 
   if [ -e /usr/local/bin/docker-compose ]; then
-    local ver=$(sudo /usr/local/bin/docker-compose --version)
+    local ver
+    ver=$(sudo /usr/local/bin/docker-compose --version)
     logging_info "${FUNCNAME[0]} ${ver}"
 
     ver=$(sudo /usr/local/bin/docker-compose version --short | awk -F. '{printf "%2d%02d%02d", $1,$2,$3}')
@@ -463,7 +465,8 @@ check_ngsi_go() {
   logging_info "${FUNCNAME[0]}"
 
   if [ -e /usr/local/bin/ngsi ]; then
-    local ver=$(/usr/local/bin/ngsi --version)
+    local ver
+    ver=$(/usr/local/bin/ngsi --version)
     logging_info "${ver}"
     ver=$(/usr/local/bin/ngsi --version | sed -e "s/ngsi version \([^ ]*\) .*/\1/" | awk -F. '{printf "%2d%02d%02d", $1,$2,$3}')
     if [ "${ver}" -ge 900 ]; then
@@ -564,7 +567,7 @@ validate_domain() {
     return
   fi
 
-  logging_info "${IPS}"
+  logging_info "${IPS[@]}"
 
   for name in "${APPS[@]}"
   do
@@ -734,7 +737,8 @@ setup_cert() {
   CRON_SH="${MINUTE} ${HOUR} \* \* \* root ${PWD}/config/script/renew.sh > /dev/null 2>&1"
   sudo sh -c "echo ${CRON_SH} > ${CRON_FILE}"
 
-  local msg=$(echo "${CRON_FILE}: $CRON_SH" | sed -e "s/\\\\//g")
+  local msg
+  msg=$(echo "${CRON_FILE}: $CRON_SH" | sed -e "s/\\\\//g")
   logging_info "${msg}"
 }
 
@@ -747,7 +751,7 @@ add_rsyslog_conf() {
   set +u
   while [ "$1" ]
   do
-    cat <<EOF >> ${RSYSLOG_CONF}
+    cat <<EOF >> "${RSYSLOG_CONF}"
 :syslogtag,startswith,"[$1]" /var/log/fiware/$1.log
 & stop
 
@@ -764,7 +768,7 @@ EOF
 setup_logging_step2() {
   logging_info "${FUNCNAME[0]}"
 
-  files=("$(sed -z -e "s/\n/ /g" ${LOGROTATE_CONF})")
+  files=("$(sed -z -e "s/\n/ /g" "${LOGROTATE_CONF}")")
   # shellcheck disable=SC2068
   for file in ${files[@]}
   do

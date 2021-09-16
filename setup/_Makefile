@@ -6,8 +6,6 @@ down:
 	sudo /usr/local/bin/docker-compose down
 ps:
 	sudo /usr/local/bin/docker-compose ps
-setup-test:
-	./test/script/setup_test.sh
 clean:
 	./setup/clean.sh
 nginx-test:
