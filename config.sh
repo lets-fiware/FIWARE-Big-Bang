@@ -30,9 +30,6 @@ IDM_ADMIN_PASS=
 # Enable firewall. (true or false) Default: false
 FIREWALL=
 
-# Enable log file creation in /var/log/fiware. (true of false) Default: true
-LOGGING=
-
 #
 # Certbot options
 #

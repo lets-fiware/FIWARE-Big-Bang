@@ -18,4 +18,4 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Run setup test
-      run: make setup-test
+      run: ./test/script/setup_test.sh

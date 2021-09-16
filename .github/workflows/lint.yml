@@ -1,4 +1,4 @@
-name: Config
+name: Lint
 on:
   push:
     branches:
@@ -9,11 +9,11 @@ on:
 
 jobs:
   lint-docs:
-    name: Lint config.sh
+    name: Lint
     runs-on: ubuntu-latest
     steps:
       - name: Git checkout
         uses: actions/checkout@v2
 
       - name: Run lint config
-        run: test/script/lint-config.sh
+        run: ./test/script/lint.sh

@@ -5,13 +5,7 @@
 [![License: MIT](https://img.shields.io/github/license/lets-fiware/FIWARE-Big-Bang.svg)](https://opensource.org/licenses/MIT)
 [![Support badge](https://img.shields.io/badge/tag-fiware-orange.svg?logo=stackoverflow)](https://stackoverflow.com/questions/tagged/fiware+fi-bb)
 <br/>
-[![Shellcheck](https://github.com/lets-fiware/FIWARE-Big-Bang/actions/workflows/shellcheck.yml/badge.svg)](https://github.com/lets-fiware/FIWARE-Big-Bang/actions/workflows/shellcheck.yml)
-[![Config](https://github.com/lets-fiware/FIWARE-Big-Bang/actions/workflows/config-lint.yml/badge.svg)](https://github.com/lets-fiware/FIWARE-Big-Bang/actions/workflows/config-lint.yml)
-[![Docs](https://github.com/lets-fiware/FIWARE-Big-Bang/actions/workflows/docs.yml/badge.svg)](https://github.com/lets-fiware/FIWARE-Big-Bang/actions/workflows/docs.yml)
-<br/>
-[![Yamllint](https://github.com/lets-fiware/FIWARE-Big-Bang/actions/workflows/yamllint.yml/badge.svg)](https://github.com/lets-fiware/FIWARE-Big-Bang/actions/workflows/yamllint.yml)
-[![Dockerfile](https://github.com/lets-fiware/FIWARE-Big-Bang/actions/workflows/dockerfile.yml/badge.svg)](https://github.com/lets-fiware/FIWARE-Big-Bang/actions/workflows/dockerfile.yml)
-<br/>
+[![Lint](https://github.com/lets-fiware/FIWARE-Big-Bang/actions/workflows/lint.yml/badge.svg)](https://github.com/lets-fiware/FIWARE-Big-Bang/actions/workflows/lint.yml)
 [![Ubuntu 18.04](https://github.com/lets-fiware/FIWARE-Big-Bang/actions/workflows/ubuntu-18.04.yml/badge.svg)](https://github.com/lets-fiware/FIWARE-Big-Bang/actions/workflows/ubuntu-18.04.yml)
 [![Ubuntu 20.04](https://github.com/lets-fiware/FIWARE-Big-Bang/actions/workflows/ubuntu-20.04.yml/badge.svg)](https://github.com/lets-fiware/FIWARE-Big-Bang/actions/workflows/ubuntu-20.04.yml)
 <br/>
@@ -98,7 +92,6 @@ You can specify configurations by editing the `config.sh` file.
 | IDM\_ADMIN\_EMAIL    | An email address of an admin user for Keyrock              | IDM\_ADMIN\_NAME @ DOMAIN\_NAME                  |
 | IDM\_ADMIN\_PASS     | A password of an admin user for Keyrock                    | (Automatically generated)                        |
 | FIREWALL             | Enable firewall. true or false                             | false                                            |
-| LOGGING              | Enable log file creation in /var/log/fiware. true of false | true                                             |
 | CERT\_EMAIL          | An email address for certbot                               | (An email address of an admin user for Keyrock)  |
 | CERT\_REVOKE         | Revoke and reacquire the certificate. true or false        | false                                            |
 | CERT\_TEST           | Use --test-cert option. true or false                      | false                                            |
