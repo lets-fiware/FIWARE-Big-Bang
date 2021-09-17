@@ -16,4 +16,4 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Run lint config
-        run: ./test/script/lint.sh
+        run: ./tests/script/lint.sh
