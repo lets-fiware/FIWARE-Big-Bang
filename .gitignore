@@ -9,3 +9,4 @@ docker-cert.yml
 cert.sh
 .vscode/
 Makefile
+coverage/
