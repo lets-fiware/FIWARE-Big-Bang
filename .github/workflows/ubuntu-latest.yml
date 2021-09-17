@@ -17,7 +17,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Run coverage
+    - name: Install
       run: ./tests/script/coverage.sh
 
     - name: Run codecov
