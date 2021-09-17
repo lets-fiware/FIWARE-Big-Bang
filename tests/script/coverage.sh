@@ -12,6 +12,13 @@ cmake ..
 sudo make install
 popd
 
+sed -i -e "s/^\(COMET=\).*/\1comet/" config.sh
+sed -i -e "s/^\(QUANTUMLEAP=\).*/\1quantumleap/" config.sh
+sed -i -e "s/^\(WIRECLOUD=\).*/\1wirecloud/" config.sh
+sed -i -e "s/^\(NGSIPROXY=\).*/\1ngsiproxy/" config.sh
+sed -i -e "s/^\(NODE_RED=\).*/\1node-red/" config.sh
+sed -i -e "s/^\(GRAFANA=\).*/\1grafana/" config.sh
+
 mkdir coverage
 export FIBB_TEST=true
-kcov --exclude-path=test,.git,setup,coverage ./coverage/ ./lets-fiware.sh example.com
+kcov --exclude-path=tests,.git,setup,coverage ./coverage/ ./lets-fiware.sh example.com
