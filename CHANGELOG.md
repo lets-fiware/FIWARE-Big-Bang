@@ -1,4 +1,4 @@
-## FIWARE Big Bang v0.1.0-next
+## FIWARE Big Bang v0.2.0 - 20 Sep, 2021
 
 -   Improve docker install on Ubuntu (#44)
 -   Add NGSI Go bash autocomplete (#43)

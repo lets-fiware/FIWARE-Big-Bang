@@ -28,6 +28,8 @@
 
 set -Ceuo pipefail
 
+VERSION=0.2.0
+
 #
 # Syslog info
 #
@@ -182,6 +184,8 @@ add_env() {
   logging_info "${FUNCNAME[0]}"
 
   cat <<EOF >> .env
+VERSION=${VERSION}
+
 DATA_DIR=${DATA_DIR}
 CERTBOT_DIR=${CERTBOT_DIR}
 CONFIG_DIR=${CONFIG_DIR}
