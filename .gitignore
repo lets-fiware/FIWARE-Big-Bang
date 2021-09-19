@@ -10,3 +10,4 @@ cert.sh
 .vscode/
 Makefile
 coverage/
+*.swp

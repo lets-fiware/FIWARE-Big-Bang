@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.1.0-next
 
+-   Add feature to install WireCloud widgets (#40)
 -   Add make command (#39)
 -   Fix certbot option (#38)
 -   Improve coverage (#37)
