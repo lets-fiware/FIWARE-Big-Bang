@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.1.0-next
 
+-   Improve docker install on Ubuntu (#44)
 -   Add NGSI Go bash autocomplete (#43)
 -   Fix cert test case (#42)
 -   Fix command parameter for certbot renew and revoke (#41)

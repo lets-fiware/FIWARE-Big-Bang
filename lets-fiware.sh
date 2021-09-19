@@ -373,6 +373,8 @@ setup_firewall() {
 #
 # Install Docker for Ubuntu
 #
+#   https://docs.docker.com/engine/install/ubuntu/
+#
 install_docker_ubuntu() {
   logging_info "${FUNCNAME[0]}"
 
@@ -389,13 +391,15 @@ install_docker_ubuntu() {
      "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
      $(lsb_release -cs) \
      stable"
-  sudo apt-get install -y docker-ce
+  sudo apt-get install -y docker-ce docker-ce-cli containerd.io
   sudo systemctl start docker
   sudo systemctl enable docker
 }
 
 #
 # Install Docker for CentOS
+#
+#   https://docs.docker.com/engine/install/centos/
 #
 install_docker_centos() {
   logging_info "${FUNCNAME[0]}"
