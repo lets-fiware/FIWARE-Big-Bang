@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.1.0-next
 
+-   Fix certbot option (#38)
 -   Improve coverage (#37)
 -   Add coverage (#36)
 -   Refactor (#35)

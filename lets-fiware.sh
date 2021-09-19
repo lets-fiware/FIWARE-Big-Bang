@@ -672,7 +672,8 @@ get_cert() {
 
   if sudo [ ! -d "${CERT_DIR}/live/$1" ]; then
     wait "$1"
-    sudo docker run --rm -v "${CERTBOT_DIR}/$1:/var/www/html/$1" -v "${CERT_DIR}:/etc/letsencrypt" "${CERTBOT}" certonly "${CERT_TEST}" --non-interactive --agree-tos -m "${CERT_EMAIL}" --webroot -w "/var/www/html/$1" -d "$1"
+    # shellcheck disable=SC2086
+    sudo docker run --rm -v "${CERTBOT_DIR}/$1:/var/www/html/$1" -v "${CERT_DIR}:/etc/letsencrypt" "${CERTBOT}" certonly ${CERT_TEST} --agree-tos -m "${CERT_EMAIL}" --webroot -w "/var/www/html/$1" -d "$1"
   else
     echo "Skip: ${CERT_DIR}/live/$1 direcotry already exits"
   fi
