@@ -95,7 +95,7 @@ get_config_sh() {
   logging_info "${FUNCNAME[0]}"
 
   if [ ! -e ./config.sh ]; then
-    echo "config.sh file not found"
+    logging_err "config.sh file not found"
     exit 1
   fi
 
@@ -112,7 +112,7 @@ check_params() {
   do
     eval VAL=\"\$$NAME\"
     if [ "$VAL" = "" ]; then
-        echo "${NAME} is empty"
+        logging_err "${NAME} is empty"
         exit 1
     fi
   done
@@ -170,7 +170,7 @@ set_and_check_values() {
   fi
 
   if [ "${WIRECLOUD}" != "" ] && [ "${NGSIPROXY}" = "" ]; then
-    echo "error: NGSIPROXY is empty"
+    logging_err "error: NGSIPROXY is empty"
     exit 1
   fi
 }
@@ -1233,7 +1233,7 @@ boot_up_containers() {
   logging_info "docker-compose up -d --build"
   sudo "${DOCKER_COMPOSE}" up -d --build
 
-  if "$FIBB_TEST"; then
+  if "$FIBB_TEST" || [ "${CERT_TEST}" = "--test-cert" ]; then
     return
   fi
   wait "https://${KEYROCK}/" "200"
