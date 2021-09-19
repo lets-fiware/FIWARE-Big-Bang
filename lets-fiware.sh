@@ -310,7 +310,7 @@ install_commands_ubuntu() {
   logging_info "${FUNCNAME[0]}"
 
   sudo apt-get update
-  sudo apt-get install -y curl pwgen jq
+  sudo apt-get install -y curl pwgen jq make
 }
 
 #
@@ -320,7 +320,7 @@ install_commands_centos() {
   logging_info "${FUNCNAME[0]}"
 
   sudo yum install -y epel-release
-  sudo yum install -y curl pwgen jq bind-utils
+  sudo yum install -y curl pwgen jq bind-utils make
 }
 
 #
