@@ -66,7 +66,7 @@ if [ -n "${CERT_FORCE_RENEWAL}" ]; then
   fi
 fi
 
-result=$(sudo docker run --rm -v "${CERTBOT_DIR}:/var/www/html" -v "${CERT_DIR}:/etc/letsencrypt" certbot/certbot:v1.18.0 renew --webroot -w /var/www/html "${CERT_TEST}" --post-hook='echo FI-BB' "$CERT_FORCE_RENEWAL")
+result=$(sudo docker run --rm -v "${CERTBOT_DIR}:/var/www/html" -v "${CERT_DIR}:/etc/letsencrypt" certbot/certbot:v1.18.0 renew --webroot -w /var/www/html ${CERT_TEST} --post-hook='echo FI-BB' "$CERT_FORCE_RENEWAL")
 
 logging "user.info" "${result}"
 

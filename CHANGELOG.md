@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.1.0-next
 
+-   Fix command parameter for certbot renew and revoke (#41)
 -   Add feature to install WireCloud widgets (#40)
 -   Add make command (#39)
 -   Fix certbot option (#38)
