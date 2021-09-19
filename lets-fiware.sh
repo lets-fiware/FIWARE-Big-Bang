@@ -478,6 +478,13 @@ check_ngsi_go() {
   curl -sOL https://github.com/lets-fiware/ngsi-go/releases/download/v0.9.0/ngsi-v0.9.0-linux-amd64.tar.gz
   sudo tar zxf ngsi-v0.9.0-linux-amd64.tar.gz -C /usr/local/bin
   rm -f ngsi-v0.9.0-linux-amd64.tar.gz
+
+  if [ -d /etc/bash_completion.d ]; then
+    curl -OL https://raw.githubusercontent.com/lets-fiware/ngsi-go/main/autocomplete/ngsi_bash_autocomplete
+    sudo mv ngsi_bash_autocomplete /etc/bash_completion.d/
+    source /etc/bash_completion.d/ngsi_bash_autocomplete
+    echo "source /etc/bash_completion.d/ngsi_bash_autocomplete" >> ~/.bashrc
+  fi
 }
 
 #
