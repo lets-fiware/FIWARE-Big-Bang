@@ -65,6 +65,7 @@ do
   eval VAL=\"\$$NAME\"
   if [ -n "$VAL" ] && [ -d "${CERT_DIR}/live/${VAL}" ]; then
     logging "user.info" "revoke ${VAL}"
-    docker run --rm -v "${CERT_DIR}:/etc/letsencrypt" "${CERTBOT}" revoke -n -v --cert-path "${CERT_DIR}/live/${VAL}/cert.pem" "${CERT_TEST}"
+    # shellcheck disable=SC2086
+    docker run --rm -v "${CERT_DIR}:/etc/letsencrypt" "${CERTBOT}" revoke -n -v --cert-path "${CERT_DIR}/live/${VAL}/cert.pem" ${CERT_TEST}
   fi
 done
