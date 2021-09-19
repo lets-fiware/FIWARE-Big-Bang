@@ -26,5 +26,7 @@ log:
 	cat /var/log/fiware/fi-bb.log
 admin:
 	./config/script/admin.sh
-get_token:
+get-token:
 	./config/script/get_token.sh
+install-widget:
+	./config/script/install_widgets.sh
