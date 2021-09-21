@@ -1,0 +1,37 @@
+version: "3"
+services:
+  keyrock:
+    image: ${IMAGE_KEYROCK}
+    depends_on:
+      - mysql
+    environment:
+      - IDM_HOST=${IDM_HOST}
+      - IDM_PORT=3000
+      - IDM_DB_HOST=${IDM_DB_HOST}
+      - IDM_DB_NAME=${IDM_DB_NAME}
+      - IDM_DB_USER=${IDM_DB_USER}
+      - IDM_DB_PASS=${IDM_DB_PASS}
+      - IDM_ADMIN_UID=${IDM_ADMIN_UID}
+      - IDM_ADMIN_USER=${IDM_ADMIN_USER}
+      - IDM_ADMIN_EMAIL=${IDM_ADMIN_EMAIL}
+      - IDM_ADMIN_PASS=${IDM_ADMIN_PASS}
+      - IDM_SESSION_SECRET=${IDM_SESSION_SECRET}
+      - IDM_ENCRYPTION_KEY=${IDM_ENCRYPTION_KEY}
+      - IDM_DEBUG=true
+    restart: always
+    logging:
+      driver: syslog
+      options:
+        tag: "[keyrock]"
+
+  mysql:
+    image: ${IMAGE_MYSQL}
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+    volumes:
+      - ./data/mysql-data:/var/lib/mysql
+    restart: always
+    logging:
+      driver: syslog
+      options:
+        tag: "[mysql]"

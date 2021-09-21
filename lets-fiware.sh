@@ -896,9 +896,9 @@ GRANT ALL PRIVILEGES ON ${IDM_DB_NAME}.* TO '${IDM_DB_USER}'@'%';
 flush PRIVILEGES;
 EOF
 
-  cp -a "${TEMPLEATE}"/docker/setup-keyrock.yml ./docker-keyrock.yml
+  cp -a "${TEMPLEATE}"/docker/setup-keyrock.yml ./docker-idm.yml
 
-  sudo "${DOCKER_COMPOSE}" -f docker-keyrock.yml up -d
+  sudo "${DOCKER_COMPOSE}" -f docker-idm.yml up -d
 
   wait "http://localhost:3000/" "200"
 
@@ -911,7 +911,7 @@ EOF
 down_keyrock() {
   logging_info "${FUNCNAME[0]}"
 
-  sudo "${DOCKER_COMPOSE}" -f docker-keyrock.yml down
+  sudo "${DOCKER_COMPOSE}" -f docker-idm.yml down
 }
 
 #
@@ -1353,7 +1353,7 @@ setup_end() {
 clean_up() {
   logging_info "${FUNCNAME[0]}"
 
-  rm -f docker-keyrock.yml
+  rm -f docker-idm.yml
   rm -f docker-cert.yml
   rm -fr "${WORK_DIR}"
 }
