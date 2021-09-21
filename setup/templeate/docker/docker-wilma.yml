@@ -1,0 +1,45 @@
+version: "3"
+services:
+  wilma:
+    image: ${IMAGE_WILMA}
+    depends_on:
+      - keyrock
+    environment:
+      - PEP_PROXY_DEBUG=true
+      - PEP_PROXY_PORT=1026
+      - PEP_PROXY_IDM_HOST=keyrock
+      - PEP_PROXY_IDM_PORT=3000
+      - PEP_PROXY_APP_ID=${PEP_PROXY_APP_ID}
+      - PEP_PROXY_USERNAME=${PEP_PROXY_USERNAME}
+      - PEP_PASSWORD=${PEP_PASSWORD}
+      - PEP_PROXY_AUTH_FOR_NGINX=true
+    restart: always
+    logging:
+      driver: syslog
+      options:
+        tag: "[pep-proxy]"
+
+  tokenproxy:
+    image: letsfiware/tokenproxy:1.0
+    build: ./config/tokenproxy
+    depends_on:
+      - keyrock
+    restart: always
+    logging:
+      driver: syslog
+      options:
+        tag: "[tokenproxy]"
+    command: >
+      --config
+      ./ngsi-go-config.json
+      --cache
+      ./ngsi-go-token-cache.json
+      tokenproxy
+      server
+      --idmHost
+      http://keyrock:3000
+      --clientId
+      ${CLIENT_ID}
+      --clientSecret
+      ${CLIENT_SECRET}
+      --verbose

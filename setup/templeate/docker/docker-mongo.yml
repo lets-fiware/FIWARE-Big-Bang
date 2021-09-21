@@ -1,0 +1,12 @@
+version: "3"
+services:
+  mongo:
+    image: ${IMAGE_MONGO}
+    command: --nojournal
+    volumes:
+      - ./config/mongo/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    restart: always
+    logging:
+      driver: syslog
+      options:
+        tag: "[mongo]"

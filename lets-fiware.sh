@@ -216,6 +216,25 @@ IDM_ADMIN_USER=${IDM_ADMIN_USER}
 IDM_ADMIN_EMAIL=${IDM_ADMIN_EMAIL}
 IDM_ADMIN_PASS=${IDM_ADMIN_PASS}
 
+IMAGE_KEYROCK=${IMAGE_KEYROCK}
+IMAGE_WILMA=${IMAGE_WILMA}
+IMAGE_ORION=${IMAGE_ORION}
+IMAGE_CYGNUS=${IMAGE_CYGNUS}
+IMAGE_COMET=${IMAGE_COMET}
+IMAGE_WIRECLOUD=${IMAGE_WIRECLOUD}
+IMAGE_NGSIPROXY=${IMAGE_NGSIPROXY}
+IMAGE_QUANTUMLEAP=${IMAGE_QUANTUMLEAP}
+
+IMAGE_MONGO=${IMAGE_MONGO}
+IMAGE_MYSQL=${IMAGE_MYSQL}
+IMAGE_POSTGRES=${IMAGE_POSTGRES}
+IMAGE_CRATE=${IMAGE_CRATE}
+
+IMAGE_NGINX=${IMAGE_NGINX}
+IMAGE_REDIS=${IMAGE_REDIS}
+IMAGE_ELASTICSEARCH=${IMAGE_ELASTICSEARCH}
+IMAGE_MEMCACHED=${IMAGE_MEMCACHED}
+IMAGE_GRAFANA=${IMAGE_GRAFANA}
 EOF
 }
 
@@ -658,7 +677,7 @@ setup_test_cert() {
       create_test_cert "${val}.${DOMAIN_NAME}" "${CERT_DIR}/live/${val}"
     fi 
   done
-  cp "${TEMPLEATE}"/nginx.conf "${CONFIG_DIR}"/nginx/
+  cp "${TEMPLEATE}"/nginx/nginx.conf "${CONFIG_DIR}"/nginx/
 }
 
 #
@@ -671,8 +690,7 @@ wait() {
   local ret
 
   host=$1
-  shift
-  ret=$1
+  ret=$2
 
   echo "Wait for ${host} to be ready"
   while [ "${ret}" != "$(curl "${host}" -o /dev/null -w '%{http_code}\n' -s)" ]
@@ -728,12 +746,12 @@ setup_cert() {
       if [ ! -d "${CERTBOT_DIR}"/"${val}" ]; then
         mkdir "${CERTBOT_DIR}"/"${val}"
       fi
-      sed -e "s/HOST/${val}/" "${TEMPLEATE}"/nginx-cert > "${NGINX_SITES}"/"${val}"
+      sed -e "s/HOST/${val}/" "${TEMPLEATE}"/nginx/nginx-cert > "${NGINX_SITES}"/"${val}"
     fi 
   done
 
   cp "${TEMPLEATE}"/docker/setup-cert.yml ./docker-cert.yml
-  cp "${TEMPLEATE}"/nginx.conf "${CONFIG_DIR}"/nginx/
+  cp "${TEMPLEATE}"/nginx/nginx.conf "${CONFIG_DIR}"/nginx/
 
   sudo "${DOCKER_COMPOSE}" -f docker-cert.yml up -d
 
@@ -837,13 +855,12 @@ EOF
 #
 # Keyrock
 #
-setup_keyrock() {
+up_keyrock() {
   logging_info "${FUNCNAME[0]}"
 
   MYSQL_ROOT_PASSWORD=$(pwgen -s 16 1)
 
   IDM_HOST=https://${KEYROCK}
-  CB_HOST=https://${ORION}
 
   IDM_DB_HOST=mysql
   IDM_DB_NAME=idm
@@ -852,7 +869,6 @@ setup_keyrock() {
 
   cat <<EOF >> .env
 IDM_HOST=${IDM_HOST}
-CB_HOST=${CB_HOST}
 
 # Mysql
 
@@ -880,9 +896,9 @@ GRANT ALL PRIVILEGES ON ${IDM_DB_NAME}.* TO '${IDM_DB_USER}'@'%';
 flush PRIVILEGES;
 EOF
 
-  cp -a "${TEMPLEATE}"/docker/setup-keyrock.yml ./docker-keyrock.yml
+  cp -a "${TEMPLEATE}"/docker/setup-keyrock.yml ./docker-idm.yml
 
-  sudo "${DOCKER_COMPOSE}" -f docker-keyrock.yml up -d
+  sudo "${DOCKER_COMPOSE}" -f docker-idm.yml up -d
 
   wait "http://localhost:3000/" "200"
 
@@ -895,7 +911,7 @@ EOF
 down_keyrock() {
   logging_info "${FUNCNAME[0]}"
 
-  sudo "${DOCKER_COMPOSE}" -f docker-keyrock.yml down
+  sudo "${DOCKER_COMPOSE}" -f docker-idm.yml down
 }
 
 #
@@ -912,7 +928,7 @@ add_docker_compose_yml() {
 # Create nginx conf
 #
 create_nginx_conf() {
-  sed -e "s/HOST/$1/" "${TEMPLEATE}/$2" > "${NGINX_SITES}/$1"
+  sed -e "s/HOST/$1/" "${TEMPLEATE}/nginx/$2" > "${NGINX_SITES}/$1"
 }
 
 #
@@ -942,32 +958,49 @@ add_nginx_volumes() {
 }
 
 #
-# Orion, Wilma and Tokenproxy
+# Nginx
 #
-setup_orion() {
+setup_nginx() {
   logging_info "${FUNCNAME[0]}"
-
-  cp "${TEMPLEATE}"/docker/docker-base.yml "${DOCKER_COMPOSE_YML}"
 
   rm -fr "${NGINX_SITES}"
   mkdir -p "${NGINX_SITES}"
 
+  cp "${TEMPLEATE}"/docker/docker-nginx.yml "${DOCKER_COMPOSE_YML}"
+
+  add_rsyslog_conf "nginx"
+}
+
+#
+# Keyrock 
+#
+setup_keyrock() {
+  logging_info "${FUNCNAME[0]}"
+
+  add_docker_compose_yml "docker-keyrock.yml"
+
   create_nginx_conf "${KEYROCK}" "nginx-keyrock"
-  create_nginx_conf "${ORION}" "nginx-orion"
 
-  add_rsyslog_conf "nginx" "orion" "mongo" "keyrock" "mysql" "pep-proxy" "tokenproxy"
+  add_nginx_depends_on "keyrock"
 
-  if [ -z "${WIRECLOUD}" ]; then
-    # Create Applicaton for Orion
-    AID=$(${NGSI_GO} applications --host "${IDM}" create --name "Orion" --description "Orion application" --url "https://${ORION}/" --redirectUri "https://${ORION}/complete/fiware/")
-    SECRET=$(${NGSI_GO} applications --host "${IDM}" get --aid "${AID}" | jq -r .application.secret )
-  else
-    # Create Applicaton for WireCloud
-    AID=$(${NGSI_GO} applications --host "${IDM}" create --name "WireCloud" --description "WireCloud application" --url "https://${WIRECLOUD}/" --redirectUri "https://${WIRECLOUD}/complete/fiware/")
-    SECRET=$(${NGSI_GO} applications --host "${IDM}" get --aid "${AID}" | jq -r .application.secret )
-    RID=$(${NGSI_GO} applications --host "${IDM}" roles --aid "${AID}" create --name Admin)
-    ${NGSI_GO} applications --host "${IDM}" users --aid "${AID}" assign --rid "${RID}" --uid "${IDM_ADMIN_UID}" > /dev/null
-  fi
+  add_rsyslog_conf "keyrock" "mysql"
+}
+
+#
+# Wilma and Tokenproxy
+#
+setup_wilma() {
+  logging_info "${FUNCNAME[0]}"
+
+  add_docker_compose_yml "docker-wilma.yml"
+
+  add_nginx_depends_on "wilma" "tokenproxy"
+
+  add_rsyslog_conf "pep-proxy" "tokenproxy"
+
+  # Create Applicaton for Orion
+  AID=$(${NGSI_GO} applications --host "${IDM}" create --name "Wilma" --description "Wilma application" --url "http://localhost/" --redirectUri "http://localhost/")
+  SECRET=$(${NGSI_GO} applications --host "${IDM}" get --aid "${AID}" | jq -r .application.secret )
 
   ORION_CLIENT_ID=${AID}
 
@@ -975,25 +1008,48 @@ setup_orion() {
   PEP_PASSWORD=$(${NGSI_GO} applications --host "${IDM}" pep --aid "${AID}" create --run | jq -r .pep_proxy.password)
   PEP_ID=$(${NGSI_GO} applications --host "${IDM}" pep --aid "${AID}" list | jq -r .pep_proxy.id)
 
-  mkdir -p "${CONFIG_DIR}/mongo"
-  cp "${TEMPLEATE}/mongo-init.js" "${CONFIG_DIR}/mongo/"
-
   mkdir -p "${CONFIG_DIR}/tokenproxy"
   cp "${TEMPLEATE}/docker/Dockerfile.tokenproxy" "${CONFIG_DIR}/tokenproxy/Dockerfile"
 
   cat <<EOF >> .env
 
-# Tokenproxy for Orion
+# Tokenproxy
 CLIENT_ID=${AID}
 CLIENT_SECRET=${SECRET}
 
-# PEP Proxy for Orion
+# PEP Proxy
 PEP_PROXY_APP_ID=${AID}
 PEP_PROXY_USERNAME=${PEP_ID}
 PEP_PASSWORD=${PEP_PASSWORD}
 EOF
 }
 
+#
+# Orion
+#
+setup_orion() {
+  logging_info "${FUNCNAME[0]}"
+
+  add_docker_compose_yml "docker-orion.yml"
+  add_docker_compose_yml "docker-mongo.yml"
+
+  create_nginx_conf "${ORION}" "nginx-orion"
+
+  add_nginx_depends_on "orion"
+
+  add_rsyslog_conf "orion" "mongo"
+
+  mkdir -p "${CONFIG_DIR}/mongo"
+  cp "${TEMPLEATE}/mongo-init.js" "${CONFIG_DIR}/mongo/"
+
+  CB_HOST=https://${ORION}
+
+  cat <<EOF >> .env
+
+CB_HOST=${CB_HOST}
+EOF
+}
+ 
 #
 # Cygnus and Comet
 #
@@ -1008,9 +1064,9 @@ setup_comet() {
 
   create_nginx_conf "${COMET}" "nginx-comet"
 
-  add_nginx_depends_on "comet" "cygnus"
+  add_nginx_depends_on "comet"
 
-  add_rsyslog_conf "cygnus" "comet"
+  add_rsyslog_conf "comet" "cygnus"
 }
 
 #
@@ -1036,6 +1092,22 @@ setup_quantumleap() {
 }
 
 #
+#  Postgres
+#
+setup_postgres() {
+  logging_info "${FUNCNAME[0]}"
+
+  add_docker_compose_yml "docker-postgres.yml"
+
+  cat <<EOF >> .env
+
+# Postgres
+
+POSTGRES_PASSWORD=$(pwgen -s 16 1)
+EOF
+}
+
+#
 # WireCLoud and ngsiproxy
 #
 setup_wirecloud() {
@@ -1046,6 +1118,16 @@ setup_wirecloud() {
   logging_info "${FUNCNAME[0]}"
 
   add_docker_compose_yml "docker-wirecloud.yml"
+
+  local aid
+  local secret
+  local rid
+
+  # Create Applicaton for WireCloud
+  aid=$(${NGSI_GO} applications --host "${IDM}" create --name "WireCloud" --description "WireCloud application" --url "https://${WIRECLOUD}/" --redirectUri "https://${WIRECLOUD}/complete/fiware/")
+  secret=$(${NGSI_GO} applications --host "${IDM}" get --aid "${aid}" | jq -r .application.secret)
+  rid=$(${NGSI_GO} applications --host "${IDM}" roles --aid "${aid}" create --name Admin)
+  ${NGSI_GO} applications --host "${IDM}" users --aid "${aid}" assign --rid "${rid}" --uid "${IDM_ADMIN_UID}" > /dev/null
 
   create_nginx_conf "${WIRECLOUD}" "nginx-wirecloud"
   create_nginx_conf "${NGSIPROXY}" "nginx-ngsiproxy"
@@ -1058,11 +1140,13 @@ setup_wirecloud() {
 
   cat <<EOF >> .env
 
-# Postgres
+# WireCloud 
 
-POSTGRES_PASSWORD=$(pwgen -s 16 1)
+WIRECLOUD_CLIENT_ID="${aid}"
+WIRECLOUD_CLIENT_SECRET="${secret}"
 EOF
 
+  setup_postgres
 }
 
 #
@@ -1108,7 +1192,7 @@ setup_node_red() {
 
   mkdir "${CONFIG_DIR}"/node-red
   cp "${TEMPLEATE}"/docker/Dockerfile.node-red "${CONFIG_DIR}"/node-red/Dockerfile
-  cp "${TEMPLEATE}"/settings.js.node-red "${CONFIG_DIR}"/node-red/settings.js
+  cp "${TEMPLEATE}"/docker/node-red-settings.js "${CONFIG_DIR}"/node-red/settings.js
 
   cat <<EOF >> .env
 
@@ -1269,7 +1353,7 @@ setup_end() {
 clean_up() {
   logging_info "${FUNCNAME[0]}"
 
-  rm -f docker-keyrock.yml
+  rm -f docker-idm.yml
   rm -f docker-cert.yml
   rm -fr "${WORK_DIR}"
 }
@@ -1282,8 +1366,11 @@ setup_main() {
 
   setup_cert
 
-  setup_keyrock
+  up_keyrock
 
+  setup_nginx
+  setup_keyrock
+  setup_wilma
   setup_orion
   setup_comet
   setup_quantumleap

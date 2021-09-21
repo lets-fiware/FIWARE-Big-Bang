@@ -1,0 +1,13 @@
+version: "3"
+services:
+  postgres:
+    image: ${IMAGE_POSTGRES}
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - ./data/wirecloud/postgres-data:/var/lib/postgresql/data
+    restart: always
+    logging:
+      driver: syslog
+      options:
+        tag: "[postgres]"

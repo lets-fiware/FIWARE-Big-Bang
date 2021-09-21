@@ -1,5 +1,7 @@
 ## FIWARE Big Bang v0.2.0-next
 
+-   Refactor (#45)
+
 ## FIWARE Big Bang v0.2.0 - 20 Sep, 2021
 
 -   Improve docker install on Ubuntu (#44)

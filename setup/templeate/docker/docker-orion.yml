@@ -1,0 +1,12 @@
+version: "3"
+services:
+  orion:
+    image: ${IMAGE_ORION}
+    depends_on:
+      - mongo
+    entrypoint: ["sh", "-c", "rm /tmp/contextBroker.pid; /usr/bin/contextBroker -fg -multiservice -dbhost mongo"]
+    restart: always
+    logging:
+      driver: syslog
+      options:
+        tag: "[orion]"
