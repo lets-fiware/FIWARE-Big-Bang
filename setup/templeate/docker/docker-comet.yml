@@ -1,7 +1,7 @@
 version: "3"
 services:
   cygnus:
-    image: fiware/cygnus-ngsi:2.10.0
+    image: ${IMAGE_CYGNUS}
     depends_on:
       - mongo
     ports:
@@ -22,7 +22,7 @@ services:
         tag: "[cygnus]"
 
   comet:
-    image: fiware/sth-comet:2.8.0
+    image: ${IMAGE_COMET}
     depends_on:
       - cygnus
       - mongo

@@ -1,7 +1,7 @@
 version: "3"
 services:
   quantumleap:
-    image: orchestracities/quantumleap:0.8.1
+    image: ${IMAGE_QUANTUMLEAP}
     depends_on:
       - crate
       - redis
@@ -19,7 +19,7 @@ services:
         tag: "[quantumleap]"
 
   redis:
-    image: redis:6
+    image: ${IMAGE_REDIS}
     volumes:
       - ./data/redis:/data
     restart: always
@@ -29,7 +29,7 @@ services:
         tag: "[redis]"
 
   crate:
-    image: crate:4.1.4
+    image: ${IMAGE_CRATE}
     ports:
       # Admin UI
       - "127.0.0.1:4200:4200"

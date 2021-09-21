@@ -4,12 +4,16 @@ services:
     image: ${IMAGE_NGINX}
     ports:
       - 80:80
+      - 443:443
+    depends_on:
+      # __NGINX_DEPENDS_ON__
     volumes:
       - ./config/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./config/nginx/sites-enable:/etc/nginx/sites-enable
-      - ${CERTBOT_DIR}:/var/www/html
       - ${CERT_DIR}:/etc/letsencrypt
       - ${NGINX_LOG_DIR}:/var/log/nginx
+      # __NGINX_VOLUMES__
+    restart: always
     logging:
       driver: syslog
       options:
