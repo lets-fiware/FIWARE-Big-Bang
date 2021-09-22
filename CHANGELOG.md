@@ -1,6 +1,7 @@
 ## FIWARE Big Bang v0.2.0-next
 
--   Refactor (#45)
+-   Update README.md (#48)
+-   Refactor (#47)
 
 ## FIWARE Big Bang v0.2.0 - 20 Sep, 2021
 
