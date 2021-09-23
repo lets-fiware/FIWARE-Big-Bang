@@ -118,7 +118,7 @@ check_params() {
         exit 1
     fi
   done
-  
+
   if ! [ "${FIBB_TEST:+false}" ]; then
     FIBB_TEST=false
   fi
@@ -139,7 +139,6 @@ set_and_check_values() {
   TEMPLEATE=${SETUP_DIR}/templeate
 
   DOCKER_COMPOSE=/usr/local/bin/docker-compose
-  CERTBOT=certbot/certbot:v1.18.0
 
   if [ -z "${IDM_ADMIN_USER}" ]; then
     IDM_ADMIN_USER="admin"
@@ -205,7 +204,7 @@ DOCKER_COMPOSE=${DOCKER_COMPOSE}
 FIREWALL=${FIREWALL}
 
 CERT_DIR=${CERT_DIR}
-CERTBOT=${CERTBOT}
+IMAGE_CERTBOT=${IMAGE_CERTBOT}
 CERT_EMAIL=${CERT_EMAIL}
 CERT_REVOKE=${CERT_REVOKE}
 CERT_TEST=${CERT_TEST}
@@ -632,55 +631,6 @@ validate_domain() {
 }
 
 #
-# create test_cert
-#
-create_test_cert() {
-  logging_info "${FUNCNAME[0]}"
-
-  openssl genrsa 2048 > "$2"/server.key
-  openssl req -new -key "$2"/server.key << EOF > "$2"/server.csr
-JP
-Tokyo
-Smart city
-Let's FIWARE
-FI-BB
-$1
-fiware@example.com
-fiware
- 
-EOF
-  openssl x509 -days 3650 -req -signkey "$2"/server.key < "$2"/server.csr > "$2"/server.crt
-  openssl rsa -in "$2"/server.key -out "$2"/server.key << EOF
-fiware
-EOF
-}
-
-
-#
-# setup test cert
-#
-setup_test_cert() {
-  logging_info "${FUNCNAME[0]}"
-
-  mkdir -p "${CERT_DIR}"/live
-
-  if "$FIBB_TEST"; then
-    SSL_CERTIFICATE=server.crt
-    SSL_CERTIFICATE_KEY=server.key
-  fi
-
-  for name in "${APPS[@]}"
-  do
-    eval val=\"\$"${name}"\"
-    if [ -n "${val}" ]; then
-      mkdir "${CERT_DIR}"/live/"${val}"
-      create_test_cert "${val}.${DOMAIN_NAME}" "${CERT_DIR}/live/${val}"
-    fi 
-  done
-  cp "${TEMPLEATE}"/nginx/nginx.conf "${CONFIG_DIR}"/nginx/
-}
-
-#
 # wait for serive
 #
 wait() {
@@ -693,7 +643,7 @@ wait() {
   ret=$2
 
   echo "Wait for ${host} to be ready"
-  while [ "${ret}" != "$(curl "${host}" -o /dev/null -w '%{http_code}\n' -s)" ]
+  while [ "${ret}" != "$(curl "${host}" --insecure -o /dev/null -w '%{http_code}\n' -s)" ]
   do
     sleep 1
   done
@@ -708,13 +658,14 @@ get_cert() {
   echo "${CERT_DIR}/live/$1"
 
   if sudo [ -d "${CERT_DIR}/live/$1" ] && ${CERT_REVOKE}; then
-    sudo docker run --rm -v "${CERT_DIR}:/etc/letsencrypt" "${CERTBOT}" revoke -n -v "${CERT_TEST}" --cert-path "${CERT_DIR}/live/$1/cert.pem"
+    # shellcheck disable=SC2086
+    sudo docker run --rm -v "${CERT_DIR}:/etc/letsencrypt" "${IMAGE_CERTBOT}" revoke -n -v ${CERT_TEST} --cert-path "${CERT_DIR}/live/$1/cert.pem"
   fi
 
   if sudo [ ! -d "${CERT_DIR}/live/$1" ]; then
     wait "http://$1/" "404"
     # shellcheck disable=SC2086
-    sudo docker run --rm -v "${CERTBOT_DIR}/$1:/var/www/html/$1" -v "${CERT_DIR}:/etc/letsencrypt" "${CERTBOT}" certonly ${CERT_TEST} --agree-tos -m "${CERT_EMAIL}" --webroot -w "/var/www/html/$1" -d "$1"
+    sudo docker run --rm -v "${CERTBOT_DIR}/$1:/var/www/html/$1" -v "${CERT_DIR}:/etc/letsencrypt" "${IMAGE_CERTBOT}" certonly ${CERT_TEST} --agree-tos -m "${CERT_EMAIL}" --webroot -w "/var/www/html/$1" -d "$1"
   else
     echo "Skip: ${CERT_DIR}/live/$1 direcotry already exits"
   fi
@@ -725,19 +676,6 @@ get_cert() {
 #
 setup_cert() {
   logging_info "${FUNCNAME[0]}"
-
-  if "$FIBB_TEST"; then
-    setup_test_cert
-    return
-  fi
-
-  if [ -n "${CERT_TEST}" ]; then
-    if "${CERT_TEST}"; then
-      CERT_TEST=--test-cert
-    else
-      CERT_TEST=
-    fi
-  fi
 
   for name in "${APPS[@]}"
   do
@@ -1332,9 +1270,6 @@ boot_up_containers() {
   logging_info "docker-compose up -d --build"
   sudo "${DOCKER_COMPOSE}" up -d --build
 
-  if "$FIBB_TEST" || [ "${CERT_TEST}" = "--test-cert" ]; then
-    return
-  fi
   wait "https://${KEYROCK}/" "200"
 }
 

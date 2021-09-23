@@ -39,7 +39,8 @@ CERT_EMAIL=
 # Revoke and reacquire the certificate. (true or false) Default: false
 CERT_REVOKE=
 
-# Use --test-cert option. (true or false) Default: false
+# Use --test-cert option.
+# CERT_TEST=--test-cert
 CERT_TEST=
 
 # Use --force-renewal option. (true or false) Default: false
@@ -65,3 +66,5 @@ IMAGE_REDIS=redis:6
 IMAGE_ELASTICSEARCH=elasticsearch:2.4
 IMAGE_MEMCACHED=memcached:1
 IMAGE_GRAFANA=grafana/grafana:6.1.6
+
+IMAGE_CERTBOT=certbot/certbot:v1.18.0
