@@ -50,14 +50,6 @@ fi
 
 . ./.env
 
-if [ -n "${CERT_TEST}" ]; then
-  if "${CERT_TEST}"; then
-    CERT_TEST=--test-cert
-  else
-    CERT_TEST=
-  fi
-fi
-
 /usr/local/bin/docker-compose down
 
 for NAME in KEYROCK ORION COMET WIRECLOUD NGSIPROXY NODE_RED GRAFANA QUANTUMLEAP
@@ -66,6 +58,6 @@ do
   if [ -n "$VAL" ] && [ -d "${CERT_DIR}/live/${VAL}" ]; then
     logging "user.info" "revoke ${VAL}"
     # shellcheck disable=SC2086
-    docker run --rm -v "${CERT_DIR}:/etc/letsencrypt" "${CERTBOT}" revoke -n -v --cert-path "${CERT_DIR}/live/${VAL}/cert.pem" ${CERT_TEST}
+    docker run --rm -v "${CERT_DIR}:/etc/letsencrypt" "${IMAGE_CERTBOT}" revoke -n -v --cert-path "${CERT_DIR}/live/${VAL}/cert.pem" ${CERT_TEST}
   fi
 done

@@ -6,7 +6,7 @@ services:
       - 80:80
       - 443:443
     depends_on:
-      # __NGINX_DEPENDS_ON__
+    # __NGINX_DEPENDS_ON__
     volumes:
       - ./config/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./config/nginx/sites-enable:/etc/nginx/sites-enable

@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.2.0-next
 
+-   Add certmock (#49)
 -   Update README.md (#48)
 -   Refactor (#47)
 
