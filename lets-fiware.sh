@@ -160,11 +160,7 @@ set_and_check_values() {
     CERT_REVOKE=false
   fi
 
-  if "${FIBB_TEST}"; then
-    CERT_DIR=${CONFIG_DIR}/cert
-  else
-    CERT_DIR=/etc/letsencrypt 
-  fi
+  CERT_DIR=/etc/letsencrypt
 
   if [ "${WIRECLOUD}" = "" ]; then
     NGSIPROXY=""
@@ -572,13 +568,15 @@ add_etc_hosts() {
     if [ -n "${val}" ]; then
       result=0
       output=$(grep "${val}" /etc/hosts 2> /dev/null) || result=$?
-      echo "${output}"
+      echo "${output}" > /dev/null
       if [ ! "$result" = "0" ]; then
         sudo bash -c "echo $1 ${val} >> /etc/hosts"
         echo "Add '$1 ${val}' to /etc/hosts"
       fi
     fi
   done
+
+  cat /etc/hosts
 }
 
 #
@@ -592,23 +590,28 @@ validate_domain() {
   if [ -n "${IP_ADDRESS}" ]; then
       IPS=("${IP_ADDRESS}")
   else
-      IPS=("$(hostname -I)")
+      # shellcheck disable=SC2207
+      IPS=($(hostname -I))
   fi
 
   if "$FIBB_TEST"; then
-    IP_ADDRESS="${IPS[0]}"
-    add_etc_hosts IP_ADDRESS
-    return
+    IP_ADDRESS=${IPS[0]}
+    echo "${IP_ADDRESS}"
+    add_etc_hosts "${IP_ADDRESS}" 
   fi
 
   logging_info "${IPS[@]}"
 
-  for name in "${APPS[@]}"
+  # shellcheck disable=SC2068
+  for name in ${APPS[@]}
   do
     eval val=\"\$"${name}"\"
     if [ -n "${val}" ]; then
         logging_info "Sub-domain: ${val}"
         IP=$(host -4 ${val} | awk 'match($0,/[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/) { print substr($0, RSTART, RLENGTH) }' || true)
+        if [ "$IP" = "" ]; then
+          IP=$(sed -n -e "/${val}/s/\([^ ].*\) .*/\1/p" /etc/hosts)
+        fi
         logging_info "IP address: ${IP}"
         found=false
         # shellcheck disable=SC2068
@@ -620,7 +623,8 @@ validate_domain() {
           fi
         done
         if ! "${found}"; then
-            MSG="IP address error: ${val}," "${IP_ADDRESS[@]}"
+            # shellcheck disable=SC2124
+            MSG="IP address error: ${val}, ${IP_ADDRESS[@]}"
             logging_err "${MSG}"
             exit 1
         fi 
