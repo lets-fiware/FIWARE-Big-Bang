@@ -184,6 +184,7 @@ VERSION=${VERSION}
 DATA_DIR=${DATA_DIR}
 CERTBOT_DIR=${CERTBOT_DIR}
 CONFIG_DIR=${CONFIG_DIR}
+CONFIG_NGINX=${CONFIG_NGINX}
 NGINX_SITES=${NGINX_SITES}
 SETUP_DIR=${SETUP_DIR}
 WORK_DIR=${WORK_DIR}
@@ -230,6 +231,7 @@ IMAGE_REDIS=${IMAGE_REDIS}
 IMAGE_ELASTICSEARCH=${IMAGE_ELASTICSEARCH}
 IMAGE_MEMCACHED=${IMAGE_MEMCACHED}
 IMAGE_GRAFANA=${IMAGE_GRAFANA}
+
 EOF
 }
 
@@ -521,6 +523,7 @@ setup_init() {
   MYSQL_DIR="${WORK_DIR}/mysql"
 
   CONFIG_DIR=./config
+  CONFIG_NGINX=${CONFIG_DIR}/nginx
   NGINX_SITES=${CONFIG_DIR}/nginx/sites-enable
 
   CERTBOT_DIR=$(pwd)/data/cert
@@ -829,7 +832,6 @@ IDM_ADMIN_EMAIL=${IDM_ADMIN_EMAIL}
 IDM_ADMIN_PASS=${IDM_ADMIN_PASS}
 IDM_SESSION_SECRET=$(pwgen -s 16 1)
 IDM_ENCRYPTION_KEY=$(pwgen -s 16 1)
-
 EOF
 
   cat <<EOF > ${MYSQL_DIR}/init.sql
@@ -900,6 +902,36 @@ add_nginx_volumes() {
 }
 
 #
+# create_dummy_cert
+#
+create_dummy_cert() {
+  logging_info "${FUNCNAME[0]}"
+
+  echo "subjectAltName=IP:${IP_ADDRESS}" > "${WORK_DIR}/ip.txt"
+
+  openssl genrsa 2048 > "${WORK_DIR}/server.key"
+  openssl req -new -key "${WORK_DIR}/server.key" << EOF > "${WORK_DIR}/server.csr"
+JP
+Tokyo
+Smart city
+Let's FIWARE
+FI-BB
+${DOMAIN_NAME}
+fiware@example.com
+fiware
+
+EOF
+
+  openssl x509 -days 3650 --extfile "${WORK_DIR}/ip.txt" -req -signkey "${WORK_DIR}/server.key" < "${WORK_DIR}/server.csr" > "${WORK_DIR}/server.crt"
+  openssl rsa -in "${WORK_DIR}/server.key" -out "${WORK_DIR}/server.key" << EOF
+fiware
+EOF
+
+  mv "${WORK_DIR}/server.crt" "${CONFIG_NGINX}/fullchain.pem"
+  mv "${WORK_DIR}/server.key" "${CONFIG_NGINX}/privkey.pem"
+}
+
+#
 # Nginx
 #
 setup_nginx() {
@@ -909,6 +941,10 @@ setup_nginx() {
   mkdir -p "${NGINX_SITES}"
 
   cp "${TEMPLEATE}"/docker/docker-nginx.yml "${DOCKER_COMPOSE_YML}"
+
+  cp "${TEMPLEATE}"/nginx/default_server "${NGINX_SITES}"
+
+  create_dummy_cert
 
   add_rsyslog_conf "nginx"
 }
