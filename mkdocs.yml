@@ -1,0 +1,7 @@
+site_name: "FIWARE Big Bang"
+site_description: FIWARE Big Bang (Let's FIWARE)
+
+nav:
+  - 'Home':
+    - 'Index': index.md
+    - 'Install': install.md
