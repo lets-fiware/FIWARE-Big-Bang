@@ -546,6 +546,7 @@ setup_init() {
   val=
 
   POSTGRES_INSTALLED=false
+  POSTGRES_PASSWORD=
 
   CONTRIB_DIR=./CONTRIB
 }
@@ -834,9 +835,7 @@ up_keyrock_mysql() {
 
   IDM_HOST=https://${KEYROCK}
 
-  IDM_DB_DIALECT=msyql
   IDM_DB_HOST=mysql
-  IDM_DB_PORT=3306
   IDM_DB_NAME=idm
   IDM_DB_USER=idm
   IDM_DB_PASS=$(pwgen -s 16 1)
@@ -848,9 +847,7 @@ IDM_HOST=${IDM_HOST}
 
 MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
 
-IDM_DB_DIALECT=${IDM_DB_DIALECT}
 IDM_DB_HOST=${IDM_DB_HOST}
-IDM_DB_PORT=${IDM_DB_PORT}
 IDM_DB_NAME=${IDM_DB_NAME}
 IDM_DB_USER=${IDM_DB_USER}
 IDM_DB_PASS=${IDM_DB_PASS}
@@ -1048,6 +1045,9 @@ setup_mysql() {
 
   add_docker_compose_yml "docker-mysql.yml"
 
+  sed -i -e "/- IDM_DB_DIALECT/d" ${DOCKER_COMPOSE_YML}
+  sed -i -e "/- IDM_DB_PORT/d" ${DOCKER_COMPOSE_YML}
+
   sed -i -e "/ __KEYROCK_DEPENDS_ON__/s/^.*/      - mysql/" ${DOCKER_COMPOSE_YML}
 
   add_rsyslog_conf "mysql"
@@ -1075,11 +1075,13 @@ setup_postgres() {
     return
   fi
 
+  POSTGRES_PASSWORD=$(pwgen -s 16 1)
+
   cat <<EOF >> .env
 
 # Postgres
 
-POSTGRES_PASSWORD=$(pwgen -s 16 1)
+POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
 EOF
 }
 
