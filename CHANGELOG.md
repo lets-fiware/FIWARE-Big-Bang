@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.2.0-next
 
+-   Add Keyrock with PostgreSQL (#52)
 -   Add default server for nginx (#51)
 -   Improve coverage (#50)
 -   Add certmock (#49)

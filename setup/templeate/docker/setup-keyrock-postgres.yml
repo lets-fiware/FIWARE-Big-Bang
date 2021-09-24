@@ -3,25 +3,43 @@ services:
   keyrock:
     image: ${IMAGE_KEYROCK}
     depends_on:
-    # __KEYROCK_DEPENDS_ON__
+      - postgres
+    ports:
+      - 127.0.0.1:3000:3000
     environment:
       - IDM_HOST=${IDM_HOST}
       - IDM_PORT=3000
-      - IDM_DB_DIALECT=${IDM_DB_DIALECT}
+      - IDM_DB_DIALECT=postgres
       - IDM_DB_HOST=${IDM_DB_HOST}
       - IDM_DB_PORT=${IDM_DB_PORT}
       - IDM_DB_NAME=${IDM_DB_NAME}
       - IDM_DB_USER=${IDM_DB_USER}
       - IDM_DB_PASS=${IDM_DB_PASS}
+
       - IDM_ADMIN_UID=${IDM_ADMIN_UID}
       - IDM_ADMIN_USER=${IDM_ADMIN_USER}
       - IDM_ADMIN_EMAIL=${IDM_ADMIN_EMAIL}
       - IDM_ADMIN_PASS=${IDM_ADMIN_PASS}
       - IDM_SESSION_SECRET=${IDM_SESSION_SECRET}
       - IDM_ENCRYPTION_KEY=${IDM_ENCRYPTION_KEY}
-      - IDM_DEBUG=true
+
+      - DEBUG=idm:*
+    volumes:
+      - ./.work/keyrock/20210603073911-hashed-access-tokens.js:/opt/fiware-idm/migrations/20210603073911-hashed-access-tokens.js
+    #logging:
+    #  driver: syslog
+    #  options:
+    #    tag: "[keyrock]"
+
+  postgres:
+    image: ${IMAGE_POSTGRES}
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - ./data/postgres-data:/var/lib/postgresql/data
+      - ./.work/postgres:/docker-entrypoint-initdb.d:ro
     restart: always
     logging:
       driver: syslog
       options:
-        tag: "[keyrock]"
+        tag: "[postgres]"

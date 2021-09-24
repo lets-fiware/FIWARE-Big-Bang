@@ -47,7 +47,7 @@ setup() {
 fibb_down() {
   make down
 
-  while [ "1" != $(docker ps | wc -l) ]
+  while [ "1" != "$(docker ps | wc -l)" ]
   do
     sleep 1
   done
@@ -88,9 +88,12 @@ install_test3() {
 install_test4() {
   sleep 5
 
+  # shellcheck disable=SC2207
   IPS=($(hostname -I))
 
   git checkout config.sh
+
+  sed -i -e "s/^\(KEYROCK_POSTGRES=\).*/\1true/" config.sh
 
   ${KCOV} ./coverage ./lets-fiware.sh example.com "${IPS[0]}"
 }
