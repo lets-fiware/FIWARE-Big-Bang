@@ -80,24 +80,25 @@ Examples:
 
 You can specify configurations by editing the `config.sh` file.
 
-| Variable name        | Description                                                | Default value                                    |
-| -------------------- | ---------------------------------------------------------- | ------------------------------------------------ |
-| KEYROCK              | A sub-domain name of Keyrock (Required)                    | keyrock                                          |
-| ORION                | A sub-domain name of Orion (Required)                      | orion                                            |
-| COMET                | A sub-domain name of Comet                                 | (empty)                                          |
-| QUANTUMLEAP          | A sub-domain name of QuantumLeap                           | (empty)                                          |
-| WIRECLOUD            | A sub-domain name of WireCloud                             | (empty)                                          |
-| NGSIPROXY            | A sub-domain name of Ngsiproxy                             | (empty)                                          |
-| NODE\_RED            | A sub-domain name of Node-RED                              | (empty)                                          |
-| GRAFANA              | A sub-domain name of Grafana                               | (empty)                                          |
-| IDM\_ADMIN\_NAME     | A name of an admin user for Keyrock                        | admin                                            |
-| IDM\_ADMIN\_EMAIL    | An email address of an admin user for Keyrock              | IDM\_ADMIN\_NAME @ DOMAIN\_NAME                  |
-| IDM\_ADMIN\_PASS     | A password of an admin user for Keyrock                    | (Automatically generated)                        |
-| FIREWALL             | Enable firewall. true or false                             | false                                            |
-| CERT\_EMAIL          | An email address for certbot                               | (An email address of an admin user for Keyrock)  |
-| CERT\_REVOKE         | Revoke and reacquire the certificate. true or false        | false                                            |
-| CERT\_TEST           | Use --test-cert option. true or false                      | false                                            |
-| CERT\_FORCE\_RENEWAL | Use --force-renewal option. true or false                  | false                                            |
+| Variable name        | Description                                                    | Default value                                    |
+| -------------------- | -------------------------------------------------------------- | ------------------------------------------------ |
+| KEYROCK              | A sub-domain name of Keyrock (Required)                        | keyrock                                          |
+| ORION                | A sub-domain name of Orion (Required)                          | orion                                            |
+| COMET                | A sub-domain name of Comet                                     | (empty)                                          |
+| QUANTUMLEAP          | A sub-domain name of QuantumLeap                               | (empty)                                          |
+| WIRECLOUD            | A sub-domain name of WireCloud                                 | (empty)                                          |
+| NGSIPROXY            | A sub-domain name of Ngsiproxy                                 | (empty)                                          |
+| NODE\_RED            | A sub-domain name of Node-RED                                  | (empty)                                          |
+| GRAFANA              | A sub-domain name of Grafana                                   | (empty)                                          |
+| IDM\_ADMIN\_NAME     | A name of an admin user for Keyrock                            | admin                                            |
+| IDM\_ADMIN\_EMAIL    | An email address of an admin user for Keyrock                  | IDM\_ADMIN\_NAME @ DOMAIN\_NAME                  |
+| IDM\_ADMIN\_PASS     | A password of an admin user for Keyrock                        | (Automatically generated)                        |
+| KEYROCK\_POSTGRES    | Use PostgreSQL as back-end database for Keyrock. true of false | false                                            |
+| FIREWALL             | Enable firewall. true or false                                 | false                                            |
+| CERT\_EMAIL          | An email address for certbot                                   | (An email address of an admin user for Keyrock)  |
+| CERT\_REVOKE         | Revoke and reacquire the certificate. true or false            | false                                            |
+| CERT\_TEST           | Use --test-cert option. Set `--test-cert` to enable it.        | (empty)                                          |
+| CERT\_FORCE\_RENEWAL | Use --force-renewal option. true or false                      | false                                            |
 
 ## Copyright and License
 
