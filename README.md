@@ -93,7 +93,7 @@ You can specify configurations by editing the `config.sh` file.
 | IDM\_ADMIN\_NAME     | A name of an admin user for Keyrock                            | admin                                            |
 | IDM\_ADMIN\_EMAIL    | An email address of an admin user for Keyrock                  | IDM\_ADMIN\_NAME @ DOMAIN\_NAME                  |
 | IDM\_ADMIN\_PASS     | A password of an admin user for Keyrock                        | (Automatically generated)                        |
-| KEYROCK\_POSTGRES    | Use PostgreSQL as back-end database for Keyrock. true of false | false                                            |
+| KEYROCK\_POSTGRES    | Use PostgreSQL as backend database for Keyrock. true of false  | false                                            |
 | FIREWALL             | Enable firewall. true or false                                 | false                                            |
 | CERT\_EMAIL          | An email address for certbot                                   | (An email address of an admin user for Keyrock)  |
 | CERT\_REVOKE         | Revoke and reacquire the certificate. true or false            | false                                            |
