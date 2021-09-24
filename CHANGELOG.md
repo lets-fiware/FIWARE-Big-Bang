@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.2.0-next
 
+-   Add default server for nginx (#51)
 -   Improve coverage (#50)
 -   Add certmock (#49)
 -   Update README.md (#48)

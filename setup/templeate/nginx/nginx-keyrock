@@ -1,5 +1,5 @@
   server {
-    listen 80 default_server;
+    listen 80;
     server_name HOST;
 
     location / {
@@ -16,7 +16,7 @@
   }
 
   server {
-    listen 443 http2 ssl default_server;
+    listen 443 http2 ssl;
     server_name HOST;
 
     ssl_certificate /etc/letsencrypt/live/HOST/SSL_CERTIFICATE;
