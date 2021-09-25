@@ -5,6 +5,7 @@ services:
     command: --nojournal
     volumes:
       - ./config/mongo/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+      - ./data/mongo-data:/data/db
     restart: always
     logging:
       driver: syslog
