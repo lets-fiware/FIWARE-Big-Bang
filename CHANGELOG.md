@@ -1,5 +1,7 @@
 ## FIWARE Big Bang v0.3.0-next
 
+-   Add persistent volume for Mongodb (#58)
+
 ## FIWARE Big Bang v0.3.0 - 25 Sep, 2021
 
 -   Fix certbot image (#55)
