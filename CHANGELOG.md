@@ -1,4 +1,4 @@
-## FIWARE Big Bang v0.2.0-next
+## FIWARE Big Bang v0.3.0 - 25 Sep, 2021
 
 -   Fix certbot image (#55)
 -   Fix WireCloud settings for NGSI Go (#54)
