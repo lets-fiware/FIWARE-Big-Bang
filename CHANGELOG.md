@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.2.0-next
 
+-   Fix certbot image (#55)
 -   Fix WireCloud settings for NGSI Go (#54)
 -   Improve documentation (#53)
 -   Add Keyrock with PostgreSQL (#52)
