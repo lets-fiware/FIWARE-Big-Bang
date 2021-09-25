@@ -1,0 +1,13 @@
+version: "3"
+services:
+  mysql:
+    image: ${IMAGE_MYSQL}
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+    volumes:
+      - ./data/mysql-data:/var/lib/mysql
+    restart: always
+    logging:
+      driver: syslog
+      options:
+        tag: "[mysql]"

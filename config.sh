@@ -18,6 +18,9 @@ NGSIPROXY=
 NODE_RED=
 GRAFANA=
 
+# Use PostgreSQL as back-end database for Keyrock. (true of false) Default: false
+KEYROCK_POSTGRES=
+
 # Set a name of an admin user for Keyrock. Default: admin
 IDM_ADMIN_USER=
 
@@ -47,8 +50,8 @@ CERT_TEST=
 CERT_FORCE_RENEWAL=
 
 # Docker images
-IMAGE_KEYROCK=fiware/idm:8.0.0
-IMAGE_WILMA=fiware/pep-proxy:8.0.0
+IMAGE_KEYROCK=fiware/idm:8.1.0
+IMAGE_WILMA=fiware/pep-proxy:8.1.0
 IMAGE_ORION=fiware/orion:3.2.0
 IMAGE_CYGNUS=fiware/cygnus-ngsi:2.10.0
 IMAGE_COMET=fiware/sth-comet:2.8.0

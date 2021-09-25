@@ -20,6 +20,10 @@ services:
       - IDM_ADMIN_PASS=${IDM_ADMIN_PASS}
       - IDM_SESSION_SECRET=${IDM_SESSION_SECRET}
       - IDM_ENCRYPTION_KEY=${IDM_ENCRYPTION_KEY}
+    logging:
+      driver: syslog
+      options:
+        tag: "[keyrock]"
 
   mysql:
     image: ${IMAGE_MYSQL}
@@ -28,3 +32,7 @@ services:
     volumes:
       - ./data/mysql-data:/var/lib/mysql
       - ./.work/mysql:/docker-entrypoint-initdb.d/:ro
+    logging:
+      driver: syslog
+      options:
+        tag: "[mysql]"

@@ -140,6 +140,10 @@ set_and_check_values() {
 
   DOCKER_COMPOSE=/usr/local/bin/docker-compose
 
+  if [ -z "${KEYROCK_POSTGRES}" ]; then
+    KEYROCK_POSTGRES=false
+  fi
+
   if [ -z "${IDM_ADMIN_USER}" ]; then
     IDM_ADMIN_USER="admin"
   fi
@@ -188,17 +192,19 @@ CONFIG_NGINX=${CONFIG_NGINX}
 NGINX_SITES=${NGINX_SITES}
 SETUP_DIR=${SETUP_DIR}
 WORK_DIR=${WORK_DIR}
+CONTRIB_DIR=${CONTRIB_DIR}
 TEMPLEATE=${TEMPLEATE}
 
 LOG_DIR=${LOG_DIR}
 NGINX_LOG_DIR=${NGINX_LOG_DIR}
 
 DOMAIN_NAME=${DOMAIN_NAME}
-IP_ADDRESS=${IP_ADDRESS}
 
 DOCKER_COMPOSE=${DOCKER_COMPOSE}
 
 FIREWALL=${FIREWALL}
+
+KEYROCK_POSTGRES=${KEYROCK_POSTGRES}
 
 CERT_DIR=${CERT_DIR}
 IMAGE_CERTBOT=${IMAGE_CERTBOT}
@@ -520,7 +526,9 @@ setup_init() {
   DATA_DIR=./data
 
   WORK_DIR=./.work
+  KEYROCK_DIR="${WORK_DIR}/keyrock"
   MYSQL_DIR="${WORK_DIR}/mysql"
+  POSTGRES_DIR="${WORK_DIR}/postgres"
 
   CONFIG_DIR=./config
   CONFIG_NGINX=${CONFIG_DIR}/nginx
@@ -536,6 +544,11 @@ setup_init() {
   readonly APPS=(KEYROCK ORION COMET WIRECLOUD NGSIPROXY NODE_RED GRAFANA QUANTUMLEAP)
 
   val=
+
+  POSTGRES_INSTALLED=false
+  POSTGRES_PASSWORD=
+
+  CONTRIB_DIR=./CONTRIB
 }
 
 #
@@ -550,7 +563,9 @@ make_directories() {
 
   mkdir "${DATA_DIR}"
   mkdir "${WORK_DIR}"
+  mkdir "${KEYROCK_DIR}"
   mkdir "${MYSQL_DIR}"
+  mkdir "${POSTGRES_DIR}"
 
   mkdir -p "${CONFIG_DIR}"/nginx
   mkdir -p "${NGINX_SITES}"
@@ -635,6 +650,10 @@ validate_domain() {
   done
 
   logging_info "IP_ADDRESS: ${IP_ADDRESS}"
+  cat <<EOF >> .env
+
+  IP_ADDRESS=${IP_ADDRESS}
+EOF
 }
 
 #
@@ -650,10 +669,17 @@ wait() {
   ret=$2
 
   echo "Wait for ${host} to be ready"
-  while [ "${ret}" != "$(curl "${host}" --insecure -o /dev/null -w '%{http_code}\n' -s)" ]
+
+  for i in $(seq 300)
   do
+    if [ "${ret}" == "$(curl "${host}" --insecure -o /dev/null -w '%{http_code}\n' -s)" ]; then
+      return
+    fi
     sleep 1
   done
+
+  logging_err "${host}: Timeout was reached."
+  exit 1
 }
 
 #
@@ -798,10 +824,12 @@ EOF
 }
 
 #
-# Keyrock
+# Up Keyrock with MySQL
 #
-up_keyrock() {
+up_keyrock_mysql() {
   logging_info "${FUNCNAME[0]}"
+
+  cp -a "${TEMPLEATE}"/docker/setup-keyrock-mysql.yml ./docker-idm.yml
 
   MYSQL_ROOT_PASSWORD=$(pwgen -s 16 1)
 
@@ -839,8 +867,68 @@ CREATE USER '${IDM_DB_USER}'@'%' IDENTIFIED BY '${IDM_DB_PASS}';
 GRANT ALL PRIVILEGES ON ${IDM_DB_NAME}.* TO '${IDM_DB_USER}'@'%';
 flush PRIVILEGES;
 EOF
+}
 
-  cp -a "${TEMPLEATE}"/docker/setup-keyrock.yml ./docker-idm.yml
+#
+# UP keyrock with PostgreSQL
+#
+up_keyrock_postgres() {
+  logging_info "${FUNCNAME[0]}"
+
+  cp "${CONTRIB_DIR}/keyrock/20210603073911-hashed-access-tokens.js" "${KEYROCK_DIR}"
+
+  cp -a "${TEMPLEATE}"/docker/setup-keyrock-postgres.yml ./docker-idm.yml
+
+  POSTGRES_PASSWORD=$(pwgen -s 16 1)
+
+  IDM_HOST=https://${KEYROCK}
+
+  IDM_DB_DIALECT=postgres
+  IDM_DB_HOST=postgres
+  IDM_DB_PORT=5432
+  IDM_DB_NAME=idm
+  IDM_DB_USER=idm
+  IDM_DB_PASS=$(pwgen -s 16 1)
+
+  cat <<EOF >> .env
+IDM_HOST=${IDM_HOST}
+
+# PostgreSQL
+
+POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+
+IDM_DB_DIALECT=${IDM_DB_DIALECT}
+IDM_DB_HOST=${IDM_DB_HOST}
+IDM_DB_PORT=${IDM_DB_PORT}
+IDM_DB_NAME=${IDM_DB_NAME}
+IDM_DB_USER=${IDM_DB_USER}
+IDM_DB_PASS=${IDM_DB_PASS}
+
+# Keyrock
+
+IDM_ADMIN_UID=${IDM_ADMIN_UID}
+IDM_ADMIN_USER=${IDM_ADMIN_USER}
+IDM_ADMIN_EMAIL=${IDM_ADMIN_EMAIL}
+IDM_ADMIN_PASS=${IDM_ADMIN_PASS}
+IDM_SESSION_SECRET=$(pwgen -s 16 1)
+IDM_ENCRYPTION_KEY=$(pwgen -s 16 1)
+EOF
+
+  cat <<EOF > ${POSTGRES_DIR}/init.sql
+create role ${IDM_DB_USER} with SUPERUSER CREATEDB login password '${IDM_DB_PASS}';
+EOF
+}
+
+#
+# Up keyrock
+#
+up_keyrock() {
+
+  if "${KEYROCK_POSTGRES}"; then
+    up_keyrock_postgres
+  else
+    up_keyrock_mysql
+  fi
 
   sudo "${DOCKER_COMPOSE}" -f docker-idm.yml up -d
 
@@ -950,6 +1038,54 @@ setup_nginx() {
 }
 
 #
+#  Setup MySQL
+#
+setup_mysql() {
+  logging_info "${FUNCNAME[0]}"
+
+  add_docker_compose_yml "docker-mysql.yml"
+
+  sed -i -e "/- IDM_DB_DIALECT/d" ${DOCKER_COMPOSE_YML}
+  sed -i -e "/- IDM_DB_PORT/d" ${DOCKER_COMPOSE_YML}
+
+  sed -i -e "/ __KEYROCK_DEPENDS_ON__/s/^.*/      - mysql/" ${DOCKER_COMPOSE_YML}
+
+  add_rsyslog_conf "mysql"
+}
+
+#
+#  Setup Postgres
+#
+setup_postgres() {
+  logging_info "${FUNCNAME[0]}"
+
+  if "${POSTGRES_INSTALLED}"; then
+    return
+  else
+    POSTGRES_INSTALLED=true
+  fi
+
+  add_docker_compose_yml "docker-postgres.yml"
+
+  sed -i -e "/ __KEYROCK_DEPENDS_ON__/s/^.*/      - postgres/" ${DOCKER_COMPOSE_YML}
+
+  add_rsyslog_conf "postgres"
+
+  if [ -n "${POSTGRES_PASSWORD}" ]; then
+    return
+  fi
+
+  POSTGRES_PASSWORD=$(pwgen -s 16 1)
+
+  cat <<EOF >> .env
+
+# Postgres
+
+POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+EOF
+}
+
+#
 # Keyrock 
 #
 setup_keyrock() {
@@ -961,7 +1097,13 @@ setup_keyrock() {
 
   add_nginx_depends_on "keyrock"
 
-  add_rsyslog_conf "keyrock" "mysql"
+  add_rsyslog_conf "keyrock"
+
+  if ${KEYROCK_POSTGRES}; then
+    setup_postgres
+  else
+    setup_mysql
+  fi
 }
 
 #
@@ -1070,22 +1212,6 @@ setup_quantumleap() {
 }
 
 #
-#  Postgres
-#
-setup_postgres() {
-  logging_info "${FUNCNAME[0]}"
-
-  add_docker_compose_yml "docker-postgres.yml"
-
-  cat <<EOF >> .env
-
-# Postgres
-
-POSTGRES_PASSWORD=$(pwgen -s 16 1)
-EOF
-}
-
-#
 # WireCLoud and ngsiproxy
 #
 setup_wirecloud() {
@@ -1114,7 +1240,7 @@ setup_wirecloud() {
 
   add_nginx_volumes "./data/wirecloud/wirecloud-static:/var/www/static:ro"
 
-  add_rsyslog_conf "wirecloud" "postgres" "elasticsearch" "memcached" "ngsiproxy"
+  add_rsyslog_conf "wirecloud" "elasticsearch" "memcached" "ngsiproxy"
 
   cat <<EOF >> .env
 
