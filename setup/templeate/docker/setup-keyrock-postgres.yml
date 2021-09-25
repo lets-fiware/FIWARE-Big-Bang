@@ -26,10 +26,10 @@ services:
       - DEBUG=idm:*
     volumes:
       - ./.work/keyrock/20210603073911-hashed-access-tokens.js:/opt/fiware-idm/migrations/20210603073911-hashed-access-tokens.js
-    #logging:
-    #  driver: syslog
-    #  options:
-    #    tag: "[keyrock]"
+    logging:
+      driver: syslog
+      options:
+        tag: "[keyrock]"
 
   postgres:
     image: ${IMAGE_POSTGRES}

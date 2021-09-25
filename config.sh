@@ -70,4 +70,4 @@ IMAGE_ELASTICSEARCH=elasticsearch:2.4
 IMAGE_MEMCACHED=memcached:1
 IMAGE_GRAFANA=grafana/grafana:6.1.6
 
-IMAGE_CERTBOT=letsfiware/certmock:0.2.0
+IMAGE_CERTBOT=certbot/certbot:v1.18.0
