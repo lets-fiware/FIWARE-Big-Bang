@@ -11,3 +11,4 @@ cert.sh
 Makefile
 coverage/
 *.swp
+:wq

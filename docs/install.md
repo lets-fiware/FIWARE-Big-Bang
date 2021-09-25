@@ -16,6 +16,7 @@
     -   QuantumLeap
     -   WireCloud
     -   Ngsiproxy
+    -   IoT Agent for UltraLight 2.0
 -   Supported third party OSS:
     -   Node-RED
     -   Grafana
@@ -67,6 +68,7 @@ You can specify configurations by editing the `config.sh` file.
 | NGSIPROXY            | A sub-domain name of Ngsiproxy                             | (empty)                                          |
 | NODE\_RED            | A sub-domain name of Node-RED                              | (empty)                                          |
 | GRAFANA              | A sub-domain name of Grafana                               | (empty)                                          |
+| IOTAGENT             | A sub-domain name of IoT Agent                             | (empty)                                          |
 | IDM\_ADMIN\_NAME     | A name of an admin user for Keyrock                        | admin                                            |
 | IDM\_ADMIN\_EMAIL    | An email address of an admin user for Keyrock              | IDM\_ADMIN\_NAME @ DOMAIN\_NAME                  |
 | IDM\_ADMIN\_PASS     | A password of an admin user for Keyrock                    | (Automatically generated)                        |

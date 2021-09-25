@@ -225,6 +225,7 @@ IMAGE_COMET=${IMAGE_COMET}
 IMAGE_WIRECLOUD=${IMAGE_WIRECLOUD}
 IMAGE_NGSIPROXY=${IMAGE_NGSIPROXY}
 IMAGE_QUANTUMLEAP=${IMAGE_QUANTUMLEAP}
+IMAGE_IOTAGENT=${IMAGE_IOTAGENT}
 
 IMAGE_MONGO=${IMAGE_MONGO}
 IMAGE_MYSQL=${IMAGE_MYSQL}
@@ -236,6 +237,7 @@ IMAGE_REDIS=${IMAGE_REDIS}
 IMAGE_ELASTICSEARCH=${IMAGE_ELASTICSEARCH}
 IMAGE_MEMCACHED=${IMAGE_MEMCACHED}
 IMAGE_GRAFANA=${IMAGE_GRAFANA}
+IMAGE_MOSQUITTO=${IMAGE_MOSQUITTO}
 
 # Logging settings
 IDM_DEBUG=${IDM_DEBUG}
@@ -560,7 +562,7 @@ setup_init() {
 
   DOCKER_COMPOSE_YML=./docker-compose.yml
 
-  readonly APPS=(KEYROCK ORION COMET WIRECLOUD NGSIPROXY NODE_RED GRAFANA QUANTUMLEAP)
+  readonly APPS=(KEYROCK ORION COMET WIRECLOUD NGSIPROXY NODE_RED GRAFANA QUANTUMLEAP IOTAGENT)
 
   val=
 
@@ -691,6 +693,7 @@ wait() {
 
   for i in $(seq 300)
   do
+    # shellcheck disable=SC2086
     if [ "${ret}" == "$(${CURL} ${host} -o /dev/null -w '%{http_code}\n' -s)" ]; then
       return
     fi
@@ -707,7 +710,7 @@ wait() {
 get_cert() {
   logging_info "${FUNCNAME[0]}"
 
-  echo "${CERT_DIR}/live/$1"
+  echo "${CERT_DIR}/live/$1" 1>&2
 
   if sudo [ -d "${CERT_DIR}/live/$1" ] && ${CERT_REVOKE}; then
     # shellcheck disable=SC2086
@@ -752,6 +755,8 @@ setup_cert() {
       get_cert "${val}"
     fi 
   done
+
+  sleep 5
 
   sudo "${DOCKER_COMPOSE}" -f docker-cert.yml down
 
@@ -983,13 +988,26 @@ create_nginx_conf() {
 }
 
 #
+# Add nginx ports
+#
+add_nginx_ports() {
+  set +u
+  while [ "$1" ]
+  do
+    sed -i -e "/__NGINX_PORTS__/ i \      - $1" ${DOCKER_COMPOSE_YML}
+    shift
+  done
+  set -u
+}
+
+#
 # Add nginx depends_on
 #
 add_nginx_depends_on() {
   set +u
   while [ "$1" ]
   do
-    sed -i -e "/ __NGINX_DEPENDS_ON__/ i \      - $1" ${DOCKER_COMPOSE_YML}
+    sed -i -e "/__NGINX_DEPENDS_ON__/ i \      - $1" ${DOCKER_COMPOSE_YML}
     shift
   done
   set -u
@@ -1002,7 +1020,7 @@ add_nginx_volumes() {
   set +u
   while [ "$1" ]
   do
-    sed -i -e "/ __NGINX_VOLUMES__/ i \      - $1" "${DOCKER_COMPOSE_YML}"
+    sed -i -e "/__NGINX_VOLUMES__/ i \      - $1" "${DOCKER_COMPOSE_YML}"
     shift
   done
   set -u
@@ -1388,6 +1406,114 @@ EOF
 }
 
 #
+# mosquitto
+#
+setup_mosquitto() {
+  logging_info "${FUNCNAME[0]}"
+
+  add_docker_compose_yml "docker-mosquitto.yml"
+
+  add_nginx_depends_on "mosquitto"
+
+  add_rsyslog_conf "mosquitto"
+
+  add_nginx_ports "1883:1883"
+
+  mkdir -p "${CONFIG_DIR}"/mosquitto
+  cd "${CONFIG_DIR}"/mosquitto
+  local dir
+  dir=$PWD  
+  cd - > /dev/null
+
+  if [ -z "${MQTT_USERNAME}" ]; then
+    MQTT_USERNAME=fiware
+  fi
+  if [ -z "${MQTT_PASSWORD}" ]; then
+    MQTT_PASSWORD=$(pwgen -s 16 1)
+  fi
+  echo "${MQTT_USERNAME}:${MQTT_PASSWORD}" > "${dir}"/password.txt
+  cat <<EOF >> .env
+
+# MQTT
+
+MQTT_USERNAME=${MQTT_USERNAME}
+MQTT_PASSWORD=${MQTT_PASSWORD}
+EOF
+
+  docker run --rm -v "${dir}":/work "${IMAGE_MOSQUITTO}" mosquitto_passwd -U /work/password.txt
+
+  sed -i -e "/__IOTA_DEPENDS_ON__/ i \      - mosquitto" ${DOCKER_COMPOSE_YML}
+  sed -i -e "/__IOTA_ENVIRONMENT__/ i \      - IOTA_MQTT_HOST=mosquitto" ${DOCKER_COMPOSE_YML}
+  sed -i -e "/__IOTA_ENVIRONMENT__/ i \      - IOTA_MQTT_PORT=1883" ${DOCKER_COMPOSE_YML}
+  sed -i -e "/__IOTA_ENVIRONMENT__/ i \      - IOTA_MQTT_USERNAME=\${MQTT_USERNAME}" ${DOCKER_COMPOSE_YML}
+  sed -i -e "/__IOTA_ENVIRONMENT__/ i \      - IOTA_MQTT_PASSWORD=\${MQTT_PASSWORD}" ${DOCKER_COMPOSE_YML}
+
+  sed -i -e "/__IOTA_DEPENDS_ON__/d" ${DOCKER_COMPOSE_YML}
+  sed -i -e "/__IOTA_ENVIRONMENT__/d" ${DOCKER_COMPOSE_YML}
+
+  cat <<EOF > "${dir}/mosquitto.conf"
+persistence true
+persistence_location /mosquitto/data/
+
+listener 1883
+
+allow_anonymous false
+password_file /mosquitto/config/password.txt
+
+connection_messages true
+log_timestamp true
+
+log_dest stdout
+
+EOF
+
+  local log_types
+  local log_type
+
+  # shellcheck disable=SC2206
+  log_types=(${MOSQUITTO_LOG_TYPE//,/ })
+
+  for log_type in "${log_types[@]}"
+  do
+    echo "log_type ${log_type}" >> "${dir}/mosquitto.conf"
+  done
+
+  cat <<EOF >> "${CONFIG_DIR}"/nginx/nginx.conf
+
+stream {
+    upstream mqtt {
+       server mosquitto:1883;
+    }
+    server {
+       listen 1883;
+       proxy_pass mqtt;
+    }
+}
+EOF
+}
+
+#
+# IoT Agent
+#
+setup_iot_agent() {
+  logging_info "${FUNCNAME[0]}"
+
+  if [ -z "${IOTAGENT}" ]; then
+    return
+  fi
+
+  add_docker_compose_yml "docker-iotagent.yml"
+
+  create_nginx_conf "${IOTAGENT}" "nginx-iotagent"
+
+  add_nginx_depends_on "iot-agent"
+
+  add_rsyslog_conf "iotagent"
+
+  setup_mosquitto
+}
+
+#
 # Node-RED
 #
 setup_node_red() {
@@ -1500,6 +1626,8 @@ EOF
 setup_ngsi_go() {
   logging_info "${FUNCNAME[0]}"
 
+  NGSI_GO=/usr/local/bin/ngsi
+
   SERVERS=("$(${NGSI_GO} server list --all -1)")
 
   for NAME in "${APPS[@]}"
@@ -1524,6 +1652,7 @@ setup_ngsi_go() {
           "KEYROCK" ) ${NGSI_GO} server add --host "${VAL}" --serverType keyrock --serverHost "https://${VAL}" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" ;;
           "ORION" )  ${NGSI_GO} broker add --host "${VAL}" --ngsiType v2 --brokerHost "https://${VAL}" --idmType tokenproxy --idmHost "https://${ORION}/token" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" ;;
           "COMET" ) ${NGSI_GO} server add --host "${VAL}" --serverType comet --serverHost "https://${VAL}" --idmType tokenproxy --idmHost "https://${ORION}/token" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" ;;
+          "IOTAGENT" ) ${NGSI_GO} server add --host "${VAL}" --serverType iota --serverHost "https://${VAL}" --idmType tokenproxy --idmHost "https://${ORION}/token" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" --service openiot --path /;;
           "WIRECLOUD" ) ${NGSI_GO} server add --host "${VAL}" --serverType wirecloud --serverHost "https://${VAL}" --idmType keyrock --idmHost "https://${KEYROCK}/oauth2/token" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" --clientId "${WIRECLOUD_CLIENT_ID}" --clientSecret "${WIRECLOUD_CLIENT_SECRET}";;
           "QUANTUMLEAP" ) ${NGSI_GO} server add --host "${VAL}" --serverType quantumleap --serverHost "https://${VAL}" --idmType tokenproxy --idmHost "https://${ORION}/token" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" ;;
       esac
@@ -1630,6 +1759,7 @@ setup_main() {
   setup_comet
   setup_quantumleap
   setup_wirecloud
+  setup_iot_agent
   setup_node_red
   setup_grafana
 
