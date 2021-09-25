@@ -1242,12 +1242,15 @@ setup_wirecloud() {
 
   add_rsyslog_conf "wirecloud" "elasticsearch" "memcached" "ngsiproxy"
 
+WIRECLOUD_CLIENT_ID=${aid}
+WIRECLOUD_CLIENT_SECRET=${secret}
+
   cat <<EOF >> .env
 
 # WireCloud 
 
-WIRECLOUD_CLIENT_ID="${aid}"
-WIRECLOUD_CLIENT_SECRET="${secret}"
+WIRECLOUD_CLIENT_ID=${WIRECLOUD_CLIENT_ID}
+WIRECLOUD_CLIENT_SECRET=${WIRECLOUD_CLIENT_SECRET}
 EOF
 
   setup_postgres
@@ -1391,7 +1394,7 @@ setup_ngsi_go() {
           "KEYROCK" ) ${NGSI_GO} server add --host "${VAL}" --serverType keyrock --serverHost "https://${VAL}" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" ;;
           "ORION" )  ${NGSI_GO} broker add --host "${VAL}" --ngsiType v2 --brokerHost "https://${VAL}" --idmType tokenproxy --idmHost "https://${ORION}/token" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" ;;
           "COMET" ) ${NGSI_GO} server add --host "${VAL}" --serverType comet --serverHost "https://${VAL}" --idmType tokenproxy --idmHost "https://${ORION}/token" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" ;;
-          "WIRECLOUD" ) ${NGSI_GO} server add --host "${VAL}" --serverType wirecloud --serverHost "https://${VAL}" --idmType tokenproxy --idmHost "https://${ORION}/token" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" ;;
+          "WIRECLOUD" ) ${NGSI_GO} server add --host "${VAL}" --serverType wirecloud --serverHost "https://${VAL}" --idmType keyrock --idmHost "https://${KEYROCK}/oauth2/token" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" --clientId "${WIRECLOUD_CLIENT_ID}" --clientSecret "${WIRECLOUD_CLIENT_SECRET}";;
           "QUANTUMLEAP" ) ${NGSI_GO} server add --host "${VAL}" --serverType quantumleap --serverHost "https://${VAL}" --idmType tokenproxy --idmHost "https://${ORION}/token" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" ;;
       esac
     fi
