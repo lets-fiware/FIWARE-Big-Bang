@@ -16,8 +16,8 @@ if [ -z "${MOSQUITTO}" ]; then
   exit 1
 fi
 
-if ! ${MQTT_1883}; then
-  echo "MQTT not available"
+if ! ${MQTT_TLS}; then
+  echo "MQTT TLS not available"
   exit 1
 fi
 
@@ -28,9 +28,10 @@ do
   echo "MSG: ${MSG}"
   mosquitto_pub \
     --debug \
-    --host "${MOSQUITTO}" --port "${MQTT_PORT}" \
+    --host "${MOSQUITTO}" --port "${MQTT_TLS_PORT}" \
     --username "${MQTT_USERNAME}" --pw "${MQTT_PASSWORD}" \
     --topic "/8f9z57ahxmtzx21oczr5vaabot/sensor001/attrs" \
-    --message "${MSG}"
+    --message "${MSG}" \
+    --cafile ${ROOT_CA}
   sleep 1
 done

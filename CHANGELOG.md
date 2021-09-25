@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.3.0-next
 
+-   Hardening IoT Agent for UltraLight over TLS (#66)
 -   Fix no coverage report found (#65)
 -   Improve WireCloud installation test (#64)
 -   Improve coverage (#63)

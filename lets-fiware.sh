@@ -170,6 +170,28 @@ set_and_check_values() {
     logging_err "error: NGSIPROXY is empty"
     exit 1
   fi
+
+  if [ "${IOTAGENT}" = "" ]; then
+    MOSQUITTO=""
+  fi
+
+  if [ "${IOTAGENT}" != "" ] && [ "${MOSQUITTO}" = "" ]; then
+    logging_err "error: MOSQUITTO is empty"
+    exit 1
+  fi
+
+  if [ -z "${MQTT_1883}" ]; then
+    MQTT_1883=false
+  fi
+
+  if [ -z "${MQTT_TLS}" ]; then
+    MQTT_TLS=true
+  fi
+
+  if ! "${MQTT_1883}" && ! "${MQTT_TLS}"; then
+    logging_err "error: Both MQTT_1883 and MQTT_TLS are false"
+    exit 1
+  fi
 }
 
 #
@@ -249,6 +271,7 @@ NODE_RED_LOGGING_LEVEL=${NODE_RED_LOGGING_LEVEL}
 NODE_RED_LOGGING_METRICS=${NODE_RED_LOGGING_METRICS}
 NODE_RED_LOGGING_AUDIT=${NODE_RED_LOGGING_AUDIT}
 GF_LOG_LEVEL=${GF_LOG_LEVEL}
+MOSQUITTO_LOG_TYPE=${MOSQUITTO_LOG_TYPE}
 
 EOF
 }
@@ -562,7 +585,7 @@ setup_init() {
 
   DOCKER_COMPOSE_YML=./docker-compose.yml
 
-  readonly APPS=(KEYROCK ORION COMET WIRECLOUD NGSIPROXY NODE_RED GRAFANA QUANTUMLEAP IOTAGENT)
+  readonly APPS=(KEYROCK ORION COMET WIRECLOUD NGSIPROXY NODE_RED GRAFANA QUANTUMLEAP IOTAGENT MOSQUITTO)
 
   val=
 
@@ -1065,7 +1088,7 @@ Smart city
 Let's FIWARE
 FI-BB
 ${DOMAIN_NAME}
-fiware@example.com
+admin@${DOMAIN_NAME}
 fiware
 
 EOF
@@ -1075,8 +1098,8 @@ EOF
 fiware
 EOF
 
-  mv "${WORK_DIR}/server.crt" "${CONFIG_NGINX}/fullchain.pem"
-  mv "${WORK_DIR}/server.key" "${CONFIG_NGINX}/privkey.pem"
+  cp "${WORK_DIR}/server.crt" "${CONFIG_NGINX}/fullchain.pem"
+  cp "${WORK_DIR}/server.key" "${CONFIG_NGINX}/privkey.pem"
 }
 
 #
@@ -1435,13 +1458,15 @@ EOF
 setup_mosquitto() {
   logging_info "${FUNCNAME[0]}"
 
+  if [ -z "${MOSQUITTO}" ]; then
+    return
+  fi
+
   add_docker_compose_yml "docker-mosquitto.yml"
 
   add_nginx_depends_on "mosquitto"
 
   add_rsyslog_conf "mosquitto"
-
-  add_nginx_ports "1883:1883"
 
   mkdir -p "${CONFIG_DIR}"/mosquitto
   cd "${CONFIG_DIR}"/mosquitto
@@ -1456,28 +1481,30 @@ setup_mosquitto() {
     MQTT_PASSWORD=$(pwgen -s 16 1)
   fi
   echo "${MQTT_USERNAME}:${MQTT_PASSWORD}" > "${dir}"/password.txt
+
   cat <<EOF >> .env
 
 # MQTT
 
 MQTT_USERNAME=${MQTT_USERNAME}
 MQTT_PASSWORD=${MQTT_PASSWORD}
+MQTT_1883=${MQTT_1883}
+MQTT_TLS=${MQTT_TLS}
 EOF
 
-  docker run --rm -v "${dir}":/work "${IMAGE_MOSQUITTO}" mosquitto_passwd -U /work/password.txt
+  sudo docker run --rm -v "${dir}":/work "${IMAGE_MOSQUITTO}" mosquitto_passwd -U /work/password.txt
 
-  sed -i -e "/__IOTA_DEPENDS_ON__/ i \      - mosquitto" ${DOCKER_COMPOSE_YML}
-  sed -i -e "/__IOTA_ENVIRONMENT__/ i \      - IOTA_MQTT_HOST=mosquitto" ${DOCKER_COMPOSE_YML}
-  sed -i -e "/__IOTA_ENVIRONMENT__/ i \      - IOTA_MQTT_PORT=1883" ${DOCKER_COMPOSE_YML}
-  sed -i -e "/__IOTA_ENVIRONMENT__/ i \      - IOTA_MQTT_USERNAME=\${MQTT_USERNAME}" ${DOCKER_COMPOSE_YML}
-  sed -i -e "/__IOTA_ENVIRONMENT__/ i \      - IOTA_MQTT_PASSWORD=\${MQTT_PASSWORD}" ${DOCKER_COMPOSE_YML}
-
-  sed -i -e "/__IOTA_DEPENDS_ON__/d" ${DOCKER_COMPOSE_YML}
-  sed -i -e "/__IOTA_ENVIRONMENT__/d" ${DOCKER_COMPOSE_YML}
+  add_to_docker_compose_yml "__IOTA_DEPENDS_ON__" "     - mosquitto"
+  add_to_docker_compose_yml "__IOTA_ENVIRONMENT__" "     - IOTA_MQTT_HOST=mosquitto"
+  add_to_docker_compose_yml "__IOTA_ENVIRONMENT__" "     - IOTA_MQTT_PORT=1883"
+  add_to_docker_compose_yml "__IOTA_ENVIRONMENT__" "     - IOTA_MQTT_USERNAME=\${MQTT_USERNAME}"
+  add_to_docker_compose_yml "__IOTA_ENVIRONMENT__" "     - IOTA_MQTT_PASSWORD=\${MQTT_PASSWORD}"
 
   cat <<EOF > "${dir}/mosquitto.conf"
 persistence true
 persistence_location /mosquitto/data/
+
+log_dest stdout
 
 listener 1883
 
@@ -1486,10 +1513,8 @@ password_file /mosquitto/config/password.txt
 
 connection_messages true
 log_timestamp true
-
-log_dest stdout
-
 EOF
+
 
   local log_types
   local log_type
@@ -1502,18 +1527,53 @@ EOF
     echo "log_type ${log_type}" >> "${dir}/mosquitto.conf"
   done
 
-  cat <<EOF >> "${CONFIG_DIR}"/nginx/nginx.conf
+  # Add nginx.conf to mosquitto configuration
+  local nginx_conf
+  nginx_conf="${CONFIG_DIR}"/nginx/nginx.conf
+
+  cat <<EOF >> "${nginx_conf}"
 
 stream {
     upstream mqtt {
-       server mosquitto:1883;
+      server mosquitto:1883;
     }
-    server {
-       listen 1883;
-       proxy_pass mqtt;
-    }
-}
 EOF
+
+  if ${MQTT_1883}; then
+    add_nginx_ports "1883:1883"
+
+    echo "MQTT_PORT=1883" >> .env
+
+    cat <<EOF >> "${CONFIG_DIR}"/nginx/nginx.conf
+    server {
+      listen 1883;
+      proxy_pass mqtt;
+    }
+EOF
+  fi
+
+  if ${MQTT_TLS}; then 
+    # ISRG Root X1 - https://letsencrypt.org/certificates/
+    local file
+    file="${dir}/isrgrootx1.pem"
+    curl -s https://letsencrypt.org/certs/isrgrootx1.pem -o "${file}"
+    echo "ROOT_CA=${file}" >> .env
+
+    add_nginx_ports "8883:8883"
+
+    echo "MQTT_TLS_PORT=8883" >> .env
+
+    cat <<EOF >> "${CONFIG_DIR}"/nginx/nginx.conf
+    server {
+      listen 8883 ssl;
+      proxy_pass mqtt;
+      ssl_certificate ${CERT_DIR}/live/${MOSQUITTO}/fullchain.pem;
+      ssl_certificate_key ${CERT_DIR}/live/${MOSQUITTO}/privkey.pem;
+    }
+EOF
+  fi
+
+echo "}" >> "${nginx_conf}"
 }
 
 #
@@ -1695,6 +1755,9 @@ update_nginx_file() {
 
   for name in "${APPS[@]}"
   do
+    if [ "${name}" = "MOSQUITTO" ]; then
+      continue
+    fi
     eval val=\"\$"${name}"\"
     if [ -n "${val}" ]; then
       sed -i -e "s/SSL_CERTIFICATE_KEY/${SSL_CERTIFICATE_KEY}/" "${NGINX_SITES}"/"${val}"
@@ -1736,6 +1799,8 @@ setup_end() {
 
   delete_from_docker_compose_yml "__NGINX_"
   delete_from_docker_compose_yml "__WIRECLOUD_"
+  delete_from_docker_compose_yml "__IOTA_"
+  delete_from_docker_compose_yml "__MOSQUITTO_"
 }
 
 #
