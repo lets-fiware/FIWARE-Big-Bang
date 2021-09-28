@@ -16,6 +16,7 @@ services:
       - FIWARE_IDM_SERVER=${IDM_HOST}
       - SOCIAL_AUTH_FIWARE_KEY=${WIRECLOUD_CLIENT_ID}
       - SOCIAL_AUTH_FIWARE_SECRET=${WIRECLOUD_CLIENT_SECRET}
+      - HTTPS_VERIFY=false
     volumes:
       - ./data/wirecloud/wirecloud-data:/opt/wirecloud_instance/data
       - ./data/wirecloud/wirecloud-static:/var/www/static

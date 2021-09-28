@@ -1,9 +1,5 @@
 #!/bin/sh
 
-if [ -d ./data ]; then
-  sudo rm -fr data
-fi
-
 for file in docker-compose.yml docker-cert.yml docker-idm.yml
 do
   if [ -e ${file} ]; then
@@ -12,6 +8,10 @@ do
     rm -f ${file}
   fi
 done
+
+if [ -d ./data ]; then
+  sudo rm -fr data
+fi
 
 rm -fr ./config
 rm -fr ./.work
