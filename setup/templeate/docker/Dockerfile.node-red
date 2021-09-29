@@ -1,7 +1,7 @@
 FROM nodered/node-red:2.0.6
 
 #
-# Add nodes modules for Node-RED
+# Add node modules for Node-RED
 #   https://nodered.org/docs/getting-started/docker
 #
 

@@ -71,3 +71,40 @@ IMAGE_MEMCACHED=memcached:1
 IMAGE_GRAFANA=grafana/grafana:6.1.6
 
 IMAGE_CERTBOT=certbot/certbot:v1.18.0
+
+# Logging option
+
+# Keyrock
+#   https://github.com/ging/fiware-idm/blob/master/doc/installation_and_administration_guide/environment_variables.md
+#   true and false
+IDM_DEBUG=false
+
+# Cygnus
+#   https://github.com/telefonicaid/fiware-cygnus/blob/master/doc/cygnus-common/installation_and_administration_guide/install_with_docker.md
+#   INFO, DEBUG
+CYGNUS_LOG_LEVEL=INFO
+
+# Comet
+#   https://github.com/telefonicaid/fiware-sth-comet/blob/master/doc/manuals/running.md
+#   Possible values are: "DEBUG", "INFO", "WARN", "ERROR" and "FATAL" 
+LOGOPS_LEVEL=INFO
+
+# Quantumleap
+#   INFO, DEBUG
+LOGLEVEL=INFO
+
+# WireCloud
+#   https://github.com/Wirecloud/docker-wirecloud/blob/master/README.md
+WIRECLOUD_LOGLEVEL=INFO
+
+# Node-RED
+#   https://nodered.org/docs/user-guide/runtime/logging
+NODE_RED_LOGGING_LEVEL=info
+NODE_RED_LOGGING_METRICS=false
+NODE_RED_LOGGING_AUDIT=false
+
+# Grafana
+#   https://grafana.com/docs/grafana/latest/administration/configuration/#configure-with-environment-variables
+#   https://github.com/grafana/grafana/blob/main/conf/defaults.ini
+#   "debug", "info", "warn", "error", "critical"
+GF_LOG_LEVEL=info

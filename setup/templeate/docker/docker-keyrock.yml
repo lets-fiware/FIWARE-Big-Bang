@@ -19,7 +19,7 @@ services:
       - IDM_ADMIN_PASS=${IDM_ADMIN_PASS}
       - IDM_SESSION_SECRET=${IDM_SESSION_SECRET}
       - IDM_ENCRYPTION_KEY=${IDM_ENCRYPTION_KEY}
-      - IDM_DEBUG=true
+      - IDM_DEBUG=${IDM_DEBUG}
     restart: always
     logging:
       driver: syslog
