@@ -118,10 +118,6 @@ check_params() {
         exit 1
     fi
   done
-
-  if ! [ "${FIBB_TEST:+false}" ]; then
-    FIBB_TEST=false
-  fi
 }
 
 #
@@ -201,6 +197,9 @@ NGINX_LOG_DIR=${NGINX_LOG_DIR}
 DOMAIN_NAME=${DOMAIN_NAME}
 
 DOCKER_COMPOSE=${DOCKER_COMPOSE}
+
+CURL="${CURL}"
+NGSI_GO="${NGSI_GO}"
 
 FIREWALL=${FIREWALL}
 
@@ -337,7 +336,7 @@ install_commands_ubuntu() {
   logging_info "${FUNCNAME[0]}"
 
   sudo apt-get update
-  sudo apt-get install -y curl pwgen jq make
+  sudo apt-get install -y curl pwgen jq make zip
 }
 
 #
@@ -347,7 +346,7 @@ install_commands_centos() {
   logging_info "${FUNCNAME[0]}"
 
   sudo yum install -y epel-release
-  sudo yum install -y curl pwgen jq bind-utils make
+  sudo yum install -y curl pwgen jq bind-utils make zip
 }
 
 #
@@ -369,6 +368,11 @@ install_commands() {
       "Ubuntu" ) install_commands_ubuntu ;;
       "CentOS" ) install_commands_centos ;;
     esac
+  fi
+
+  CURL=$(type curl | sed "s/.* \(\/.*\)/\1/")
+  if $FIBB_TEST; then
+    CURL="${CURL} --insecure"
   fi
 }
 
@@ -537,6 +541,10 @@ setup_init() {
   CERTBOT_DIR=$(pwd)/data/cert
 
   NGSI_GO="/usr/local/bin/ngsi --batch --config ${WORK_DIR}/ngsi-go-config.json --cache ${WORK_DIR}/ngsi-go-token-cache.json"
+  if $FIBB_TEST; then
+    NGSI_GO="${NGSI_GO} --insecureSkipVerify"
+  fi
+
   IDM=keyrock-$(date +%Y%m%d_%H-%M-%S)
 
   DOCKER_COMPOSE_YML=./docker-compose.yml
@@ -652,7 +660,7 @@ validate_domain() {
   logging_info "IP_ADDRESS: ${IP_ADDRESS}"
   cat <<EOF >> .env
 
-  IP_ADDRESS=${IP_ADDRESS}
+IP_ADDRESS=${IP_ADDRESS}
 EOF
 }
 
@@ -672,7 +680,7 @@ wait() {
 
   for i in $(seq 300)
   do
-    if [ "${ret}" == "$(curl "${host}" --insecure -o /dev/null -w '%{http_code}\n' -s)" ]; then
+    if [ "${ret}" == "$(${CURL} ${host} -o /dev/null -w '%{http_code}\n' -s)" ]; then
       return
     fi
     sleep 1
@@ -1212,6 +1220,111 @@ setup_quantumleap() {
 }
 
 #
+#
+#
+login_and_logoff_wirecloud() {
+  logging_info "${FUNCNAME[0]}"
+
+  wait "https://${WIRECLOUD}/" "200"
+
+  sleep 1
+
+  ${CURL} -sL "https://${WIRECLOUD}/login" -c "${WORK_DIR}/cookie01.txt"  -o "${WORK_DIR}/out1.txt"
+
+  CSRF_TOKEN=$(sed -n "/name='_csrf/s/.*value='\(.*\)'.*/\1/p" "${WORK_DIR}/out1.txt")
+  OAUTH2_URL=$(sed -n "/\/oauth2\/authorize/s/.*action=\"\([^\"]*\)\".*/\1/p" "${WORK_DIR}/out1.txt" | sed -e "s/amp;//g")
+
+  sleep 1
+
+  ${CURL} -sL -b "${WORK_DIR}/cookie01.txt" -c "${WORK_DIR}/cookie02.txt" \
+    -o "${WORK_DIR}/out2.txt" \
+    --data "email=${IDM_ADMIN_EMAIL}" \
+    --data "password=${IDM_ADMIN_PASS}" \
+    --data "_csrf=${CSRF_TOKEN}" \
+    -X POST "https://${KEYROCK}${OAUTH2_URL}"
+
+  CSRF_TOKEN=$(sed -n "/name='_csrf/s/.*value='\(.*\)'.*/\1/p" "${WORK_DIR}/out2.txt")
+  OAUTH2_URL=$(sed -n "/enable_app/s/.*action=\"\([^\"]*\)\".*/\1/p" "${WORK_DIR}/out2.txt" | sed -e "s/amp;//g")
+
+  sleep 1
+
+  ${CURL} -sL -b "${WORK_DIR}/cookie02.txt" -c "${WORK_DIR}/cookie03.txt" -o "${WORK_DIR}/out3.txt" --data "_csrf=${CSRF_TOKEN}" \
+    --data "user_authorized_application[shared_attributes]=username" \
+    --data "user_authorized_application[shared_attributes]=email" \
+    --data "user_authorized_application[shared_attributes]=identity_attributes" \
+    --data "user_authorized_application[shared_attributes]=image" \
+    --data "user_authorized_application[shared_attributes]=gravatar" \
+    --data "user_authorized_application[shared_attributes]=eidas_profile" \
+    -X POST "https://${KEYROCK}${OAUTH2_URL}"
+
+  sleep 1
+
+  ${CURL} -sL -b "${WORK_DIR}/cookie03.txt" -o "${WORK_DIR}/out4.txt" "https://${WIRECLOUD}/logout"
+}
+
+#
+# patch widget
+#
+patch_widget() {
+  local widget widget_path
+
+  widget=$1
+  widget_path=$(cd "$(dirname "$2")"; pwd)/$(basename "$2")
+  patch_dir="${WORK_DIR}/widget_patch"
+
+  for name in ngsi-browser ngsi-source ngsi-type-browser
+  do
+    # shellcheck disable=SC2143
+    if [ "$(echo "${widget}" | grep "${name}")" ]; then
+      logging_info "Patch ${name}"
+      mkdir "${patch_dir}"
+      cd "${patch_dir}"
+      unzip "${widget_path}" > /dev/null
+      sed -i "s%http://orion.lab.fiware.org:1026%https://${ORION}%" config.xml
+      sed -i "s%ngsiproxy.lab.fiware.org%${NGSIPROXY}%" config.xml
+      rm "${widget_path}"
+      # shellcheck disable=SC2035
+      zip -r "${widget_path}" -b /tmp * > /dev/null
+      cd - > /dev/null
+      rm -fr "${patch_dir}"
+      return
+  fi
+  done
+}
+
+#
+# install widgets for WireCloud
+#
+install_widgets_for_wirecloud() {
+  if ${FIBB_TEST}; then
+    return
+  fi
+
+  logging_info "${FUNCNAME[0]}"
+
+  login_and_logoff_wirecloud
+
+  mkdir -p "${WORK_DIR}/widgets/"
+
+  while read -r line
+  do
+    name="$(basename "${line}")"
+    logging_info "Installing ${name}"
+    fullpath="${WORK_DIR}/widgets/${name}"
+
+    curl -sL "${line}" -o "${fullpath}"
+    patch_widget "${name}" "${fullpath}"
+    ${NGSI_GO} macs --host "${WIRECLOUD}" install --file "${fullpath}" --overwrite
+  done < "${SETUP_DIR}/widgets_list.txt"
+
+  cat <<EOF > "${WORK_DIR}/patch.sql"
+UPDATE catalogue_catalogueresource SET public = true;
+\q
+EOF
+  sudo sh -c "${DOCKER_COMPOSE} exec -T postgres psql -U postgres postgres < ${WORK_DIR}/patch.sql"
+}
+
+#
 # WireCLoud and ngsiproxy
 #
 setup_wirecloud() {
@@ -1232,6 +1345,9 @@ setup_wirecloud() {
   secret=$(${NGSI_GO} applications --host "${IDM}" get --aid "${aid}" | jq -r .application.secret)
   rid=$(${NGSI_GO} applications --host "${IDM}" roles --aid "${aid}" create --name Admin)
   ${NGSI_GO} applications --host "${IDM}" users --aid "${aid}" assign --rid "${rid}" --uid "${IDM_ADMIN_UID}" > /dev/null
+
+  # Add WireCloud application as a trusted application to WireCloud application
+  ${NGSI_GO} applications --host "${IDM}" trusted --aid "${ORION_CLIENT_ID}" add --tid "${aid}"  > /dev/null
 
   create_nginx_conf "${WIRECLOUD}" "nginx-wirecloud"
   create_nginx_conf "${NGSIPROXY}" "nginx-ngsiproxy"
@@ -1289,7 +1405,7 @@ setup_node_red() {
   RID=$(${NGSI_GO} applications --host "${IDM}" roles --aid "${NODE_RED_CLIENT_ID}" create --name "/node-red/api")
   ${NGSI_GO} applications --host "${IDM}" users --aid "${NODE_RED_CLIENT_ID}" assign --rid "${RID}" --uid "${IDM_ADMIN_UID}" > /dev/null
 
-  # Add Orion (or Wirecloud) application as a trusted application to Node-RED application
+  # Add Wilma application as a trusted application to Node-RED application
   ${NGSI_GO} applications --host "${IDM}" trusted --aid "${NODE_RED_CLIENT_ID}" add --tid "${ORION_CLIENT_ID}"  > /dev/null
   RID=$(${NGSI_GO} applications --host "${IDM}" roles --aid "${ORION_CLIENT_ID}" create --name "/node-red/api")
   ${NGSI_GO} applications --host "${IDM}" users --aid "${ORION_CLIENT_ID}" assign --rid "${RID}" --uid "${IDM_ADMIN_UID}" > /dev/null
@@ -1369,7 +1485,6 @@ EOF
 setup_ngsi_go() {
   logging_info "${FUNCNAME[0]}"
 
-  NGSI_GO="/usr/local/bin/ngsi --batch"
   SERVERS=("$(${NGSI_GO} server list --all -1)")
 
   for NAME in "${APPS[@]}"
@@ -1463,6 +1578,27 @@ clean_up() {
 }
 
 #
+# parse args
+#
+parse_args() {
+  if [ $# -eq 0 ] || [ $# -ge 3 ]; then
+    echo "$0 DOMAIN_NAME [GLOBAL_IP_ADDRESS]"
+    exit 1
+  fi
+
+  DOMAIN_NAME=$1
+  IP_ADDRESS=
+
+  if [ $# -ge 2 ]; then
+    IP_ADDRESS=$2
+  fi
+
+  if ! [ "${FIBB_TEST:+false}" ]; then
+    FIBB_TEST=false
+  fi
+}
+
+#
 # setup main
 #
 setup_main() {
@@ -1495,6 +1631,8 @@ setup_main() {
 
   boot_up_containers
 
+  install_widgets_for_wirecloud
+
   clean_up
 }
 
@@ -1502,6 +1640,10 @@ setup_main() {
 # main
 #
 main() {
+  LANG=C
+
+  parse_args "$@"
+
   check_machine
 
   get_distro
@@ -1539,16 +1681,4 @@ main() {
   setup_complete
 }
 
-if [ $# -eq 0 ] || [ $# -ge 3 ]; then
-  echo "$0 DOMAIN_NAME [GLOBAL_IP_ADDRESS]"
-  exit 1
-fi
-
-DOMAIN_NAME=$1
-IP_ADDRESS=
-
-if [ $# -ge 2 ]; then
-  IP_ADDRESS=$2
-fi
-
-main
+main "$@"

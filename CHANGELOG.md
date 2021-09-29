@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.3.0-next
 
+-   Hardening WireCloud installation (#59)
 -   Add persistent volume for Mongodb (#58)
 
 ## FIWARE Big Bang v0.3.0 - 25 Sep, 2021

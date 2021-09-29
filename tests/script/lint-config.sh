@@ -51,3 +51,8 @@ do
     exit 1
   fi
 done
+
+if [ "${IMAGE_CERTBOT}" != "certbot/certbot:v1.18.0" ]; then
+  echo "Error IMAGE_CERTBOT"
+  exit 1
+fi

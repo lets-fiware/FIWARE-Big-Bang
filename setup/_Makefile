@@ -28,5 +28,3 @@ admin:
 	./config/script/admin.sh
 get-token:
 	./config/script/get_token.sh
-install-widget:
-	./config/script/install_widgets.sh

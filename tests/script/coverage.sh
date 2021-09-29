@@ -2,7 +2,15 @@
 
 set -ue
 
+logging() {
+  echo "$2"
+  /usr/bin/logger -is -p "$1" -t "FI-BB" "$2"
+}
+
+
 install_kcov() {
+  logging "user.info" "${FUNCNAME[0]}"
+
   if type kcov >/dev/null 2>&1; then
     return
   fi
@@ -19,12 +27,16 @@ install_kcov() {
 }
 
 build_certmock() {
+  logging "user.info" "${FUNCNAME[0]}"
+
   pushd ./tests/certmock/
   docker build -t letsfiware/certmock:0.2.0 .
   popd
 }
 
 setup() {
+  logging "user.info" "${FUNCNAME[0]}"
+
   install_kcov
   build_certmock
 
@@ -37,6 +49,7 @@ setup() {
   mkdir coverage
 
   sudo rm -f /usr/local/bin/docker-compose
+
   curl -OL https://github.com/lets-fiware/ngsi-go/releases/download/v0.8.0/ngsi-v0.8.0-linux-amd64.tar.gz
   sudo tar zxvf ngsi-v0.8.0-linux-amd64.tar.gz -C /usr/local/bin
   rm -f ngsi-v0.8.0-linux-amd64.tar.gz
@@ -45,6 +58,8 @@ setup() {
 }
 
 fibb_down() {
+  logging "user.info" "${FUNCNAME[0]}"
+
   make down
 
   while [ "1" != "$(docker ps | wc -l)" ]
@@ -58,6 +73,8 @@ fibb_down() {
 }
 
 install_test1() {
+  logging "user.info" "${FUNCNAME[0]}"
+
   sed -i -e "s/^\(COMET=\).*/\1comet/" config.sh
   sed -i -e "s/^\(QUANTUMLEAP=\).*/\1quantumleap/" config.sh
   sed -i -e "s/^\(WIRECLOUD=\).*/\1wirecloud/" config.sh
@@ -72,12 +89,16 @@ install_test1() {
 
 
 install_test2() {
+  logging "user.info" "${FUNCNAME[0]}"
+
   sleep 5
 
   ${KCOV} ./coverage ./lets-fiware.sh example.com
 }
 
 install_test3() {
+  logging "user.info" "${FUNCNAME[0]}"
+
   sleep 5
 
   git checkout config.sh
@@ -86,6 +107,8 @@ install_test3() {
 }
 
 install_test4() {
+  logging "user.info" "${FUNCNAME[0]}"
+
   sleep 5
 
   # shellcheck disable=SC2207
