@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.3.0-next
 
+-   Fix WireCloud setup (#60)
 -   Add environment variables for logging level (#59)
 -   Hardening WireCloud installation (#59)
 -   Add persistent volume for Mongodb (#58)

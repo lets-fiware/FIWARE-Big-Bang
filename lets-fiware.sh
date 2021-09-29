@@ -1307,6 +1307,10 @@ patch_widget() {
 # install widgets for WireCloud
 #
 install_widgets_for_wirecloud() {
+  if [ -z "${WIRECLOUD}" ]; then
+    return
+  fi
+
   if ${FIBB_TEST}; then
     return
   fi
