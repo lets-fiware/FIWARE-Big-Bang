@@ -23,7 +23,7 @@ services:
       - IDM_SESSION_SECRET=${IDM_SESSION_SECRET}
       - IDM_ENCRYPTION_KEY=${IDM_ENCRYPTION_KEY}
 
-      - DEBUG=idm:*
+      - IDM_DEBUG=true
     volumes:
       - ./.work/keyrock/20210603073911-hashed-access-tokens.js:/opt/fiware-idm/migrations/20210603073911-hashed-access-tokens.js
     logging:

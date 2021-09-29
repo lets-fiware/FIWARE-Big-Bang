@@ -101,9 +101,9 @@ module.exports = {
 
     logging: {
         console: {
-            level: "info",
-            metrics: false,
-            audit: false
+            level: process.env.NODE_RED_LOGGING_LEVEL,
+            metrics: process.env.NODE_RED_LOGGING_METRICS,
+            audit: process.env.NODE_RED_LOGGING_AUDIT
         }
     },
 

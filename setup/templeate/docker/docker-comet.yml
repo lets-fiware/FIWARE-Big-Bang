@@ -12,7 +12,7 @@ services:
       - CYGNUS_MONGO_HOSTS=mongo:27017
       - CYGNUS_SERVICE_PORT=5050
       - CYGNUS_API_PORT=5080
-      - CYGNUS_LOG_LEVEL=DEBUG
+      - CYGNUS_LOG_LEVEL=${CYGNUS_LOG_LEVEL}
     healthcheck:
       test: curl --fail -s http://cygnus:5080/v1/version || exit 1
     restart: always
@@ -33,7 +33,7 @@ services:
       - STH_PORT=8666
       - DB_PREFIX=sth_
       - DB_URI=mongo:27017
-      - LOGOPS_LEVEL=DEBUG
+      - LOGOPS_LEVEL=${LOGOPS_LEVEL}
     healthcheck:
       test: curl --fail -s http://comet:8666/version || exit 1
     restart: always

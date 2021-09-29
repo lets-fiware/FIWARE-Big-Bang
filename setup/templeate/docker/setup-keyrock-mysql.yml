@@ -20,6 +20,8 @@ services:
       - IDM_ADMIN_PASS=${IDM_ADMIN_PASS}
       - IDM_SESSION_SECRET=${IDM_SESSION_SECRET}
       - IDM_ENCRYPTION_KEY=${IDM_ENCRYPTION_KEY}
+
+      - IDM_DEBUG=true
     logging:
       driver: syslog
       options:

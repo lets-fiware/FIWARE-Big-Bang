@@ -20,6 +20,7 @@ services:
       - GF_AUTH_GENERIC_OAUTH_TOKEN_URL=${GF_AUTH_GENERIC_OAUTH_TOKEN_URL}
       - GF_AUTH_GENERIC_OAUTH_API_URL=${GF_AUTH_GENERIC_OAUTH_API_URL}
       - GF_INSTALL_PLUGINS=${GF_INSTALL_PLUGINS}
+      - GF_LOG_LEVEL=${GF_LOG_LEVEL}
     logging:
       driver: syslog
       options:
