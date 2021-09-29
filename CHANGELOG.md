@@ -1,7 +1,8 @@
 ## FIWARE Big Bang v0.3.0-next
 
--   Fix WireCloud setup (#60)
--   Add environment variables for logging level (#59)
+-   Add IoT Agent for UltraLight on MQTT (#62)
+-   Fix WireCloud setup (#61)
+-   Add environment variables for logging level (#60)
 -   Hardening WireCloud installation (#59)
 -   Add persistent volume for Mongodb (#58)
 

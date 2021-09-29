@@ -5,6 +5,7 @@ services:
     ports:
       - 80:80
       - 443:443
+    # __NGINX_PORTS__
     depends_on:
     # __NGINX_DEPENDS_ON__
     volumes:

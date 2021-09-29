@@ -15,11 +15,19 @@ COMET=
 QUANTUMLEAP=
 WIRECLOUD=
 NGSIPROXY=
+IOTAGENT=
+
 NODE_RED=
 GRAFANA=
 
 # Use PostgreSQL as back-end database for Keyrock. (true of false) Default: false
 KEYROCK_POSTGRES=
+
+# Set username for MQTT. Defaut: fiware
+MQTT_USERNAME=
+
+# Set password for MQTT. Defaut: automatically generated
+MQTT_PASSWORD=
 
 # Set a name of an admin user for Keyrock. Default: admin
 IDM_ADMIN_USER=
@@ -58,6 +66,7 @@ IMAGE_COMET=fiware/sth-comet:2.8.0
 IMAGE_WIRECLOUD=fiware/wirecloud:1.3.1
 IMAGE_NGSIPROXY=fiware/ngsiproxy:1.2.2
 IMAGE_QUANTUMLEAP=orchestracities/quantumleap:0.8.1
+IMAGE_IOTAGENT=fiware/iotagent-ul:1.16.2
 
 IMAGE_MONGO=mongo:4.4
 IMAGE_MYSQL=mysql:5.7
@@ -69,6 +78,7 @@ IMAGE_REDIS=redis:6
 IMAGE_ELASTICSEARCH=elasticsearch:2.4
 IMAGE_MEMCACHED=memcached:1
 IMAGE_GRAFANA=grafana/grafana:6.1.6
+IMAGE_MOSQUITTO=eclipse-mosquitto:1.6
 
 IMAGE_CERTBOT=certbot/certbot:v1.18.0
 
@@ -108,3 +118,8 @@ NODE_RED_LOGGING_AUDIT=false
 #   https://github.com/grafana/grafana/blob/main/conf/defaults.ini
 #   "debug", "info", "warn", "error", "critical"
 GF_LOG_LEVEL=info
+
+# Mosquitto
+#   https://mosquitto.org/man/mosquitto-conf-5.html
+#   debug, error, warning, notice, information, subscribe, unsubscribe, websockets, none, all
+MOSQUITTO_LOG_TYPE=error,warning,notice,information

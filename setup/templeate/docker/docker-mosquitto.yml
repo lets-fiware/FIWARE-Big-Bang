@@ -1,0 +1,13 @@
+version: "3"
+services:
+  mosquitto:
+    image: ${IMAGE_MOSQUITTO}
+    volumes:
+      - ${CONFIG_DIR}/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - ${CONFIG_DIR}/mosquitto/password.txt:/mosquitto/config/password.txt
+      - ${DATA_DIR}/mosquitto:/mosquitto/data
+    restart: always
+    logging:
+      driver: syslog
+      options:
+        tag: "[mosquitto]"
