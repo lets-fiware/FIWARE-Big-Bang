@@ -54,7 +54,7 @@ setup() {
   sudo tar zxvf ngsi-v0.8.0-linux-amd64.tar.gz -C /usr/local/bin
   rm -f ngsi-v0.8.0-linux-amd64.tar.gz
 
-  KCOV="/usr/local/bin/kcov --exclude-path=tests,.git,setup,coverage,.github,.vscode"
+  KCOV="/usr/local/bin/kcov --exclude-path=tests,.git,setup,coverage,.github,.vscode,examples"
 }
 
 fibb_down() {
