@@ -34,7 +34,7 @@ VERSION=0.3.0-next
 # Syslog info
 #
 logging_info() {
-  echo "setup: $1"
+  echo "setup: $1" 1>&2
   /usr/bin/logger -i -p "user.info" -t "FI-BB" "setup: $1"
 }
 
@@ -42,7 +42,7 @@ logging_info() {
 # Syslog err
 #
 logging_err() {
-  echo "setup: $1"
+  echo "setup: $1" 1>&2
   /usr/bin/logger -i -p "user.err" -t "FI-BB" "setup: $1"
 }
 
@@ -718,9 +718,20 @@ get_cert() {
   fi
 
   if sudo [ ! -d "${CERT_DIR}/live/$1" ]; then
+    local root_ca
+    root_ca="${PWD}/config/root_ca"
+    if [ ! -d "${root_ca}" ]; then
+      mkdir "${root_ca}"
+    fi
     wait "http://$1/" "404"
     # shellcheck disable=SC2086
-    sudo docker run --rm -v "${CERTBOT_DIR}/$1:/var/www/html/$1" -v "${CERT_DIR}:/etc/letsencrypt" "${IMAGE_CERTBOT}" certonly ${CERT_TEST} --agree-tos -m "${CERT_EMAIL}" --webroot -w "/var/www/html/$1" -d "$1"
+    sudo docker run --rm \
+      -v "${CERTBOT_DIR}/$1:/var/www/html/$1" \
+      -v "${CERT_DIR}:/etc/letsencrypt" \
+      -v "${root_ca}":/root_ca \
+      -e IP_ADDRESS="${IP_ADDRESS}" \
+      "${IMAGE_CERTBOT}" \
+      certonly ${CERT_TEST} --agree-tos -m "${CERT_EMAIL}" --webroot -w "/var/www/html/$1" -d "$1"
   else
     echo "Skip: ${CERT_DIR}/live/$1 direcotry already exits"
   fi
@@ -755,8 +766,6 @@ setup_cert() {
       get_cert "${val}"
     fi 
   done
-
-  sleep 5
 
   sudo "${DOCKER_COMPOSE}" -f docker-cert.yml down
 

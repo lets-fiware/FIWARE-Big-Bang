@@ -1,5 +1,59 @@
 #!/bin/sh
 
+# MIT License
+#
+# Copyright (c) 2021 Kazuhito Suda
+#
+# This file is part of FIWARE Big Bang
+#
+# https://github.com/lets-fiware/FIWARE-Big-Bang
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+#
+# create root CA
+#
+craete_root_ca() {
+
+  ROOT_CA_DIR=/root_ca
+
+  if [ -e "${ROOT_CA_DIR}/root-ca.key" ]; then
+    return
+  fi
+
+  cat <<EOF > "${ROOT_CA_DIR}/root-ca.cnf"
+[root_ca]
+basicConstraints = critical,CA:TRUE,pathlen:1
+keyUsage = critical, nonRepudiation, cRLSign, keyCertSign
+subjectKeyIdentifier=hash
+EOF
+
+  openssl genrsa -out "${ROOT_CA_DIR}/root-ca.key" 4096
+
+  openssl req -new -key "${ROOT_CA_DIR}/root-ca.key" -out "${ROOT_CA_DIR}/root-ca.csr" \
+    -sha256 -subj "/C=JP/ST=Tokyo/L=Smart City/O=FIWARE/CN=FI-BB Secret Example CA"
+
+  openssl x509 -req  -days 3650  -in "${ROOT_CA_DIR}/root-ca.csr" \
+    -signkey "${ROOT_CA_DIR}/root-ca.key" -sha256 -out "${ROOT_CA_DIR}/root-ca.crt" \
+    -extfile "${ROOT_CA_DIR}/root-ca.cnf" -extensions root_ca
+}
+
 #
 # create cert
 #
@@ -11,31 +65,39 @@ create_cert() {
     exit 1
   fi
 
-  DIR="/etc/letsencrypt/live/${DOMAIN}"
+  if [ -z "${IP_ADDRESS}" ]; then
+    echo "IP address not found"
+    exit 1
+  fi
 
-  echo "${DIR}";
-  mkdir -p "${DIR}"
+  craete_root_ca
 
-  openssl genrsa 2048 > "${DIR}/server.key"
-  openssl req -new -key "${DIR}/server.key" << EOF > "${DIR}/server.csr"
-JP
-Tokyo
-Smart city
-Let's FIWARE
-FI-BB
-${DOMAIN}
-fiware@example.com
-fiware
+  dir="/etc/letsencrypt/live/${DOMAIN}"
 
+  echo "${dir}";
+  mkdir -p "${dir}"
+
+cat <<EOF > "${dir}/server.cnf"
+[server]
+authorityKeyIdentifier=keyid,issuer
+basicConstraints = critical,CA:FALSE
+extendedKeyUsage=serverAuth
+keyUsage = critical, digitalSignature, keyEncipherment
+subjectAltName = DNS:${DOMAIN}, IP:${IP_ADDRESS}
+subjectKeyIdentifier=hash
 EOF
 
-  openssl x509 -days 3650 -req -signkey "${DIR}/server.key" < "${DIR}/server.csr" > "${DIR}/server.crt"
-  openssl rsa -in "${DIR}/server.key" -out "${DIR}/server.key" << EOF
-fiware
-EOF
+  openssl genrsa -out "${dir}/server.key" 4096
 
-  mv "${DIR}/server.crt" "${DIR}/fullchain.pem"
-  mv "${DIR}/server.key" "${DIR}/privkey.pem"
+  openssl req -new -key "${dir}/server.key" -out "${dir}/server.csr" \
+    -sha256 -subj "/C=JP/ST=Tokyo/L=Smart City/O=FIWARE/CN=r${DOMAIN}"
+
+  openssl x509 -req -days 3650 -in "${dir}/server.csr" -sha256 \
+    -CA "${ROOT_CA_DIR}/root-ca.crt" -CAkey "${ROOT_CA_DIR}/root-ca.key" -CAcreateserial \
+    -out "${dir}/server.crt" -extfile "${dir}/server.cnf" -extensions server
+
+  mv "${dir}/server.crt" "${dir}/fullchain.pem"
+  mv "${dir}/server.key" "${dir}/privkey.pem"
 }
 
 #

@@ -4,4 +4,4 @@ COPY certmock.sh /
 
 RUN apk add --no-cache openssl 
 
-ENTRYPOINT ["/certmock.sh"]
+ENTRYPOINT ["sh", "/certmock.sh"]
