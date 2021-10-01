@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.3.0-next
 
+-   Fix no coverage report found (#65)
 -   Improve WireCloud installation test (#64)
 -   Improve coverage (#63)
 -   Add IoT Agent for UltraLight on MQTT (#62)
