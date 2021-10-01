@@ -13,7 +13,6 @@ if [ -d ./data ]; then
   sudo rm -fr data
 fi
 
-rm -fr ./coverage
 rm -fr ./config
 rm -fr ./.work
 rm -f ./.env
