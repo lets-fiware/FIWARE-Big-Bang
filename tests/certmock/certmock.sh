@@ -90,7 +90,7 @@ EOF
   openssl genrsa -out "${dir}/server.key" 4096
 
   openssl req -new -key "${dir}/server.key" -out "${dir}/server.csr" \
-    -sha256 -subj "/C=JP/ST=Tokyo/L=Smart City/O=FIWARE/CN=r${DOMAIN}"
+    -sha256 -subj "/C=JP/ST=Tokyo/L=Smart City/O=FIWARE/CN=${DOMAIN}"
 
   openssl x509 -req -days 3650 -in "${dir}/server.csr" -sha256 \
     -CA "${ROOT_CA_DIR}/root-ca.crt" -CAkey "${ROOT_CA_DIR}/root-ca.key" -CAcreateserial \

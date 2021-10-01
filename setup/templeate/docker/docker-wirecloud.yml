@@ -16,9 +16,11 @@ services:
       - FIWARE_IDM_SERVER=${IDM_HOST}
       - SOCIAL_AUTH_FIWARE_KEY=${WIRECLOUD_CLIENT_ID}
       - SOCIAL_AUTH_FIWARE_SECRET=${WIRECLOUD_CLIENT_SECRET}
+      # __WIRECLOUD_ENVIRONMENT__
     volumes:
       - ./data/wirecloud/wirecloud-data:/opt/wirecloud_instance/data
       - ./data/wirecloud/wirecloud-static:/var/www/static
+      # __WIRECLOUD_VOLUMES__
     restart: always
     logging:
       driver: syslog

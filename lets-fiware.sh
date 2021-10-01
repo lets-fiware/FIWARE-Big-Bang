@@ -1036,6 +1036,20 @@ add_nginx_volumes() {
 }
 
 #
+# Add to docker_compose.yml
+#
+add_to_docker_compose_yml() {
+  sed -i -e "/$1/i \ $2" "${DOCKER_COMPOSE_YML}"
+}
+
+#
+# Delete from docker_compose.yml
+#
+delete_from_docker_compose_yml() {
+  sed -i -e "/$1/d" "${DOCKER_COMPOSE_YML}"
+}
+
+#
 # create_dummy_cert
 #
 create_dummy_cert() {
@@ -1338,10 +1352,6 @@ install_widgets_for_wirecloud() {
     return
   fi
 
-  if ${FIBB_TEST}; then
-    return
-  fi
-
   logging_info "${FUNCNAME[0]}"
 
   login_and_logoff_wirecloud
@@ -1412,6 +1422,11 @@ WIRECLOUD_CLIENT_SECRET=${WIRECLOUD_CLIENT_SECRET}
 EOF
 
   setup_postgres
+
+  if $FIBB_TEST; then
+    add_to_docker_compose_yml "__WIRECLOUD_ENVIRONMENT__" "     - REQUESTS_CA_BUNDLE=/root_ca/root-ca.crt"
+    add_to_docker_compose_yml "__WIRECLOUD_VOLUMES__" "     - \${CONFIG_DIR}/root_ca/root-ca.crt:/root_ca/root-ca.crt"
+  fi
 }
 
 #
@@ -1636,6 +1651,9 @@ setup_ngsi_go() {
   logging_info "${FUNCNAME[0]}"
 
   NGSI_GO=/usr/local/bin/ngsi
+  if $FIBB_TEST; then
+    NGSI_GO="${NGSI_GO} --insecureSkipVerify"
+  fi
 
   SERVERS=("$(${NGSI_GO} server list --all -1)")
 
@@ -1716,7 +1734,8 @@ boot_up_containers() {
 setup_end() {
   logging_info "${FUNCNAME[0]}"
 
-  sed -i -e "/# __NGINX_/d" ${DOCKER_COMPOSE_YML}
+  delete_from_docker_compose_yml "__NGINX_"
+  delete_from_docker_compose_yml "__WIRECLOUD_"
 }
 
 #
