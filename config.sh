@@ -19,8 +19,15 @@ IOTAGENT=
 
 NODE_RED=
 GRAFANA=
+MOSQUITTO=
 
-# Use PostgreSQL as back-end database for Keyrock. (true of false) Default: false
+# Use MQTT (Port 1883). (true or false) Default: false
+MQTT_1883=
+
+# Use MQTT TLS (Port 8883). (true or false) Default: true
+MQTT_TLS=
+
+# Use PostgreSQL as back-end database for Keyrock. (true or false) Default: false
 KEYROCK_POSTGRES=
 
 # Set username for MQTT. Defaut: fiware
@@ -119,7 +126,6 @@ NODE_RED_LOGGING_AUDIT=false
 #   "debug", "info", "warn", "error", "critical"
 GF_LOG_LEVEL=info
 
-# Mosquitto
 #   https://mosquitto.org/man/mosquitto-conf-5.html
 #   debug, error, warning, notice, information, subscribe, unsubscribe, websockets, none, all
 MOSQUITTO_LOG_TYPE=error,warning,notice,information

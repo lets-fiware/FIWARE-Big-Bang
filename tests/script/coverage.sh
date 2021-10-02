@@ -82,6 +82,9 @@ install_test1() {
   sed -i -e "s/^\(NODE_RED=\).*/\1node-red/" config.sh
   sed -i -e "s/^\(GRAFANA=\).*/\1grafana/" config.sh
   sed -i -e "s/^\(IOTAGENT=\).*/\1iotagent/" config.sh
+  sed -i -e "s/^\(MOSQUITTO=\).*/\1mosquitto/" config.sh
+  sed -i -e "s/^\(MQTT_1883=\).*/\1true/" config.sh
+  sed -i -e "s/^\(MQTT_TLS=\).*/\1true/" config.sh
   sed -i -e "s/^\(IMAGE_CERTBOT=\).*/\1letsfiware\/certmock:0.2.0/" config.sh
   sed -i -e "s/^\(CERT_REVOKE=\).*/\1true/" config.sh
 

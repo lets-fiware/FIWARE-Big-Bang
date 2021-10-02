@@ -69,6 +69,7 @@ You can specify configurations by editing the `config.sh` file.
 | NODE\_RED            | A sub-domain name of Node-RED                              | (empty)                                          |
 | GRAFANA              | A sub-domain name of Grafana                               | (empty)                                          |
 | IOTAGENT             | A sub-domain name of IoT Agent                             | (empty)                                          |
+| MOSQUITTO            | A sub-domain name of MOSQUITTO                             | (empty)                                          |
 | IDM\_ADMIN\_NAME     | A name of an admin user for Keyrock                        | admin                                            |
 | IDM\_ADMIN\_EMAIL    | An email address of an admin user for Keyrock              | IDM\_ADMIN\_NAME @ DOMAIN\_NAME                  |
 | IDM\_ADMIN\_PASS     | A password of an admin user for Keyrock                    | (Automatically generated)                        |
@@ -77,6 +78,8 @@ You can specify configurations by editing the `config.sh` file.
 | CERT\_REVOKE         | Revoke and reacquire the certificate. true or false        | false                                            |
 | CERT\_TEST           | Use --test-cert option. true or false                      | false                                            |
 | CERT\_FORCE\_RENEWAL | Use --force-renewal option. true or false                  | false                                            |
+| MQTT_1883            | Use MQTT 1883 Port. true or false                          | false                                            |
+| MQTT_TLS             | Use MQTT TLS. true or false                                | true                                             |
 
 ## Files and directories layout
 

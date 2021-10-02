@@ -6,6 +6,7 @@ services:
       - ${CONFIG_DIR}/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
       - ${CONFIG_DIR}/mosquitto/password.txt:/mosquitto/config/password.txt
       - ${DATA_DIR}/mosquitto:/mosquitto/data
+    # __MOSQUITTO_VOLUMES__
     restart: always
     logging:
       driver: syslog
