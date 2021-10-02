@@ -1,3 +1,5 @@
+## FIWARE Big Bang v0.4.0-next
+
 ## FIWARE Big Bang v0.4.0 - 3 Oct, 2021
 
 -   Hardening IoT Agent for UltraLight over TLS (#66)
