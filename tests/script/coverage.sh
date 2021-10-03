@@ -34,6 +34,11 @@ build_certmock() {
   popd
 }
 
+reset_env() {
+  sudo rm -fr config/ data/
+  git checkout config.sh
+}
+
 setup() {
   logging "user.info" "${FUNCNAME[0]}"
 
@@ -49,12 +54,15 @@ setup() {
   mkdir coverage
 
   sudo rm -f /usr/local/bin/docker-compose
+  sudo rm -f /etc/redhat-release
 
   curl -OL https://github.com/lets-fiware/ngsi-go/releases/download/v0.8.0/ngsi-v0.8.0-linux-amd64.tar.gz
   sudo tar zxvf ngsi-v0.8.0-linux-amd64.tar.gz -C /usr/local/bin
   rm -f ngsi-v0.8.0-linux-amd64.tar.gz
 
   KCOV="/usr/local/bin/kcov --exclude-path=tests,.git,setup,coverage,.github,.vscode,examples"
+
+  reset_env
 }
 
 fibb_down() {
@@ -128,7 +136,129 @@ install_test4() {
   ${KCOV} ./coverage ./lets-fiware.sh example.com "${IPS[0]}"
 }
 
+install_on_centos() {
+  logging "user.info" "${FUNCNAME[0]}"
+
+  sleep 5
+
+  sudo touch /etc/redhat-release
+  sudo rm -f /usr/local/bin/yum
+
+  cat <<EOF > /tmp/yum
+#!/bin/sh
+while [ "\$1" ]
+do
+  if [ "\$1" = "epel-release" ]; then
+    exit 0
+  fi
+  shift
+done
+apt-get update 
+sudo apt-get install -y curl pwgen jq make zip
+EOF
+
+  chmod +x /tmp/yum
+  sudo mv /tmp/yum /usr/local/bin/yum
+
+  sudo apt remove -y jq
+
+  reset_env
+
+  ${KCOV} ./coverage ./lets-fiware.sh example.com
+
+  sudo rm -f /etc/redhat-release
+  sudo rm -f /usr/local/bin/yum
+
+  sleep 5
+
+  fibb_down
+}
+
+error_test() {
+  logging "user.info" "${FUNCNAME[0]}"
+
+  sleep 5
+
+  reset_env
+
+  echo "*** config.sh not found ***" 1>&2
+  rm config.sh
+  ${KCOV} ./coverage ./lets-fiware.sh example.com
+  reset_env
+
+  echo "*** Args error ***" 1>&2
+  ${KCOV} ./coverage ./lets-fiware.sh example.com example.com example.com
+  reset_env
+
+  echo "*** NGSIPROXY is empty ***" 1>&2
+  sed -i -e "s/^\(WIRECLOUD=\).*/\1wirecloud/" config.sh
+  ${KCOV} ./coverage ./lets-fiware.sh example.com
+  reset_env
+
+  echo "*** MOSQUITTO is empty ***" 1>&2
+  sed -i -e "s/^\(IOTAGENT=\).*/\1iotagent/" config.sh
+  ${KCOV} ./coverage ./lets-fiware.sh example.com
+  reset_env
+
+  echo "*** Both MQTT_1883 and MQTT_TLS are false ***" 1>&2
+  sed -i -e "s/^\(MQTT_1883=\).*/\1false/" config.sh
+  sed -i -e "s/^\(MQTT_TLS=\).*/\1false/" config.sh
+  ${KCOV} ./coverage ./lets-fiware.sh example.com
+  reset_env
+
+  echo "*** NODE_RED_INSTANCE_NUMBER out of range ***" 1>&2
+  sed -i -e "s/^\(NODE_RED_INSTANCE_NUMBER=\).*/\1100/" config.sh
+  ${KCOV} ./coverage ./lets-fiware.sh example.com
+  reset_env
+
+  echo "*** Keyrock is empty ***" 1>&2
+  sed -i -e "s/^\(KEYROCK=\).*/\1/" config.sh
+  ${KCOV} ./coverage ./lets-fiware.sh example.com
+  reset_env
+
+  echo "*** Orion is empty ***" 1>&2
+  sed -i -e "s/^\(ORION=\).*/\1/" config.sh
+  ${KCOV} ./coverage ./lets-fiware.sh example.com
+  reset_env
+
+  echo "*** Not Ubuntu ***" 1>&2
+  if [ -e /etc/lsb-release ]; then
+    sudo mv /etc/lsb-release /etc/_lsb-release
+cat <<EOF > /tmp/lsb-release
+DISTRIB_ID=Ubuntu
+DISTRIB_RELEASE=16.04
+DISTRIB_CODENAME=Xenial
+DISTRIB_DESCRIPTION="Ubuntu 16.04 LTS"
+EOF
+    sudo mv /tmp/lsb-release /etc/lsb-release
+    ${KCOV} ./coverage ./lets-fiware.sh example.com
+    reset_env
+    sudo rm /etc/lsb-release
+    sudo mv /etc/_lsb-release /etc/lsb-release
+  fi
+ 
+  echo "*** Not Ubuntu ***" 1>&2
+  if [ -e /etc/lsb-release ]; then
+    sudo mv /etc/lsb-release /etc/_lsb-release
+    ${KCOV} ./coverage ./lets-fiware.sh example.com
+    reset_env
+    sudo mv /etc/_lsb-release /etc/lsb-release
+  fi
+ 
+  echo "*** Unknown distro ***" 1>&2
+  if [ -e /etc/debian_version ]; then
+    sudo mv /etc/debian_version /etc/_debian_version
+    ${KCOV} ./coverage ./lets-fiware.sh example.com
+    reset_env
+    sudo mv /etc/_debian_version /etc/debian_version
+  fi
+ 
+  reset_env
+}
+
 setup
+
+error_test
 
 install_test1
 
@@ -143,3 +273,5 @@ fibb_down
 install_test4
 
 fibb_down
+
+install_on_centos
