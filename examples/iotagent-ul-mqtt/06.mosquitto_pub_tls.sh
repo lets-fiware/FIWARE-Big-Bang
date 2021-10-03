@@ -32,6 +32,6 @@ do
     --username "${MQTT_USERNAME}" --pw "${MQTT_PASSWORD}" \
     --topic "/8f9z57ahxmtzx21oczr5vaabot/sensor001/attrs" \
     --message "${MSG}" \
-    --cafile ${ROOT_CA}
+    --cafile "${ROOT_CA}"
   sleep 1
 done

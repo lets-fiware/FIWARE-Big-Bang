@@ -58,28 +58,31 @@ Examples:
 
 You can specify configurations by editing the `config.sh` file.
 
-| Variable name        | Description                                                | Default value                                    |
-| -------------------- | ---------------------------------------------------------- | ------------------------------------------------ |
-| KEYROCK              | A sub-domain name of Keyrock (Required)                    | keyrock                                          |
-| ORION                | A sub-domain name of Orion (Required)                      | orion                                            |
-| COMET                | A sub-domain name of Comet                                 | (empty)                                          |
-| QUANTUMLEAP          | A sub-domain name of QuantumLeap                           | (empty)                                          |
-| WIRECLOUD            | A sub-domain name of WireCloud                             | (empty)                                          |
-| NGSIPROXY            | A sub-domain name of Ngsiproxy                             | (empty)                                          |
-| NODE\_RED            | A sub-domain name of Node-RED                              | (empty)                                          |
-| GRAFANA              | A sub-domain name of Grafana                               | (empty)                                          |
-| IOTAGENT             | A sub-domain name of IoT Agent                             | (empty)                                          |
-| MOSQUITTO            | A sub-domain name of MOSQUITTO                             | (empty)                                          |
-| IDM\_ADMIN\_NAME     | A name of an admin user for Keyrock                        | admin                                            |
-| IDM\_ADMIN\_EMAIL    | An email address of an admin user for Keyrock              | IDM\_ADMIN\_NAME @ DOMAIN\_NAME                  |
-| IDM\_ADMIN\_PASS     | A password of an admin user for Keyrock                    | (Automatically generated)                        |
-| FIREWALL             | Enable firewall. true or false                             | false                                            |
-| CERT\_EMAIL          | An email address for certbot                               | (An email address of an admin user for Keyrock)  |
-| CERT\_REVOKE         | Revoke and reacquire the certificate. true or false        | false                                            |
-| CERT\_TEST           | Use --test-cert option. true or false                      | false                                            |
-| CERT\_FORCE\_RENEWAL | Use --force-renewal option. true or false                  | false                                            |
-| MQTT_1883            | Use MQTT 1883 Port. true or false                          | false                                            |
-| MQTT_TLS             | Use MQTT TLS. true or false                                | true                                             |
+| Variable name                   | Description                                         | Default value                                   |
+| ------------------------------- | --------------------------------------------------- | ----------------------------------------------- |
+| KEYROCK                         | A sub-domain name of Keyrock (Required)             | keyrock                                         |
+| ORION                           | A sub-domain name of Orion (Required)               | orion                                           |
+| COMET                           | A sub-domain name of Comet                          | (empty)                                         |
+| QUANTUMLEAP                     | A sub-domain name of QuantumLeap                    | (empty)                                         |
+| WIRECLOUD                       | A sub-domain name of WireCloud                      | (empty)                                         |
+| NGSIPROXY                       | A sub-domain name of Ngsiproxy                      | (empty)                                         |
+| NODE\_RED                       | A sub-domain name of Node-RED                       | (empty)                                         |
+| GRAFANA                         | A sub-domain name of Grafana                        | (empty)                                         |
+| IOTAGENT                        | A sub-domain name of IoT Agent                      | (empty)                                         |
+| MOSQUITTO                       | A sub-domain name of MOSQUITTO                      | (empty)                                         |
+| IDM\_ADMIN\_NAME                | A name of an admin user for Keyrock                 | admin                                           |
+| IDM\_ADMIN\_EMAIL               | An email address of an admin user for Keyrock       | IDM\_ADMIN\_NAME @ DOMAIN\_NAME                 |
+| IDM\_ADMIN\_PASS                | A password of an admin user for Keyrock             | (Automatically generated)                       |
+| FIREWALL                        | Enable firewall. true or false                      | false                                           |
+| CERT\_EMAIL                     | An email address for certbot                        | (An email address of an admin user for Keyrock) |
+| CERT\_REVOKE                    | Revoke and reacquire the certificate. true or false | false                                           |
+| CERT\_TEST                      | Use --test-cert option. true or false               | false                                           |
+| CERT\_FORCE\_RENEWAL            | Use --force-renewal option. true or false           | false                                           |
+| MQTT\_1883                      | Use MQTT 1883 Port. true or false                   | false                                           |
+| MQTT\_TLS                       | Use MQTT TLS. true or false                         | true                                            |
+| NODE\_RED\_INSTANCE\_NUMBER     | Number of Node-RED instance.                        | 1                                               |
+| NODE\_RED\_INSTANCE\_USERNAME   | Username for Node-RED instance.                     | node-red                                        |
+| NODE\_RED\_INSTANCE\_HTTP\_ROOT | HTTP root for Node-RED instance.                    | /node-red                                       |
 
 ## Files and directories layout
 

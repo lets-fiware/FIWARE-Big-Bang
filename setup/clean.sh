@@ -16,3 +16,4 @@ fi
 rm -fr ./config
 rm -fr ./.work
 rm -f ./.env
+rm -f ./node-red_users.txt

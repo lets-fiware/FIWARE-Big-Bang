@@ -136,6 +136,8 @@ set_and_check_values() {
 
   DOCKER_COMPOSE=/usr/local/bin/docker-compose
 
+  NODE_RED_USERS_TEXT=node-red_users.txt
+
   if [ -z "${KEYROCK_POSTGRES}" ]; then
     KEYROCK_POSTGRES=false
   fi
@@ -191,6 +193,21 @@ set_and_check_values() {
   if ! "${MQTT_1883}" && ! "${MQTT_TLS}"; then
     logging_err "error: Both MQTT_1883 and MQTT_TLS are false"
     exit 1
+  fi
+
+  if [ -n "${NODE_RED_INSTANCE_NUMBER}" ]; then
+    if [ "${NODE_RED_INSTANCE_NUMBER}" -lt 2 ] || [ "${NODE_RED_INSTANCE_NUMBER}" -gt 20 ]; then
+      echo "error: NODE_RED_INSTANCE_NUMBER out of range (2-20)"
+      exit 1
+    fi
+    if [ -z "${NODE_RED_INSTANCE_HTTP_ROOT}" ]; then
+      NODE_RED_INSTANCE_HTTP_ROOT=/node-red
+    fi
+    if [ -z "${NODE_RED_INSTANCE_USERNAME}" ]; then
+      NODE_RED_INSTANCE_USERNAME=node-red
+    fi
+  else
+    NODE_RED_INSTANCE_NUMBER=1
   fi
 }
 
@@ -260,6 +277,7 @@ IMAGE_ELASTICSEARCH=${IMAGE_ELASTICSEARCH}
 IMAGE_MEMCACHED=${IMAGE_MEMCACHED}
 IMAGE_GRAFANA=${IMAGE_GRAFANA}
 IMAGE_MOSQUITTO=${IMAGE_MOSQUITTO}
+IMAGE_NODE_RED=${IMAGE_NODE_RED}
 
 # Logging settings
 IDM_DEBUG=${IDM_DEBUG}
@@ -309,6 +327,9 @@ setup_complete() {
   echo "User: ${IDM_ADMIN_EMAIL}"
   echo "Password: ${IDM_ADMIN_PASS}"
   echo "Please see the .env file for details."
+  if [ -e "${NODE_RED_USERS_TEXT}" ]; then
+    echo "User informatin for Node-RED is here: ${NODE_RED_USERS_TEXT}"
+  fi
 }
 
 #
@@ -1598,6 +1619,100 @@ setup_iot_agent() {
 }
 
 #
+# Node-RED multi instance
+#
+setup_node_red_multi_instance() {
+  logging_info "${FUNCNAME[0]}"
+
+  local http_root
+  local username
+  local number
+  local env_val
+  local node_red_yml
+  local node_red_nginx
+
+  node_red_yaml="${TEMPLEATE}"/docker/docker-node-red.yml
+
+  create_nginx_conf "${NODE_RED}" "nginx-node-red"
+
+  node_red_nginx="${NGINX_SITES}/${NODE_RED}"
+
+  rm -f "${NODE_RED_USERS_TEXT}"
+
+  cat <<EOF >> .env
+
+# Node-RED
+
+EOF
+
+  ORION_RID_API=$(${NGSI_GO} applications --host "${IDM}" roles --aid "${ORION_CLIENT_ID}" create --name "/node-red/api")
+
+  for i in $(seq "${NODE_RED_INSTANCE_NUMBER}")
+  do
+    number=$(printf "%03d" "$i")
+    http_root=${NODE_RED_INSTANCE_HTTP_ROOT}${number}
+    username=${NODE_RED_INSTANCE_USERNAME}${number}
+    env_val=NODE_RED_${number}_
+ 
+    echo "" >> ${DOCKER_COMPOSE_YML}
+
+    sed "s/node-red/${username}/" "${node_red_yaml}" | \
+    sed "s/letsfiware\/node-red[0-9][0-9]*:/letsfiware\/node-red:/" | \
+    sed "/NODE_RED_CLIENT_ID/s/NODE_RED_/${env_val}/g" | \
+    sed "/NODE_RED_CLIENT_SECRET/s/NODE_RED_/${env_val}/g" | \
+    sed "/NODE_RED_CALLBACK_URL/s/NODE_RED_/${env_val}/g" | \
+    sed "s/${env_val}/NODE_RED_/" | \
+    sed "/__NODE_RED_ENVIRONMENT__/i \      - NODE_RED_HTTP_ROOT=${http_root}" | \
+    sed "/^version:/,/services:/d" >> ${DOCKER_COMPOSE_YML}
+
+    sed -i -e "s/proxy_pass http:\/\/node-red:1880/return 404/" "${node_red_nginx}"
+    sed -i -e "/__NODE_RED_SERVER__/i \  location ${http_root} {\n    proxy_pass http:\/\/${username}:1880${http_root};\n  }\n" "${node_red_nginx}"
+
+    add_rsyslog_conf "${username}"
+
+    NODE_RED_URL=https://${NODE_RED}${http_root}/
+    NODE_RED_CALLBACK_URL=https://${NODE_RED}${http_root}/auth/strategy/callback
+
+    # Create application for Node-RED
+    NODE_RED_CLIENT_ID=$(${NGSI_GO} applications --host "${IDM}" create --name "Node-RED ${number}" --description "Node-RED ${number} application" --url "${NODE_RED_URL}" --redirectUri "${NODE_RED_CALLBACK_URL}")
+    NODE_RED_CLIENT_SECRET=$(${NGSI_GO} applications --host "${IDM}" get --aid "${NODE_RED_CLIENT_ID}" | jq -r .application.secret )
+
+    # Create roles and add them to Admin
+    RID_FULL=$(${NGSI_GO} applications --host "${IDM}" roles --aid "${NODE_RED_CLIENT_ID}" create --name "/node-red/full")
+    ${NGSI_GO} applications --host "${IDM}" users --aid "${NODE_RED_CLIENT_ID}" assign --rid "${RID_FULL}" --uid "${IDM_ADMIN_UID}" > /dev/null
+    ${NGSI_GO} applications --host "${IDM}" roles --aid "${NODE_RED_CLIENT_ID}" create --name "/node-red/read" > /dev/null
+    RID_API=$(${NGSI_GO} applications --host "${IDM}" roles --aid "${NODE_RED_CLIENT_ID}" create --name "/node-red/api")
+    ${NGSI_GO} applications --host "${IDM}" users --aid "${NODE_RED_CLIENT_ID}" assign --rid "${RID_API}" --uid "${IDM_ADMIN_UID}" > /dev/null
+
+    # Add Wilma application as a trusted application to Node-RED application
+    ${NGSI_GO} applications --host "${IDM}" trusted --aid "${NODE_RED_CLIENT_ID}" add --tid "${ORION_CLIENT_ID}"  > /dev/null
+    ${NGSI_GO} applications --host "${IDM}" users --aid "${ORION_CLIENT_ID}" assign --rid "${ORION_RID_API}" --uid "${IDM_ADMIN_UID}" > /dev/null
+
+    password=$(pwgen -s 16 1)
+    NODE_RED_UID=$(${NGSI_GO} users --host "${IDM}" create --username "${username}" --password "${password}" --email "${username}@${DOMAIN_NAME}")
+    ${NGSI_GO} applications --host "${IDM}" users --aid "${NODE_RED_CLIENT_ID}" assign --rid "${RID_FULL}" --uid "${NODE_RED_UID}" > /dev/null
+    ${NGSI_GO} applications --host "${IDM}" users --aid "${NODE_RED_CLIENT_ID}" assign --rid "${RID_API}" --uid "${NODE_RED_UID}" > /dev/null
+    ${NGSI_GO} applications --host "${IDM}" users --aid "${ORION_CLIENT_ID}" assign --rid "${ORION_RID_API}" --uid "${NODE_RED_UID}" > /dev/null
+
+    add_nginx_depends_on "${username}"
+
+    mkdir "${DATA_DIR}/${username}"
+    sudo chown 1000:1000 "${DATA_DIR}/${username}"
+
+    echo -e "https://${NODE_RED}${http_root}\t${username}@${DOMAIN_NAME}\t${password}" >> "${NODE_RED_USERS_TEXT}"
+
+  cat <<EOF >> .env
+${env_val}CLIENT_ID=${NODE_RED_CLIENT_ID}
+${env_val}CLIENT_SECRET=${NODE_RED_CLIENT_SECRET}
+${env_val}CALLBACK_URL=${NODE_RED_CALLBACK_URL}
+${env_val}HTTP_ROOT=${http_root}
+EOF
+  done
+
+  sed -i -e "/__NODE_RED_SERVER__/d" "${node_red_nginx}"
+}
+
+#
 # Node-RED
 #
 setup_node_red() {
@@ -1606,6 +1721,19 @@ setup_node_red() {
   fi
 
   logging_info "${FUNCNAME[0]}"
+
+  mkdir "${CONFIG_DIR}"/node-red
+  cp "${TEMPLEATE}"/docker/Dockerfile.node-red "${CONFIG_DIR}"/node-red/Dockerfile
+  cp "${TEMPLEATE}"/docker/node-red-settings.js "${CONFIG_DIR}"/node-red/settings.js
+
+  cd "${CONFIG_DIR}"/node-red > /dev/null
+  sudo docker build -t "${IMAGE_NODE_RED}" .
+  cd - > /dev/null
+
+  if [ "${NODE_RED_INSTANCE_NUMBER}" -ge 2 ]; then
+    setup_node_red_multi_instance
+    return
+  fi
 
   add_docker_compose_yml "docker-node-red.yml"
 
@@ -1625,8 +1753,7 @@ setup_node_red() {
   # Create roles and add them to Admin
   RID=$(${NGSI_GO} applications --host "${IDM}" roles --aid "${NODE_RED_CLIENT_ID}" create --name "/node-red/full")
   ${NGSI_GO} applications --host "${IDM}" users --aid "${NODE_RED_CLIENT_ID}" assign --rid "${RID}" --uid "${IDM_ADMIN_UID}" > /dev/null
-  RID=$(${NGSI_GO} applications --host "${IDM}" roles --aid "${NODE_RED_CLIENT_ID}" create --name "/node-red/read")
-  ${NGSI_GO} applications --host "${IDM}" users --aid "${NODE_RED_CLIENT_ID}" assign --rid "${RID}" --uid "${IDM_ADMIN_UID}" > /dev/null
+  ${NGSI_GO} applications --host "${IDM}" roles --aid "${NODE_RED_CLIENT_ID}" create --name "/node-red/read" > /dev/null
   RID=$(${NGSI_GO} applications --host "${IDM}" roles --aid "${NODE_RED_CLIENT_ID}" create --name "/node-red/api")
   ${NGSI_GO} applications --host "${IDM}" users --aid "${NODE_RED_CLIENT_ID}" assign --rid "${RID}" --uid "${IDM_ADMIN_UID}" > /dev/null
 
@@ -1637,10 +1764,6 @@ setup_node_red() {
 
   mkdir "${DATA_DIR}"/node-red
   sudo chown 1000:1000 "${DATA_DIR}"/node-red
-
-  mkdir "${CONFIG_DIR}"/node-red
-  cp "${TEMPLEATE}"/docker/Dockerfile.node-red "${CONFIG_DIR}"/node-red/Dockerfile
-  cp "${TEMPLEATE}"/docker/node-red-settings.js "${CONFIG_DIR}"/node-red/settings.js
 
   cat <<EOF >> .env
 
@@ -1801,6 +1924,7 @@ setup_end() {
   delete_from_docker_compose_yml "__WIRECLOUD_"
   delete_from_docker_compose_yml "__IOTA_"
   delete_from_docker_compose_yml "__MOSQUITTO_"
+  delete_from_docker_compose_yml "__NODE_RED_"
 }
 
 #

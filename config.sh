@@ -48,6 +48,16 @@ IDM_ADMIN_PASS=
 # Enable firewall. (true or false) Default: false
 FIREWALL=
 
+# Node-RED multi instance
+# Number of Node-RED instance. default: 1
+NODE_RED_INSTANCE_NUMBER=
+
+# username for Node-RED instance. default: node-red
+NODE_RED_INSTANCE_USERNAME=
+
+# http root for Node-RED instance. default: /node-red
+NODE_RED_INSTANCE_HTTP_ROOT=
+
 #
 # Certbot options
 #
@@ -86,6 +96,7 @@ IMAGE_ELASTICSEARCH=elasticsearch:2.4
 IMAGE_MEMCACHED=memcached:1
 IMAGE_GRAFANA=grafana/grafana:6.1.6
 IMAGE_MOSQUITTO=eclipse-mosquitto:1.6
+IMAGE_NODE_RED=letsfiware/node-red:0.4.0-next
 
 IMAGE_CERTBOT=certbot/certbot:v1.18.0
 
