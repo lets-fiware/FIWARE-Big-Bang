@@ -121,6 +121,9 @@ install_test4() {
   git checkout config.sh
 
   sed -i -e "s/^\(KEYROCK_POSTGRES=\).*/\1true/" config.sh
+  sed -i -e "s/^\(KEYROCK_POSTGRES=\).*/\1true/" config.sh
+  sed -i -e "s/^\(NODE_RED=\).*/\1node-red/" config.sh
+  sed -i -e "s/^\(NODE_RED_INSTANCE_NUMBER=\).*/\13/" config.sh
 
   ${KCOV} ./coverage ./lets-fiware.sh example.com "${IPS[0]}"
 }

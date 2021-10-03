@@ -1,7 +1,7 @@
 version: "3"
 services:
   node-red:
-    build: ./config/node-red
+    image: ${IMAGE_NODE_RED}
     depends_on:
       - keyrock
     volumes:
@@ -14,6 +14,7 @@ services:
       - NODE_RED_LOGGING_LEVEL=${NODE_RED_LOGGING_LEVEL}
       - NODE_RED_LOGGING_METRICS=${NODE_RED_LOGGING_METRICS}
       - NODE_RED_LOGGING_AUDIT=${NODE_RED_LOGGING_AUDIT}
+      # __NODE_RED_ENVIRONMENT__
     restart: always
     logging:
       driver: syslog

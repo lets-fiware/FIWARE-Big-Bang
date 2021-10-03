@@ -1,5 +1,7 @@
 ## FIWARE Big Bang v0.4.0-next
 
+-   Support Node-RED multi instance (#69)
+
 ## FIWARE Big Bang v0.4.0 - 3 Oct, 2021
 
 -   Hardening IoT Agent for UltraLight over TLS (#66)

@@ -35,8 +35,10 @@ module.exports = {
 
     debugMaxLength: 1000,
 
+    httpRoot: process.env.NODE_RED_HTTP_ROOT || "/",
+
     adminAuth: {
-        type:"strategy",
+        type: "strategy",
         strategy: {
             name: "fiware",
             label: "Sign in with Keyrock",
@@ -47,23 +49,23 @@ module.exports = {
                 clientSecret: process.env.NODE_RED_CLIENT_SECRET,
                 callbackURL: process.env.NODE_RED_CALLBACK_URL,
                 isLegacy: false,
-                verify: function(accessToken, refreshToken, profile, done) {
-                  done(null, profile._json);
+                verify: function (accessToken, refreshToken, profile, done) {
+                    done(null, profile._json);
                 },
                 state: true
             }
         },
-        users: function(username) {
-            var userinfo = {username: username};
-            if (this.authenticate != null && this.authenticate.arguments != null ) {
+        users: function (username) {
+            var userinfo = { username: username };
+            if (this.authenticate != null && this.authenticate.arguments != null) {
                 L1: {
                     for (var role of this.authenticate.arguments[0].roles) {
                         switch (role.name) {
                             case "/node-red/full":
-                                userinfo = {username: username, permissions: ["*"]};
+                                userinfo = { username: username, permissions: ["*"] };
                                 break L1;
                             case "/node-red/read":
-                                userinfo = {username: username, permissions: ["read"]};
+                                userinfo = { username: username, permissions: ["read"] };
                                 break L1;
                         }
                     }
@@ -72,12 +74,12 @@ module.exports = {
             }
             return Promise.resolve(userinfo);
         },
-        tokens: function(token) {
-            return new Promise(function(resolve, reject) {
+        tokens: function (token) {
+            return new Promise(function (resolve, reject) {
                 var request = require("request");
                 var url = process.env.IDM_HOST.replace(/\/$/, "") + "/user";
                 var query = { access_token: token, app_id: process.env.NODE_RED_CLIENT_ID };
-                request.get({url: url, qs: query}, function (error, response, body) {
+                request.get({ url: url, qs: query }, function (error, response, body) {
                     if (response.statusCode == 200) {
                         var userinfo = JSON.parse(body);
                         for (var role of userinfo.roles) {
