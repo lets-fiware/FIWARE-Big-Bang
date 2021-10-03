@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.4.0-next
 
+-   Improve coverage (#70)
 -   Support Node-RED multi instance (#69)
 
 ## FIWARE Big Bang v0.4.0 - 3 Oct, 2021

@@ -86,7 +86,7 @@ check_data_direcotry() {
 
   if [ -d ./data ]; then
     sudo /usr/local/bin/docker-compose up -d --build
-    exit
+    exit "${ERR_CODE}"
   fi
 }
 
@@ -98,26 +98,10 @@ get_config_sh() {
 
   if [ ! -e ./config.sh ]; then
     logging_err "config.sh file not found"
-    exit 1
+    exit "${ERR_CODE}"
   fi
 
   . ./config.sh
-}
-
-#
-# Check params
-#
-check_params() {
-  logging_info "${FUNCNAME[0]}"
-
-  for NAME in KEYROCK ORION
-  do
-    eval VAL=\"\$$NAME\"
-    if [ "$VAL" = "" ]; then
-        logging_err "${NAME} is empty"
-        exit 1
-    fi
-  done
 }
 
 #
@@ -138,6 +122,15 @@ set_and_check_values() {
 
   NODE_RED_USERS_TEXT=node-red_users.txt
 
+  for NAME in KEYROCK ORION
+  do
+    eval VAL=\"\$$NAME\"
+    if [ "$VAL" = "" ]; then
+        logging_err "${NAME} is empty"
+        exit "${ERR_CODE}"
+    fi
+  done
+
   if [ -z "${KEYROCK_POSTGRES}" ]; then
     KEYROCK_POSTGRES=false
   fi
@@ -148,10 +141,6 @@ set_and_check_values() {
 
   if [ -z "${IDM_ADMIN_EMAIL}" ]; then
     IDM_ADMIN_EMAIL=${IDM_ADMIN_USER}@${DOMAIN_NAME}
-  fi
-
-  if [ -z "${IDM_ADMIN_PASS}" ]; then
-    IDM_ADMIN_PASS=$(pwgen -s 16 1)
   fi
 
   if [ -z "${CERT_EMAIL}" ]; then
@@ -170,7 +159,7 @@ set_and_check_values() {
 
   if [ "${WIRECLOUD}" != "" ] && [ "${NGSIPROXY}" = "" ]; then
     logging_err "error: NGSIPROXY is empty"
-    exit 1
+    exit "${ERR_CODE}"
   fi
 
   if [ "${IOTAGENT}" = "" ]; then
@@ -179,7 +168,7 @@ set_and_check_values() {
 
   if [ "${IOTAGENT}" != "" ] && [ "${MOSQUITTO}" = "" ]; then
     logging_err "error: MOSQUITTO is empty"
-    exit 1
+    exit "${ERR_CODE}"
   fi
 
   if [ -z "${MQTT_1883}" ]; then
@@ -192,13 +181,13 @@ set_and_check_values() {
 
   if ! "${MQTT_1883}" && ! "${MQTT_TLS}"; then
     logging_err "error: Both MQTT_1883 and MQTT_TLS are false"
-    exit 1
+    exit "${ERR_CODE}"
   fi
 
   if [ -n "${NODE_RED_INSTANCE_NUMBER}" ]; then
     if [ "${NODE_RED_INSTANCE_NUMBER}" -lt 2 ] || [ "${NODE_RED_INSTANCE_NUMBER}" -gt 20 ]; then
       echo "error: NODE_RED_INSTANCE_NUMBER out of range (2-20)"
-      exit 1
+      exit "${ERR_CODE}"
     fi
     if [ -z "${NODE_RED_INSTANCE_HTTP_ROOT}" ]; then
       NODE_RED_INSTANCE_HTTP_ROOT=/node-red
@@ -216,6 +205,10 @@ set_and_check_values() {
 #
 add_env() {
   logging_info "${FUNCNAME[0]}"
+
+  if [ -z "${IDM_ADMIN_PASS}" ]; then
+    IDM_ADMIN_PASS=$(pwgen -s 16 1)
+  fi
 
   cat <<EOF >> .env
 VERSION=${VERSION}
@@ -339,7 +332,10 @@ get_distro() {
   logging_info "${FUNCNAME[0]}"
 
   DISTRO=
-  if [ -e /etc/debian_version ] || [ -e /etc/debian_release ]; then
+
+  if [ -e /etc/redhat-release ]; then
+    DISTRO="CentOS"
+  elif [ -e /etc/debian_version ] || [ -e /etc/debian_release ]; then
 
     if [ -e /etc/lsb-release ]; then
       ver="$(sed -n -e "/DISTRIB_RELEASE=/s/DISTRIB_RELEASE=\(.*\)/\1/p" /etc/lsb-release | awk -F. '{printf "%2d%02d", $1,$2}')"
@@ -348,19 +344,17 @@ get_distro() {
       else
         MSG="Error: Ubuntu ${ver} not supported"
         logging_err "${FUNCNAME[0]} ${MSG}"
-        exit 1
+        exit "${ERR_CODE}"
       fi
     else
       MSG="Error: not Ubuntu"
       logging_err "${FUNCNAME[0]} ${MSG}"
-      exit 1
+      exit "${ERR_CODE}"
     fi
-  elif [ -e /etc/redhat-release ]; then
-    DISTRO="CentOS"
   else
     MSG="Unknown distro"
     logging_err "${FUNCNAME[0]} ${MSG}"
-    exit 1
+    exit "${ERR_CODE}"
   fi
 
   echo "DISTRO=${DISTRO}" >> .env
@@ -382,7 +376,7 @@ check_machine() {
 
   MSG="Error: ${machine} not supported"
   logging_err "${FUNCNAME[0]} ${MSG}"
-  exit 1
+  exit "${ERR_CODE}"
 
 }
 
@@ -413,7 +407,7 @@ install_commands() {
   logging_info "${FUNCNAME[0]}"
 
   update=false
-  for cmd in curl pwgen jq
+  for cmd in curl pwgen jq zip
   do
     if ! type "${cmd}" >/dev/null 2>&1; then
         update=true
@@ -525,7 +519,7 @@ check_docker() {
 
   MSG="Docker engine requires equal or higher version than 20.10.6"
   logging_err "${FUNCNAME[0]} ${MSG}"
-  exit 1
+  exit "${ERR_CODE}"
 }
 
 #
@@ -709,7 +703,7 @@ validate_domain() {
             # shellcheck disable=SC2124
             MSG="IP address error: ${val}, ${IP_ADDRESS[@]}"
             logging_err "${MSG}"
-            exit 1
+            exit "${ERR_CODE}"
         fi 
     fi 
   done
@@ -745,7 +739,7 @@ wait() {
   done
 
   logging_err "${host}: Timeout was reached."
-  exit 1
+  exit "${ERR_CODE}"
 }
 
 #
@@ -1942,9 +1936,17 @@ clean_up() {
 # parse args
 #
 parse_args() {
+  ERR_CODE=1
+
+  if ! [ "${FIBB_TEST:+false}" ]; then
+    FIBB_TEST=false
+  else
+    ERR_CODE=0
+  fi
+
   if [ $# -eq 0 ] || [ $# -ge 3 ]; then
     echo "$0 DOMAIN_NAME [GLOBAL_IP_ADDRESS]"
-    exit 1
+    exit "${ERR_CODE}"
   fi
 
   DOMAIN_NAME=$1
@@ -1952,10 +1954,6 @@ parse_args() {
 
   if [ $# -ge 2 ]; then
     IP_ADDRESS=$2
-  fi
-
-  if ! [ "${FIBB_TEST:+false}" ]; then
-    FIBB_TEST=false
   fi
 }
 
@@ -2016,11 +2014,11 @@ main() {
 
   make_directories
 
-  setup_logging_step1
-
   get_config_sh
 
-  check_params
+  set_and_check_values
+
+  setup_logging_step1
 
   install_commands
 
@@ -2029,8 +2027,6 @@ main() {
   check_docker
   check_docker_compose
   check_ngsi_go
-
-  set_and_check_values
 
   add_env
 
