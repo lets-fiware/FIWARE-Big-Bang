@@ -55,8 +55,11 @@ NODE_RED_INSTANCE_NUMBER=
 # username for Node-RED instance. default: node-red
 NODE_RED_INSTANCE_USERNAME=
 
-# http root for Node-RED instance. default: /node-red
-NODE_RED_INSTANCE_HTTP_ROOT=
+# httpNodeRoot for Node-RED instance. default: / or /node-red???
+NODE_RED_INSTANCE_HTTP_NODE_ROOT=
+
+# httpAdminRoot for Node-RED instance. default: / or /node-red???
+NODE_RED_INSTANCE_HTTP_ADMIN_ROOT=
 
 #
 # Certbot options
@@ -128,8 +131,8 @@ WIRECLOUD_LOGLEVEL=INFO
 # Node-RED
 #   https://nodered.org/docs/user-guide/runtime/logging
 NODE_RED_LOGGING_LEVEL=info
-NODE_RED_LOGGING_METRICS=false
-NODE_RED_LOGGING_AUDIT=false
+NODE_RED_LOGGING_METRICS=
+NODE_RED_LOGGING_AUDIT=
 
 # Grafana
 #   https://grafana.com/docs/grafana/latest/administration/configuration/#configure-with-environment-variables

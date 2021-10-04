@@ -27,6 +27,10 @@
  **/
 
 module.exports = {
+    flowFile: 'flows.json',
+
+    flowFilePretty: true,
+
     uiPort: process.env.NODE_RED_PORT || 1880,
 
     mqttReconnectTime: 15000,
@@ -35,7 +39,9 @@ module.exports = {
 
     debugMaxLength: 1000,
 
-    httpRoot: process.env.NODE_RED_HTTP_ROOT || "/",
+    httpNodeRoot: process.env.NODE_RED_HTTP_NODE_ROOT || "/",
+
+    httpAdminRoot: process.env.NODE_RED_HTTP_ADMIN_ROOT || "/",
 
     adminAuth: {
         type: "strategy",
@@ -103,9 +109,9 @@ module.exports = {
 
     logging: {
         console: {
-            level: process.env.NODE_RED_LOGGING_LEVEL,
-            metrics: process.env.NODE_RED_LOGGING_METRICS,
-            audit: process.env.NODE_RED_LOGGING_AUDIT
+            level: process.env.NODE_RED_LOGGING_LEVEL || "info",
+            metrics: process.env.NODE_RED_LOGGING_METRICS || false,
+            audit: process.env.NODE_RED_LOGGING_AUDIT || false
         }
     },
 
