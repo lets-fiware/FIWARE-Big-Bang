@@ -189,8 +189,11 @@ set_and_check_values() {
       echo "error: NODE_RED_INSTANCE_NUMBER out of range (2-20)"
       exit "${ERR_CODE}"
     fi
-    if [ -z "${NODE_RED_INSTANCE_HTTP_ROOT}" ]; then
-      NODE_RED_INSTANCE_HTTP_ROOT=/node-red
+    if [ -z "${NODE_RED_INSTANCE_HTTP_NODE_ROOT}" ]; then
+      NODE_RED_INSTANCE_HTTP_NODE_ROOT=/node-red
+    fi
+    if [ -z "${NODE_RED_INSTANCE_HTTP_ADMIN_ROOT}" ]; then
+      NODE_RED_INSTANCE_HTTP_ADMIN_ROOT=/node-red
     fi
     if [ -z "${NODE_RED_INSTANCE_USERNAME}" ]; then
       NODE_RED_INSTANCE_USERNAME=node-red
@@ -1618,7 +1621,8 @@ setup_iot_agent() {
 setup_node_red_multi_instance() {
   logging_info "${FUNCNAME[0]}"
 
-  local http_root
+  local http_node_root
+  local http_admin_root
   local username
   local number
   local env_val
@@ -1644,7 +1648,8 @@ EOF
   for i in $(seq "${NODE_RED_INSTANCE_NUMBER}")
   do
     number=$(printf "%03d" "$i")
-    http_root=${NODE_RED_INSTANCE_HTTP_ROOT}${number}
+    http_node_root=${NODE_RED_INSTANCE_HTTP_NODE_ROOT}${number}
+    http_admin_root=${NODE_RED_INSTANCE_HTTP_ADMIN_ROOT}${number}
     username=${NODE_RED_INSTANCE_USERNAME}${number}
     env_val=NODE_RED_${number}_
  
@@ -1656,16 +1661,17 @@ EOF
     sed "/NODE_RED_CLIENT_SECRET/s/NODE_RED_/${env_val}/g" | \
     sed "/NODE_RED_CALLBACK_URL/s/NODE_RED_/${env_val}/g" | \
     sed "s/${env_val}/NODE_RED_/" | \
-    sed "/__NODE_RED_ENVIRONMENT__/i \      - NODE_RED_HTTP_ROOT=${http_root}" | \
+    sed "/__NODE_RED_ENVIRONMENT__/i \      - NODE_RED_HTTP_NODE_ROOT=${http_node_root}" | \
+    sed "/__NODE_RED_ENVIRONMENT__/i \      - NODE_RED_HTTP_ADMIN_ROOT=${http_admin_root}" | \
     sed "/^version:/,/services:/d" >> ${DOCKER_COMPOSE_YML}
 
     sed -i -e "s/proxy_pass http:\/\/node-red:1880/return 404/" "${node_red_nginx}"
-    sed -i -e "/__NODE_RED_SERVER__/i \  location ${http_root} {\n    proxy_pass http:\/\/${username}:1880${http_root};\n  }\n" "${node_red_nginx}"
+    sed -i -e "/__NODE_RED_SERVER__/i \  location ${http_admin_root} {\n    proxy_pass http:\/\/${username}:1880${http_admin_root};\n  }\n" "${node_red_nginx}"
 
     add_rsyslog_conf "${username}"
 
-    NODE_RED_URL=https://${NODE_RED}${http_root}/
-    NODE_RED_CALLBACK_URL=https://${NODE_RED}${http_root}/auth/strategy/callback
+    NODE_RED_URL=https://${NODE_RED}${http_admin_root}/
+    NODE_RED_CALLBACK_URL=https://${NODE_RED}${http_admin_root}/auth/strategy/callback
 
     # Create application for Node-RED
     NODE_RED_CLIENT_ID=$(${NGSI_GO} applications --host "${IDM}" create --name "Node-RED ${number}" --description "Node-RED ${number} application" --url "${NODE_RED_URL}" --redirectUri "${NODE_RED_CALLBACK_URL}")
@@ -1693,13 +1699,12 @@ EOF
     mkdir "${DATA_DIR}/${username}"
     sudo chown 1000:1000 "${DATA_DIR}/${username}"
 
-    echo -e "https://${NODE_RED}${http_root}\t${username}@${DOMAIN_NAME}\t${password}" >> "${NODE_RED_USERS_TEXT}"
+    echo -e "https://${NODE_RED}${http_admin_root}\t${username}@${DOMAIN_NAME}\t${password}" >> "${NODE_RED_USERS_TEXT}"
 
   cat <<EOF >> .env
 ${env_val}CLIENT_ID=${NODE_RED_CLIENT_ID}
 ${env_val}CLIENT_SECRET=${NODE_RED_CLIENT_SECRET}
 ${env_val}CALLBACK_URL=${NODE_RED_CALLBACK_URL}
-${env_val}HTTP_ROOT=${http_root}
 EOF
   done
 
