@@ -1,5 +1,7 @@
 ## FIWARE Big Bang v0.4.0-next
 
+-   Improve coverage (#72)
+-   Replace httpRoot with httpAdminRoot and httpNodeRoot for Node-RED (#71)
 -   Improve coverage (#70)
 -   Support Node-RED multi instance (#69)
 

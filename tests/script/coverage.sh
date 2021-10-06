@@ -30,7 +30,7 @@ build_certmock() {
   logging "user.info" "${FUNCNAME[0]}"
 
   pushd ./tests/certmock/
-  docker build -t letsfiware/certmock:0.2.0 .
+  sudo docker build -t letsfiware/certmock:0.2.0 .
   popd
 }
 
@@ -46,6 +46,8 @@ setup() {
   build_certmock
 
   export FIBB_TEST=true
+  export FIBB_TEST_MOCK_PATH="${PWD}/.mock/"
+  export FIBB_TEST_IMAGE_CERTBOT="letsfiware/certmock:0.2.0"
 
   if [ -d coverage ]; then
     rm -fr coverage
@@ -62,6 +64,50 @@ setup() {
 
   KCOV="/usr/local/bin/kcov --exclude-path=tests,.git,setup,coverage,.github,.vscode,examples"
 
+  SAVE_PATH=${PATH}
+
+  MOCK_DIR=${PWD}/.mock
+  rm -fr "${MOCK_DIR}"
+  mkdir "${MOCK_DIR}"
+
+  PATH="${MOCK_DIR}:${PATH}"
+
+  cat <<EOF > "${MOCK_DIR}/apt"
+#!/bin/sh
+while [ "\$1" ]
+do
+  if [ "\$1" = "firewalld" ]; then
+    exit 0
+  fi
+  shift
+done
+apt-get update 
+sudo apt-get install -y curl pwgen jq make zip
+EOF
+  chmod +x "${MOCK_DIR}/apt"
+
+  cat <<EOF > "${MOCK_DIR}/yum"
+#!/bin/sh
+while [ "\$1" ]
+do
+  if [ "\$1" = "epel-release" ] || [ "\$1" = "firewalld" ] || [ "\$1" = "yum-utils" ] || [ "\$1" = "docker-ce" ]; then
+    exit 0
+  fi
+  shift
+done
+apt-get update 
+sudo apt-get install -y curl pwgen jq make zip
+EOF
+  chmod +x "${MOCK_DIR}/yum"
+
+  for cmd in systemctl fiware-cmd add-apt-repository apt-key apt-get yum-config-manager
+  do
+    echo "#!/bin/sh" > "${MOCK_DIR}/${cmd}"
+    chmod +x "${MOCK_DIR}/${cmd}"
+  done 
+
+  echo "cat - > /dev/null" >> "${MOCK_DIR}/apt-key"
+
   reset_env
 }
 
@@ -70,7 +116,7 @@ fibb_down() {
 
   make down
 
-  while [ "1" != "$(docker ps | wc -l)" ]
+  while [ "1" != "$(sudo docker ps | wc -l)" ]
   do
     sleep 1
   done
@@ -93,8 +139,8 @@ install_test1() {
   sed -i -e "s/^\(MOSQUITTO=\).*/\1mosquitto/" config.sh
   sed -i -e "s/^\(MQTT_1883=\).*/\1true/" config.sh
   sed -i -e "s/^\(MQTT_TLS=\).*/\1true/" config.sh
-  sed -i -e "s/^\(IMAGE_CERTBOT=\).*/\1letsfiware\/certmock:0.2.0/" config.sh
   sed -i -e "s/^\(CERT_REVOKE=\).*/\1true/" config.sh
+  sed -i -e "s/^\(FIREWALL=\).*/\1true/" config.sh
 
   ${KCOV} ./coverage ./lets-fiware.sh example.com
 }
@@ -129,11 +175,16 @@ install_test4() {
   git checkout config.sh
 
   sed -i -e "s/^\(KEYROCK_POSTGRES=\).*/\1true/" config.sh
-  sed -i -e "s/^\(KEYROCK_POSTGRES=\).*/\1true/" config.sh
+  sed -i -e "s/^\(WIRECLOUD=\).*/\1wirecloud/" config.sh
+  sed -i -e "s/^\(NGSIPROXY=\).*/\1ngsiproxy/" config.sh
   sed -i -e "s/^\(NODE_RED=\).*/\1node-red/" config.sh
   sed -i -e "s/^\(NODE_RED_INSTANCE_NUMBER=\).*/\13/" config.sh
+  export FIBB_TEST_DOCKER_CMD=rekcod
+  export FIBB_TEST_SKIP_INSTALL_WIDGET=true
 
   ${KCOV} ./coverage ./lets-fiware.sh example.com "${IPS[0]}"
+
+  export FIBB_TEST_DOCKER_CMD=
 }
 
 install_on_centos() {
@@ -142,32 +193,18 @@ install_on_centos() {
   sleep 5
 
   sudo touch /etc/redhat-release
-  sudo rm -f /usr/local/bin/yum
-
-  cat <<EOF > /tmp/yum
-#!/bin/sh
-while [ "\$1" ]
-do
-  if [ "\$1" = "epel-release" ]; then
-    exit 0
-  fi
-  shift
-done
-apt-get update 
-sudo apt-get install -y curl pwgen jq make zip
-EOF
-
-  chmod +x /tmp/yum
-  sudo mv /tmp/yum /usr/local/bin/yum
 
   sudo apt remove -y jq
 
   reset_env
 
+  sed -i -e "s/^\(FIREWALL=\).*/\1true/" config.sh
+  export FIBB_TEST_DOCKER_CMD=rekcod
+
   ${KCOV} ./coverage ./lets-fiware.sh example.com
 
   sudo rm -f /etc/redhat-release
-  sudo rm -f /usr/local/bin/yum
+  export FIBB_TEST_DOCKER_CMD=
 
   sleep 5
 
@@ -179,6 +216,36 @@ error_test() {
 
   sleep 5
 
+  reset_env
+
+  echo "*** aarch64 not supported ***" 1>&2
+  echo -e "#!/bin/sh\necho \"aarch64\"" >> "${MOCK_DIR}/uname"
+  chmod +x "${MOCK_DIR}/uname"
+  ${KCOV} ./coverage ./lets-fiware.sh example.com
+  rm -f "${MOCK_DIR}/uname"
+  reset_env
+
+  echo "*** Docker engine version error ***" 1>&2
+  echo -e "#!/bin/sh\necho \"20.10.1\"" >> "${MOCK_DIR}/docker"
+  chmod +x "${MOCK_DIR}/docker"
+  ${KCOV} ./coverage ./lets-fiware.sh example.com
+  rm -f "${MOCK_DIR}/docker"
+  reset_env
+
+  ln -s /usr/bin/docker "${MOCK_DIR}/docker"
+
+  echo "*** host command ***" 1>&2
+  echo -e "#!/bin/sh" >> "${MOCK_DIR}/host"
+  chmod +x "${MOCK_DIR}/host"
+  FIBB_TEST_HOST_CMD="${MOCK_DIR}/host"
+  rm config.sh
+  ${KCOV} ./coverage ./lets-fiware.sh example.com 0.0.0.0
+  reset_env
+  unset FIBB_TEST_HOST_CMD
+
+  echo "*** IP address error ***" 1>&2
+  rm config.sh
+  ${KCOV} ./coverage ./lets-fiware.sh example.com 0.0.0.0
   reset_env
 
   echo "*** config.sh not found ***" 1>&2
@@ -256,6 +323,48 @@ EOF
   reset_env
 }
 
+
+install_test5() {
+  echo "*** Timeout was reached ***" 1>&2
+  export FIBB_WAIT_TIME=1
+  ${KCOV} ./coverage ./lets-fiware.sh example.com
+
+  sudo docker-compose -f docker-idm.yml down
+
+  while [ "1" != "$(sudo docker ps | wc -l)" ]
+  do
+    sleep 1
+  done
+
+  sleep 5
+
+  reset_env
+
+  unset FIBB_WAIT_TIME
+}
+
+install_on_centos() {
+  logging "user.info" "${FUNCNAME[0]}"
+
+  sleep 5
+
+  sudo touch /etc/redhat-release
+
+  sudo apt remove -y jq
+
+  reset_env
+
+  sed -i -e "s/^\(FIREWALL=\).*/\1true/" config.sh
+
+  ${KCOV} ./coverage ./lets-fiware.sh example.com
+
+  sudo rm -f /etc/redhat-release
+
+  sleep 5
+
+  fibb_down
+}
+
 setup
 
 error_test
@@ -275,3 +384,5 @@ install_test4
 fibb_down
 
 install_on_centos
+
+install_test5
