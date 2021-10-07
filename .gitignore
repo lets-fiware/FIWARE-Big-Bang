@@ -13,3 +13,4 @@ coverage/
 *.swp
 :wq
 node-red_users.txt
+.mock

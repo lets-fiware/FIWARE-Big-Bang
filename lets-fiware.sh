@@ -59,12 +59,12 @@ setup_logging_step1() {
   LOGROTATE_CONF=${WORK_DIR}/logrotate.conf
 
   if [ -d "${LOG_DIR}" ]; then
-    sudo rm -fr "${LOG_DIR}"
+    ${SUDO} rm -fr "${LOG_DIR}"
   fi
-  sudo mkdir "${LOG_DIR}"
-  sudo mkdir "${NGINX_LOG_DIR}"
+  ${SUDO} mkdir "${LOG_DIR}"
+  ${SUDO} mkdir "${NGINX_LOG_DIR}"
   if [ "${DISTRO}" = "Ubuntu" ]; then
-    sudo chown syslog:adm "${LOG_DIR}"
+    ${SUDO} chown syslog:adm "${LOG_DIR}"
   fi
 
   # FI-BB log
@@ -75,7 +75,7 @@ setup_logging_step1() {
 
 EOF
 
-  sudo systemctl restart rsyslog.service
+  ${SYSTEMCTL} restart rsyslog.service
 }
 
 #
@@ -85,7 +85,7 @@ check_data_direcotry() {
   logging_info "${FUNCNAME[0]}"
 
   if [ -d ./data ]; then
-    sudo /usr/local/bin/docker-compose up -d --build
+    ${DOCKER_COMPOSE} up -d --build
     exit "${ERR_CODE}"
   fi
 }
@@ -102,6 +102,11 @@ get_config_sh() {
   fi
 
   . ./config.sh
+
+  if $FIBB_TEST; then
+    MOCK_PATH="${FIBB_TEST_MOCK_PATH-""}"
+    IMAGE_CERTBOT="letsfiware/certmock:0.2.0"
+  fi
 }
 
 #
@@ -117,8 +122,6 @@ set_and_check_values() {
 
   SETUP_DIR=./setup
   TEMPLEATE=${SETUP_DIR}/templeate
-
-  DOCKER_COMPOSE=/usr/local/bin/docker-compose
 
   NODE_RED_USERS_TEXT=node-red_users.txt
 
@@ -189,9 +192,6 @@ set_and_check_values() {
       echo "error: NODE_RED_INSTANCE_NUMBER out of range (2-20)"
       exit "${ERR_CODE}"
     fi
-    if [ -z "${NODE_RED_INSTANCE_HTTP_NODE_ROOT}" ]; then
-      NODE_RED_INSTANCE_HTTP_NODE_ROOT=/node-red
-    fi
     if [ -z "${NODE_RED_INSTANCE_HTTP_ADMIN_ROOT}" ]; then
       NODE_RED_INSTANCE_HTTP_ADMIN_ROOT=/node-red
     fi
@@ -231,7 +231,7 @@ NGINX_LOG_DIR=${NGINX_LOG_DIR}
 
 DOMAIN_NAME=${DOMAIN_NAME}
 
-DOCKER_COMPOSE=${DOCKER_COMPOSE}
+DOCKER_COMPOSE="${DOCKER_COMPOSE}"
 
 CURL="${CURL}"
 NGSI_GO="${NGSI_GO}"
@@ -371,7 +371,7 @@ get_distro() {
 check_machine() {
   logging_info "${FUNCNAME[0]}"
 
-  machine=$(uname -m)
+  machine=$("${UNAME}" -m)
   if [ "${machine}" = "x86_64" ]; then
     logging_info "${FUNCNAME[0]} ${machine}"
     return
@@ -380,7 +380,6 @@ check_machine() {
   MSG="Error: ${machine} not supported"
   logging_err "${FUNCNAME[0]} ${MSG}"
   exit "${ERR_CODE}"
-
 }
 
 #
@@ -389,8 +388,8 @@ check_machine() {
 install_commands_ubuntu() {
   logging_info "${FUNCNAME[0]}"
 
-  sudo apt-get update
-  sudo apt-get install -y curl pwgen jq make zip
+  ${APT} update
+  ${APT} install -y curl pwgen jq make zip
 }
 
 #
@@ -399,8 +398,8 @@ install_commands_ubuntu() {
 install_commands_centos() {
   logging_info "${FUNCNAME[0]}"
 
-  sudo yum install -y epel-release
-  sudo yum install -y curl pwgen jq bind-utils make zip
+  ${YUM} install -y epel-release
+  ${YUM} install -y curl pwgen jq bind-utils make zip
 }
 
 #
@@ -442,15 +441,14 @@ setup_firewall() {
   
   if "${FIREWALL}"; then
     case "${DISTRO}" in
-      "Ubuntu" ) sudo apt install -y firewalld ;;
-      "CentOS" ) sudo yum -y install firewalld ;;
-      *) return ;;
+      "Ubuntu" ) ${APT} install -y firewalld ;;
+      "CentOS" ) ${YUM} -y install firewalld ;;
     esac
-    sudo systemctl start firewalld
-    sudo systemctl enable firewalld
-    sudo firewall-cmd --zone=public --add-service=http --permanent
-    sudo firewall-cmd --zone=public --add-service=https --permanent
-    sudo firewall-cmd --reload
+    ${SYSTEMCTL} start firewalld
+    ${SYSTEMCTL} enable firewalld
+    ${FIREWALL-CMD} --zone=public --add-service=http --permanent
+    ${FIREWALL-CMD} --zone=public --add-service=https --permanent
+    ${FIREWALL-CMD} --reload
   fi
 }
 
@@ -462,22 +460,19 @@ setup_firewall() {
 install_docker_ubuntu() {
   logging_info "${FUNCNAME[0]}"
 
-  sudo cp -p /etc/apt/sources.list{,.bak}
-  sudo apt-get update
-  sudo apt-get install -y \
+  ${SUDO} cp -p /etc/apt/sources.list{,.bak}
+  ${APT_GET} update
+  ${APT_GET} install -y \
       apt-transport-https \
       ca-certificates \
       curl \
       gnupg-agent \
       software-properties-common
-  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-  sudo add-apt-repository \
-     "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
-     $(lsb_release -cs) \
-     stable"
-  sudo apt-get install -y docker-ce docker-ce-cli containerd.io
-  sudo systemctl start docker
-  sudo systemctl enable docker
+  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | ${APT_KEY} add -
+  ${ADD_APT_REPOSITORY} "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+  ${APT_GET} install -y docker-ce docker-ce-cli containerd.io
+  ${SYSTEMCTL} start docker
+  ${SYSTEMCTL} enable docker
 }
 
 #
@@ -488,13 +483,11 @@ install_docker_ubuntu() {
 install_docker_centos() {
   logging_info "${FUNCNAME[0]}"
 
-  sudo yum install -y yum-utils
-  sudo yum-config-manager \
-    --add-repo \
-    https://download.docker.com/linux/centos/docker-ce.repo
-  sudo yum install -y docker-ce docker-ce-cli containerd.io
-  sudo systemctl start docker
-  sudo systemctl enable docker
+  ${YUM} install -y yum-utils
+  ${YUM_CONFIG_MANAGER} --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+  ${YUM} install -y docker-ce docker-ce-cli containerd.io
+  ${SYSTEMCTL} start docker
+  ${SYSTEMCTL} enable docker
 }
 
 #
@@ -503,19 +496,23 @@ install_docker_centos() {
 check_docker() {
   logging_info "${FUNCNAME[0]}"
 
-  if ! type docker >/dev/null 2>&1; then
+  if ! type "${DOCKER_CMD}" >/dev/null 2>&1; then
     case "${DISTRO}" in
        "Ubuntu" ) install_docker_ubuntu ;;
        "CentOS" ) install_docker_centos ;;
     esac
-    return
   fi
 
+  DOCKER="${SUDO} $(type docker | sed "s/.* \(\/.*\)/\1/")"
+  if $FIBB_TEST; then
+    DOCKER="${SUDO} ${MOCK_PATH}docker"
+  fi
+  
   local ver
-  ver=$(sudo docker --version)
+  ver=$(${DOCKER} --version)
   logging_info "${FUNCNAME[0]} ${ver}"
 
-  ver=$(sudo docker version -f "{{.Server.Version}}" | awk -F. '{printf "%2d%02d%02d", $1,$2,$3}')
+  ver=$(${DOCKER} version -f "{{.Server.Version}}" | awk -F. '{printf "%2d%02d%02d", $1,$2,$3}')
   if [ "${ver}" -ge 201006 ]; then
       return
   fi
@@ -531,20 +528,20 @@ check_docker() {
 check_docker_compose() {
   logging_info "${FUNCNAME[0]}"
 
-  if [ -e /usr/local/bin/docker-compose ]; then
+  if [ -e "${DOCKER_COMPOSE_CMD}" ]; then
     local ver
-    ver=$(sudo /usr/local/bin/docker-compose --version)
+    ver=$(${DOCKER_COMPOSE} --version)
     logging_info "${FUNCNAME[0]} ${ver}"
 
-    ver=$(sudo /usr/local/bin/docker-compose version --short | awk -F. '{printf "%2d%02d%02d", $1,$2,$3}')
+    ver=$(${DOCKER_COMPOSE} version --short | awk -F. '{printf "%2d%02d%02d", $1,$2,$3}')
     if [ "${ver}" -ge 11700 ]; then
       return
     fi
   fi
 
   curl -sOL https://github.com/docker/compose/releases/download/1.29.2/docker-compose-Linux-x86_64
-  sudo mv docker-compose-Linux-x86_64 /usr/local/bin/docker-compose
-  sudo chmod a+x /usr/local/bin/docker-compose
+  ${SUDO} mv docker-compose-Linux-x86_64 "${DOCKER_COMPOSE_CMD}"
+  ${SUDO} chmod a+x "${DOCKER_COMPOSE_CMD}"
 }
 
 #
@@ -564,12 +561,12 @@ check_ngsi_go() {
   fi
 
   curl -sOL https://github.com/lets-fiware/ngsi-go/releases/download/v0.9.0/ngsi-v0.9.0-linux-amd64.tar.gz
-  sudo tar zxf ngsi-v0.9.0-linux-amd64.tar.gz -C /usr/local/bin
+  ${SUDO} tar zxf ngsi-v0.9.0-linux-amd64.tar.gz -C /usr/local/bin
   rm -f ngsi-v0.9.0-linux-amd64.tar.gz
 
   if [ -d /etc/bash_completion.d ]; then
     curl -OL https://raw.githubusercontent.com/lets-fiware/ngsi-go/main/autocomplete/ngsi_bash_autocomplete
-    sudo mv ngsi_bash_autocomplete /etc/bash_completion.d/
+    ${SUDO} mv ngsi_bash_autocomplete /etc/bash_completion.d/
     source /etc/bash_completion.d/ngsi_bash_autocomplete
     echo "source /etc/bash_completion.d/ngsi_bash_autocomplete" >> ~/.bashrc
   fi
@@ -650,7 +647,7 @@ add_etc_hosts() {
       output=$(grep "${val}" /etc/hosts 2> /dev/null) || result=$?
       echo "${output}" > /dev/null
       if [ ! "$result" = "0" ]; then
-        sudo bash -c "echo $1 ${val} >> /etc/hosts"
+        ${SUDO} bash -c "echo $1 ${val} >> /etc/hosts"
         echo "Add '$1 ${val}' to /etc/hosts"
       fi
     fi
@@ -688,7 +685,7 @@ validate_domain() {
     eval val=\"\$"${name}"\"
     if [ -n "${val}" ]; then
         logging_info "Sub-domain: ${val}"
-        IP=$(host -4 ${val} | awk 'match($0,/[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/) { print substr($0, RSTART, RLENGTH) }' || true)
+        IP=$(${HOST_CMD} -4 ${val} | awk 'match($0,/[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/) { print substr($0, RSTART, RLENGTH) }' || true)
         if [ "$IP" = "" ]; then
           IP=$(sed -n -e "/${val}/s/\([^ ].*\) .*/\1/p" /etc/hosts)
         fi
@@ -730,9 +727,9 @@ wait() {
   host=$1
   ret=$2
 
-  echo "Wait for ${host} to be ready"
+  echo "Wait for ${host} to be ready (${WAIT_TIME} sec)" 1>&2
 
-  for i in $(seq 300)
+  for i in $(seq "${WAIT_TIME}")
   do
     # shellcheck disable=SC2086
     if [ "${ret}" == "$(${CURL} ${host} -o /dev/null -w '%{http_code}\n' -s)" ]; then
@@ -753,12 +750,12 @@ get_cert() {
 
   echo "${CERT_DIR}/live/$1" 1>&2
 
-  if sudo [ -d "${CERT_DIR}/live/$1" ] && ${CERT_REVOKE}; then
+  if ${SUDO} [ -d "${CERT_DIR}/live/$1" ] && ${CERT_REVOKE}; then
     # shellcheck disable=SC2086
-    sudo docker run --rm -v "${CERT_DIR}:/etc/letsencrypt" "${IMAGE_CERTBOT}" revoke -n -v ${CERT_TEST} --cert-path "${CERT_DIR}/live/$1/cert.pem"
+    ${DOCKER} run --rm -v "${CERT_DIR}:/etc/letsencrypt" "${IMAGE_CERTBOT}" revoke -n -v ${CERT_TEST} --cert-path "${CERT_DIR}/live/$1/cert.pem"
   fi
 
-  if sudo [ ! -d "${CERT_DIR}/live/$1" ]; then
+  if ${SUDO} [ ! -d "${CERT_DIR}/live/$1" ]; then
     local root_ca
     root_ca="${PWD}/config/root_ca"
     if [ ! -d "${root_ca}" ]; then
@@ -766,7 +763,7 @@ get_cert() {
     fi
     wait "http://$1/" "404"
     # shellcheck disable=SC2086
-    sudo docker run --rm \
+    ${SUDO} docker run --rm \
       -v "${CERTBOT_DIR}/$1:/var/www/html/$1" \
       -v "${CERT_DIR}:/etc/letsencrypt" \
       -v "${root_ca}":/root_ca \
@@ -798,7 +795,7 @@ setup_cert() {
   cp "${TEMPLEATE}"/docker/setup-cert.yml ./docker-cert.yml
   cp "${TEMPLEATE}"/nginx/nginx.conf "${CONFIG_DIR}"/nginx/
 
-  sudo "${DOCKER_COMPOSE}" -f docker-cert.yml up -d
+  ${DOCKER_COMPOSE} -f docker-cert.yml up -d
 
   for name in "${APPS[@]}"
   do
@@ -808,7 +805,7 @@ setup_cert() {
     fi 
   done
 
-  sudo "${DOCKER_COMPOSE}" -f docker-cert.yml down
+  ${DOCKER_COMPOSE} -f docker-cert.yml down
 
   RND=$(od -An -tu1 -N1 /dev/urandom)
   HOUR=$(( "${RND}" % 5 ))
@@ -818,11 +815,11 @@ setup_cert() {
   CRON_FILE=/etc/cron.d/fiware-big-bang
 
   if [ -e "${CRON_FILE}" ]; then
-    sudo rm -f "${CRON_FILE}"
+    ${SUDO} rm -f "${CRON_FILE}"
   fi
 
   CRON_SH="${MINUTE} ${HOUR} \* \* \* root ${PWD}/config/script/renew.sh > /dev/null 2>&1"
-  sudo sh -c "echo ${CRON_SH} > ${CRON_FILE}"
+  ${SUDO} sh -c "echo ${CRON_SH} > ${CRON_FILE}"
 
   local msg
   msg=$(echo "${CRON_FILE}: $CRON_SH" | sed -e "s/\\\\//g")
@@ -859,24 +856,24 @@ setup_logging_step2() {
   # shellcheck disable=SC2068
   for file in ${files[@]}
   do
-    sudo touch "${file}"
+    ${SUDO} touch "${file}"
     if [ "${DISTRO}" = "Ubuntu" ]; then
-      sudo chown syslog:adm "${file}"
+      ${SUDO} chown syslog:adm "${file}"
     else
-      sudo chown root:root "${file}"
-      sudo chmod 0644 "${file}"
+      ${SUDO} chown root:root "${file}"
+      ${SUDO} chmod 0644 "${file}"
     fi
   done
 
   if [ "${DISTRO}" = "Ubuntu" ]; then
-    sudo cp "${RSYSLOG_CONF}" /etc/rsyslog.d/10-fiware.conf
+    ${SUDO} cp "${RSYSLOG_CONF}" /etc/rsyslog.d/10-fiware.conf
     ROTATE_CMD="/usr/lib/rsyslog/rsyslog-rotate"
   else
-    sudo cp "${RSYSLOG_CONF}" /etc/rsyslog.d/fiware.conf
+    ${SUDO} cp "${RSYSLOG_CONF}" /etc/rsyslog.d/fiware.conf
     ROTATE_CMD="/bin/kill -HUP \`cat /var/run/syslogd.pid 2> /dev/null\` 2> /dev/null || true"
   fi
 
-  sudo systemctl restart rsyslog.service
+  ${SYSTEMCTL} restart rsyslog.service
 
   cat <<EOF >> "${LOGROTATE_CONF}"
 {
@@ -894,7 +891,7 @@ setup_logging_step2() {
 }
 EOF
 
-  sudo cp "${LOGROTATE_CONF}" /etc/logrotate.d/fiware
+  ${SUDO} cp "${LOGROTATE_CONF}" /etc/logrotate.d/fiware
 }
 
 #
@@ -1004,7 +1001,7 @@ up_keyrock() {
     up_keyrock_mysql
   fi
 
-  sudo "${DOCKER_COMPOSE}" -f docker-idm.yml up -d
+  ${DOCKER_COMPOSE} -f docker-idm.yml up -d
 
   wait "http://localhost:3000/" "200"
 
@@ -1017,7 +1014,7 @@ up_keyrock() {
 down_keyrock() {
   logging_info "${FUNCNAME[0]}"
 
-  sudo "${DOCKER_COMPOSE}" -f docker-idm.yml down
+  ${DOCKER_COMPOSE} -f docker-idm.yml down
 }
 
 #
@@ -1309,7 +1306,7 @@ setup_quantumleap() {
   add_rsyslog_conf "quantumleap" "redis" "crate"
 
   # Workaround for CrateDB. See https://crate.io/docs/crate/howtos/en/latest/deployment/containers/docker.html#troubleshooting
-  sudo sysctl -w vm.max_map_count=262144
+  ${SUDO} sysctl -w vm.max_map_count=262144
 }
 
 #
@@ -1393,6 +1390,10 @@ install_widgets_for_wirecloud() {
     return
   fi
 
+  if ${SKIP_INSTALL_WIDGET}; then
+    return
+  fi
+
   logging_info "${FUNCNAME[0]}"
 
   login_and_logoff_wirecloud
@@ -1414,7 +1415,7 @@ install_widgets_for_wirecloud() {
 UPDATE catalogue_catalogueresource SET public = true;
 \q
 EOF
-  sudo sh -c "${DOCKER_COMPOSE} exec -T postgres psql -U postgres postgres < ${WORK_DIR}/patch.sql"
+  ${SUDO} sh -c "${DOCKER_COMPOSE_CMD} exec -T postgres psql -U postgres postgres < ${WORK_DIR}/patch.sql"
 }
 
 #
@@ -1476,10 +1477,6 @@ EOF
 setup_mosquitto() {
   logging_info "${FUNCNAME[0]}"
 
-  if [ -z "${MOSQUITTO}" ]; then
-    return
-  fi
-
   add_docker_compose_yml "docker-mosquitto.yml"
 
   add_nginx_depends_on "mosquitto"
@@ -1510,7 +1507,7 @@ MQTT_1883=${MQTT_1883}
 MQTT_TLS=${MQTT_TLS}
 EOF
 
-  sudo docker run --rm -v "${dir}":/work "${IMAGE_MOSQUITTO}" mosquitto_passwd -U /work/password.txt
+  ${DOCKER} run --rm -v "${dir}":/work "${IMAGE_MOSQUITTO}" mosquitto_passwd -U /work/password.txt
 
   add_to_docker_compose_yml "__IOTA_DEPENDS_ON__" "     - mosquitto"
   add_to_docker_compose_yml "__IOTA_ENVIRONMENT__" "     - IOTA_MQTT_HOST=mosquitto"
@@ -1697,7 +1694,7 @@ EOF
     add_nginx_depends_on "${username}"
 
     mkdir "${DATA_DIR}/${username}"
-    sudo chown 1000:1000 "${DATA_DIR}/${username}"
+    ${SUDO} chown 1000:1000 "${DATA_DIR}/${username}"
 
     echo -e "https://${NODE_RED}${http_admin_root}\t${username}@${DOMAIN_NAME}\t${password}" >> "${NODE_RED_USERS_TEXT}"
 
@@ -1726,7 +1723,7 @@ setup_node_red() {
   cp "${TEMPLEATE}"/docker/node-red-settings.js "${CONFIG_DIR}"/node-red/settings.js
 
   cd "${CONFIG_DIR}"/node-red > /dev/null
-  sudo docker build -t "${IMAGE_NODE_RED}" .
+  ${DOCKER} build -t "${IMAGE_NODE_RED}" .
   cd - > /dev/null
 
   if [ "${NODE_RED_INSTANCE_NUMBER}" -ge 2 ]; then
@@ -1762,7 +1759,7 @@ setup_node_red() {
   ${NGSI_GO} applications --host "${IDM}" users --aid "${ORION_CLIENT_ID}" assign --rid "${RID}" --uid "${IDM_ADMIN_UID}" > /dev/null
 
   mkdir "${DATA_DIR}"/node-red
-  sudo chown 1000:1000 "${DATA_DIR}"/node-red
+  ${SUDO} chown 1000:1000 "${DATA_DIR}"/node-red
 
   cat <<EOF >> .env
 
@@ -1799,7 +1796,7 @@ setup_grafana() {
   GRAFANA_CLIENT_SECRET=$(${NGSI_GO} applications --host "${IDM}" get --aid "${GRAFANA_CLIENT_ID}" | jq -r .application.secret )
 
   mkdir -p "${DATA_DIR}"/grafana
-  sudo chown 472:472 "${DATA_DIR}"/grafana
+  ${SUDO} chown 472:472 "${DATA_DIR}"/grafana
 
   cat <<EOF >> .env
 
@@ -1908,7 +1905,7 @@ boot_up_containers() {
   logging_info "${FUNCNAME[0]}"
 
   logging_info "docker-compose up -d --build"
-  sudo "${DOCKER_COMPOSE}" up -d --build
+  ${DOCKER_COMPOSE} up -d --build
 
   wait "https://${KEYROCK}/" "200"
 }
@@ -1941,11 +1938,11 @@ clean_up() {
 # parse args
 #
 parse_args() {
-  ERR_CODE=1
 
-  if ! [ "${FIBB_TEST:+false}" ]; then
-    FIBB_TEST=false
-  else
+  FIBB_TEST="${FIBB_TEST:-false}"
+
+  ERR_CODE=1
+  if ${FIBB_TEST}; then
     ERR_CODE=0
   fi
 
@@ -2001,6 +1998,32 @@ setup_main() {
   clean_up
 }
 
+init_cmd() {
+  SUDO=sudo
+  IS_ROOT=false 
+
+  MOCK_PATH=""
+  if $FIBB_TEST; then
+    MOCK_PATH="${FIBB_TEST_MOCK_PATH-""}"
+  fi
+
+  APT="${SUDO} ${MOCK_PATH}apt"
+  APT_GET="${SUDO} ${MOCK_PATH}apt-get"
+  APT_KEY="${SUDO} ${MOCK_PATH}apt-key"
+  ADD_APT_REPOSITORY="${SUDO} ${MOCK_PATH}add-apt-repository"
+  SYSTEMCTL="${SUDO} ${MOCK_PATH}systemctl"
+  YUM="${SUDO} ${MOCK_PATH}yum"
+  YUM_CONFIG_MANAGER="${SUDO} ${MOCK_PATH}yum-config-manager"
+  FIREWALL_CMD="${SUDO} ${MOCK_PATH}firewall-cmd"
+  UNAME="${FIBB_TEST_UNAME_CMD:-uname}"
+  DOCKER_CMD="${FIBB_TEST_DOCKER_CMD:-docker}"
+  DOCKER_COMPOSE_CMD="/usr/local/bin/docker-compose"
+  DOCKER_COMPOSE="${SUDO} ${DOCKER_COMPOSE_CMD}"
+  HOST_CMD="${FIBB_TEST_HOST_CMD:-host}"
+  WAIT_TIME=${FIBB_WAIT_TIME:-300}
+  SKIP_INSTALL_WIDGET="${FIBB_TEST_SKIP_INSTALL_WIDGET:-false}"
+}
+
 #
 # main
 #
@@ -2008,6 +2031,8 @@ main() {
   LANG=C
 
   parse_args "$@"
+
+  init_cmd
 
   check_machine
 
