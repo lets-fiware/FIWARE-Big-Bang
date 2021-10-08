@@ -1721,6 +1721,7 @@ setup_node_red() {
   mkdir "${CONFIG_DIR}"/node-red
   cp "${TEMPLEATE}"/docker/Dockerfile.node-red "${CONFIG_DIR}"/node-red/Dockerfile
   cp "${TEMPLEATE}"/docker/node-red-settings.js "${CONFIG_DIR}"/node-red/settings.js
+  cp "${CONTRIB_DIR}/node-red-contrib-FIWARE_official/contextbroker.js" "${CONFIG_DIR}"/node-red/contextbroker.js
 
   cd "${CONFIG_DIR}"/node-red > /dev/null
   ${DOCKER} build -t "${IMAGE_NODE_RED}" .

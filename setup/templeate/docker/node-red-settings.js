@@ -26,6 +26,8 @@
 * SOFTWARE.
  **/
 
+var keyrockUsers = {};
+
 module.exports = {
     flowFile: 'flows.json',
 
@@ -55,30 +57,28 @@ module.exports = {
                 clientSecret: process.env.NODE_RED_CLIENT_SECRET,
                 callbackURL: process.env.NODE_RED_CALLBACK_URL,
                 isLegacy: false,
-                verify: function (accessToken, refreshToken, profile, done) {
-                    done(null, profile._json);
+                verify: function(accessToken, refreshToken, profile, done) {
+                  var userinfo = null
+                  L1: {
+                      for (var role of profile._json.roles) {
+                          switch (role.name) {
+                          case "/node-red/full":
+                              userinfo = {username: profile._json.username, permissions: ["*"]}
+                              break L1;
+                          case "/node-red/read":
+                              userinfo = {username: profile._json.username, permissions: ["read"]}
+                              break L1;
+                          }
+                      }
+                  }
+                  keyrockUsers[profile._json.username] = userinfo;
+                  done(null, profile._json);
                 },
                 state: true
             }
         },
-        users: function (username) {
-            var userinfo = { username: username };
-            if (this.authenticate != null && this.authenticate.arguments != null) {
-                L1: {
-                    for (var role of this.authenticate.arguments[0].roles) {
-                        switch (role.name) {
-                            case "/node-red/full":
-                                userinfo = { username: username, permissions: ["*"] };
-                                break L1;
-                            case "/node-red/read":
-                                userinfo = { username: username, permissions: ["read"] };
-                                break L1;
-                        }
-                    }
-                    userinfo = null
-                }
-            }
-            return Promise.resolve(userinfo);
+        users: function(username) {
+            return Promise.resolve(keyrockUsers[username]);
         },
         tokens: function (token) {
             return new Promise(function (resolve, reject) {
