@@ -18,28 +18,3 @@ services:
       driver: syslog
       options:
         tag: "[pep-proxy]"
-
-  tokenproxy:
-    image: letsfiware/tokenproxy:1.0
-    build: ./config/tokenproxy
-    depends_on:
-      - keyrock
-    restart: always
-    logging:
-      driver: syslog
-      options:
-        tag: "[tokenproxy]"
-    command: >
-      --config
-      ./ngsi-go-config.json
-      --cache
-      ./ngsi-go-token-cache.json
-      tokenproxy
-      server
-      --idmHost
-      http://keyrock:3000
-      --clientId
-      ${CLIENT_ID}
-      --clientSecret
-      ${CLIENT_SECRET}
-      --verbose

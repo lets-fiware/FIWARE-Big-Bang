@@ -266,6 +266,7 @@ IMAGE_NGSIPROXY=${IMAGE_NGSIPROXY}
 IMAGE_QUANTUMLEAP=${IMAGE_QUANTUMLEAP}
 IMAGE_IOTAGENT=${IMAGE_IOTAGENT}
 
+IMAGE_TOKENPROXY=${IMAGE_TOKENPROXY}
 IMAGE_QUERYPROXY=${IMAGE_QUERYPROXY}
 
 IMAGE_MONGO=${IMAGE_MONGO}
@@ -287,6 +288,8 @@ CYGNUS_LOG_LEVEL=${CYGNUS_LOG_LEVEL}
 LOGOPS_LEVEL=${LOGOPS_LEVEL}
 LOGLEVEL=${LOGLEVEL}
 WIRECLOUD_LOGLEVEL=${WIRECLOUD_LOGLEVEL}
+TOKENPROXY_LOGLEVEL=${TOKENPROXY_LOGLEVEL}
+TOKENPROXY_VERBOSE=${TOKENPROXY_VERBOSE}
 QUERYPROXY_LOGLEVEL=${QUERYPROXY_LOGLEVEL}
 NODE_RED_LOGGING_LEVEL=${NODE_RED_LOGGING_LEVEL}
 NODE_RED_LOGGING_METRICS=${NODE_RED_LOGGING_METRICS}
@@ -1222,6 +1225,8 @@ setup_wilma() {
 
   add_docker_compose_yml "docker-wilma.yml"
 
+  add_docker_compose_yml "docker-tokenproxy.yml"
+
   add_nginx_depends_on "wilma" "tokenproxy"
 
   add_rsyslog_conf "pep-proxy" "tokenproxy"
@@ -1236,14 +1241,19 @@ setup_wilma() {
   PEP_PASSWORD=$(${NGSI_GO} applications --host "${IDM}" pep --aid "${AID}" create --run | jq -r .pep_proxy.password)
   PEP_ID=$(${NGSI_GO} applications --host "${IDM}" pep --aid "${AID}" list | jq -r .pep_proxy.id)
 
-  mkdir -p "${CONFIG_DIR}/tokenproxy"
-  cp "${TEMPLEATE}/docker/Dockerfile.tokenproxy" "${CONFIG_DIR}/tokenproxy/Dockerfile"
+  cp -r "${SETUP_DIR}"/docker/tokenproxy "${CONFIG_DIR}"/
+  cp "${WORK_DIR}"/ngsi "${CONFIG_DIR}"/tokenproxy/
+
+  cd "${CONFIG_DIR}"/tokenproxy > /dev/null
+  ${DOCKER} build -t "${IMAGE_TOKENPROXY}" .
+  rm -f ngsi
+  cd - > /dev/null
 
   cat <<EOF >> .env
 
 # Tokenproxy
-CLIENT_ID=${AID}
-CLIENT_SECRET=${SECRET}
+TOKENPROXY_CLIENT_ID=${AID}
+TOKENPROXY_CLIENT_SECRET=${SECRET}
 
 # PEP Proxy
 PEP_PROXY_APP_ID=${AID}
@@ -1773,9 +1783,7 @@ setup_node_red() {
 
   logging_info "${FUNCNAME[0]}"
 
-  mkdir "${CONFIG_DIR}"/node-red
-  cp "${TEMPLEATE}"/docker/Dockerfile.node-red "${CONFIG_DIR}"/node-red/Dockerfile
-  cp "${TEMPLEATE}"/docker/node-red-settings.js "${CONFIG_DIR}"/node-red/settings.js
+  cp -r "${SETUP_DIR}"/docker/node-red "${CONFIG_DIR}"/
   cp "${CONTRIB_DIR}/node-red-contrib-FIWARE_official/contextbroker.js" "${CONFIG_DIR}"/node-red/contextbroker.js
 
   cd "${CONFIG_DIR}"/node-red > /dev/null

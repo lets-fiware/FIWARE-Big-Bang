@@ -96,6 +96,7 @@ IMAGE_MYSQL=mysql:5.7
 IMAGE_POSTGRES=postgres:11
 IMAGE_CRATE=crate:4.1.4
 
+IMAGE_TOKENPROXY=letsfiware/tokenproxy:0.5.0-next
 IMAGE_QUERYPROXY=letsfiware/queryproxy:0.5.0-next
 
 IMAGE_NGINX=nginx:1.21
@@ -132,6 +133,10 @@ LOGLEVEL=INFO
 # WireCloud
 #   https://github.com/Wirecloud/docker-wirecloud/blob/master/README.md
 WIRECLOUD_LOGLEVEL=INFO
+
+# Tokenproxy
+TOKENPROXY_LOGLEVEL=info
+TOKENPROXY_VERBOSE=
 
 # Queryproxy
 QUERYPROXY_LOGLEVEL=info

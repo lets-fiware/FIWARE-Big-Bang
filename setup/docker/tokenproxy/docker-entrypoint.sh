@@ -1,3 +1,5 @@
+#!/bin/sh
+
 # MIT License
 #
 # Copyright (c) 2021 Kazuhito Suda
@@ -24,24 +26,26 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-FROM alpine:3.14 AS builder
+set -ue
 
-# hadolint ignore=DL3018
-RUN \
-    apk update && \
-    apk add --no-cache curl tar && \
-    curl -OL https://github.com/lets-fiware/ngsi-go/releases/download/v0.9.0/ngsi-v0.9.0-linux-amd64.tar.gz && \
-    tar zxvf ngsi-v0.9.0-linux-amd64.tar.gz -C /usr/local/bin
-    
+: "${CLIENT_ID:?CLIENT_ID not found}"
+: "${CLIENT_SECRET:?CLIENT_SECRET not found}"
 
-FROM alpine:3.14 AS runner
+ORION=orion
+LOG_LEVEL="${LOG_LEVEL:-info}"
+HOST="${HOST:-http://keyrock:3000}"
+VERBOSE="${VERBOSE:-false}"
 
-COPY --from=builder /usr/local/bin/ngsi /usr/local/bin/ngsi
+if ${VERBOSE}; then
+  VERBOSE=--verbose
+else
+  VERBOSE=""
+fi
 
-WORKDIR /opt/ngsi-go/
+echo "HOST=${HOST}"
+echo "LOG_LEVEL=${LOG_LEVEL}"
+echo "VERBOSE=${VERBOSE}"
 
-RUN chown -R nobody:nobody /opt/ngsi-go
+NGSI_GO="/usr/local/bin/ngsi --stderr ${LOG_LEVEL} --config ./ngsi-go-config.json --cache ./ngsi-go-token-cache.json"
 
-USER nobody 
-
-ENTRYPOINT ["/usr/local/bin/ngsi"]
+${NGSI_GO} tokenproxy server --idmHost "${HOST}" --clientId "${CLIENT_ID}" --clientSecret "${CLIENT_SECRET}" "${VERBOSE}"

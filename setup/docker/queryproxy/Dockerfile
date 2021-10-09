@@ -37,4 +37,4 @@ USER nobody
 
 ENTRYPOINT ["docker-entrypoint.sh"]
 
-EXPOSE 1030:1030
+EXPOSE 1030
