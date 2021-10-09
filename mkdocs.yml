@@ -5,3 +5,4 @@ nav:
   - 'Home':
     - 'Index': index.md
     - 'Install': install.md
+    - 'Node-RED': node-red.md
