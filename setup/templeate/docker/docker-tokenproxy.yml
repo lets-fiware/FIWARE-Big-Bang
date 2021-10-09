@@ -1,0 +1,15 @@
+version: "3"
+services:
+  tokenproxy:
+    image: ${IMAGE_TOKENPROXY}
+    depends_on:
+      - keyrock
+    environment:
+      - CLIENT_ID=${TOKENPROXY_CLIENT_ID}
+      - CLIENT_SECRET=${TOKENPROXY_CLIENT_SECRET}
+      - VERBOSE=${TOKENPROXY_VERBOSE}
+    restart: always
+    logging:
+      driver: syslog
+      options:
+        tag: "[tokenproxy]"

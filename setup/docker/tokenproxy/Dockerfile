@@ -1,5 +1,3 @@
-#!/bin/sh
-
 # MIT License
 #
 # Copyright (c) 2021 Kazuhito Suda
@@ -26,12 +24,17 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-set -ue
+FROM alpine:3.14
 
-cd "$(dirname "$0")"
-cd ../..
+COPY ./ngsi /usr/local/bin/ngsi
+COPY ./docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 
-docker pull hadolint/hadolint
-docker run --rm -i hadolint/hadolint < ./setup/docker/node-red/Dockerfile
-docker run --rm -i hadolint/hadolint < ./setup/docker/tokenproxy/Dockerfile
-docker run --rm -i hadolint/hadolint < ./setup/docker/queryproxy/Dockerfile
+WORKDIR /opt/ngsi-go/
+
+RUN chown -R nobody:nobody /opt/ngsi-go
+
+USER nobody 
+
+ENTRYPOINT ["docker-entrypoint.sh"]
+
+EXPOSE 1029
