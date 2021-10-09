@@ -1,0 +1,22 @@
+version: "3"
+services:
+  regproxy:
+    image: ${IMAGE_REGPROXY}
+    ports:
+      - 127.0.0.1:1028:1028
+    environment:
+      - HOST=${REGPROXY_HOST}
+      - NGSITYPE=${REGPROXY_NGSITYPE}
+      - IDMTYPE=${REGPROXY_IDMTYPE}
+      - IDMHOST=${REGPROXY_IDMHOST}
+      - USERNAME=${REGPROXY_USERNAME}
+      - PASSWORD=${REGPROXY_PASSWORD}
+      - CLIENT_ID=${REGPROXY_CLIENT_ID}
+      - CLIENT_SECRET=${REGPROXY_CLIENT_SECRET}
+      - LOG_LEVEL=${REGPROXY_LOGLEVEL}
+      - VERBOSE=${REGPROXY_VERBOSE}
+    restart: always
+    logging:
+      driver: syslog
+      options:
+        tag: "[regproxy]"

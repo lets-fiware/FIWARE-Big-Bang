@@ -143,6 +143,14 @@ install_test1() {
   sed -i -e "s/^\(FIREWALL=\).*/\1true/" config.sh
   sed -i -e "s/^\(QUERYPROXY=\).*/\1true/" config.sh
 
+  sed -i -e "s/^\(REGPROXY=\).*/\1true/" config.sh
+  sed -i -e "s/^\(REGPROXY_NGSITYPE=\).*/\1v2/" config.sh
+  sed -i -e "s/^\(REGPROXY_HOST=\).*/\1http:\/\/remote-orion/" config.sh
+  sed -i -e "s/^\(REGPROXY_IDMTYPE=\).*/\1tokenproxy/" config.sh
+  sed -i -e "s/^\(REGPROXY_IDMHOST=\).*/\1\/token/" config.sh
+  sed -i -e "s/^\(REGPROXY_USERNAME=\).*/\1fiware/" config.sh
+  sed -i -e "s/^\(REGPROXY_PASSWORD=\).*/\1abcd/" config.sh
+
   ${KCOV} ./coverage ./lets-fiware.sh example.com
 }
 

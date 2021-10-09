@@ -138,6 +138,10 @@ set_and_check_values() {
     QUERYPROXY=false
   fi
 
+  if [ -z "${REGPROXY}" ]; then
+    REGPROXY=false
+  fi
+
   if [ -z "${KEYROCK_POSTGRES}" ]; then
     KEYROCK_POSTGRES=false
   fi
@@ -268,6 +272,7 @@ IMAGE_IOTAGENT=${IMAGE_IOTAGENT}
 
 IMAGE_TOKENPROXY=${IMAGE_TOKENPROXY}
 IMAGE_QUERYPROXY=${IMAGE_QUERYPROXY}
+IMAGE_REGPROXY=${IMAGE_REGPROXY}
 
 IMAGE_MONGO=${IMAGE_MONGO}
 IMAGE_MYSQL=${IMAGE_MYSQL}
@@ -286,7 +291,7 @@ IMAGE_NODE_RED=${IMAGE_NODE_RED}
 IDM_DEBUG=${IDM_DEBUG}
 CYGNUS_LOG_LEVEL=${CYGNUS_LOG_LEVEL}
 LOGOPS_LEVEL=${LOGOPS_LEVEL}
-LOGLEVEL=${LOGLEVEL}
+QUANTUMLEAP_LOGLEVEL=${QUANTUMLEAP_LOGLEVEL}
 WIRECLOUD_LOGLEVEL=${WIRECLOUD_LOGLEVEL}
 TOKENPROXY_LOGLEVEL=${TOKENPROXY_LOGLEVEL}
 TOKENPROXY_VERBOSE=${TOKENPROXY_VERBOSE}
@@ -1334,6 +1339,59 @@ EOF
 }
 
 #
+# Regproxy
+#
+setup_regproxy() {
+  if ! ${REGPROXY}; then
+    return
+  fi
+
+  logging_info "${FUNCNAME[0]}"
+
+  cp -r "${SETUP_DIR}"/docker/regproxy "${CONFIG_DIR}"/
+  cp "${WORK_DIR}"/ngsi "${CONFIG_DIR}"/regproxy/
+
+  cd "${CONFIG_DIR}"/regproxy > /dev/null
+  ${DOCKER} build -t "${IMAGE_REGPROXY}" .
+  rm -f ngsi
+  cd - > /dev/null
+
+  add_docker_compose_yml "docker-regproxy.yml"
+
+  add_nginx_depends_on "regproxy"
+
+  add_to_docker_compose_yml "__ORION_DEPENDS_ON__" "     - regproxy"
+
+  add_rsyslog_conf "regproxy"
+
+  REGPROXY_NGSITYPE="${REGPROXY_NGSITYPE:-v2}"
+  : "${REGPROXY_HOST:?REGPROXY_HOST missing}"
+  : "${REGPROXY_IDMTYPE:?REGPROXY_IDMTYPE missing}"
+  : "${REGPROXY_IDMHOST:?REGPROXY_IDMHOST missing}"
+  : "${REGPROXY_USERNAME:?REGPROXY_USERNAME missing}"
+  : "${REGPROXY_PASSWORD:?REGPROXY_PASSWORD missing}"
+  REGPROXY_CLIENT_ID="${REGPROXY_CLIENT_ID:-}"
+  REGPROXY_CLIENT_SECRET="${REGPROXY_CLIENT_SECRET:-}"
+  LOG_LEVEL="${LOG_LEVEL:-info}"
+
+  cat <<EOF >> .env
+
+# Regproxy
+
+REGPROXY_HOST=${REGPROXY_HOST}
+REGPROXY_NGSITYPE=${REGPROXY_NGSITYPE}
+REGPROXY_IDMTYPE=${REGPROXY_IDMTYPE}
+REGPROXY_IDMHOST=${REGPROXY_IDMHOST}
+REGPROXY_USERNAME=${REGPROXY_USERNAME}
+REGPROXY_PASSWORD=${REGPROXY_PASSWORD}
+REGPROXY_CLIENT_ID=${REGPROXY_CLIENT_ID}
+REGPROXY_CLIENT_SECRET=${REGPROXY_CLIENT_SECRET}
+REGPROXY_LOGLEVEL=${REGPROXY_LOGLEVEL}
+REGPROXY_VERBOSE=${REGPROXY_VERBOSE}
+EOF
+}
+
+#
 # Cygnus and Comet
 #
 setup_comet() {
@@ -1985,6 +2043,7 @@ setup_end() {
   delete_from_docker_compose_yml "__IOTA_"
   delete_from_docker_compose_yml "__MOSQUITTO_"
   delete_from_docker_compose_yml "__NODE_RED_"
+  delete_from_docker_compose_yml "__ORION_"
 
   sed -i -e "/# __NGINX_ORION_/d" "${NGINX_SITES}/${ORION}"
 }
@@ -2040,6 +2099,7 @@ setup_main() {
   setup_wilma
   setup_orion
   setup_queryproxy
+  setup_regproxy
   setup_comet
   setup_quantumleap
   setup_wirecloud

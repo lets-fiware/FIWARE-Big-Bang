@@ -9,7 +9,7 @@ services:
       - CRATE_HOST=crate
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-      - LOGLEVEL=DEBUG
+      - LOGLEVEL=${QUANTUMLEAP_LOGLEVEL}
     healthcheck:
       test: curl --fail -s http://quantumleap:8668/version || exit 1
     restart: always

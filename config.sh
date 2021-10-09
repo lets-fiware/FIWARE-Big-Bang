@@ -65,6 +65,36 @@ NODE_RED_INSTANCE_HTTP_NODE_ROOT=
 NODE_RED_INSTANCE_HTTP_ADMIN_ROOT=
 
 #
+# Regproxy options
+#
+# Use regproxy. (true or false) Default: false
+REGPROXY=
+
+# NgsiType for remote broker. (v2 or ld) Default: v2
+REGPROXY_NGSITYPE=
+
+# Host for remote broker.
+REGPROXY_HOST=
+
+# IdM type for remote broker.
+REGPROXY_IDMTYPE=
+
+# IdM host for remote broker.
+REGPROXY_IDMHOST=
+
+# username for remote broker.
+REGPROXY_USERNAME=
+
+# password for remote broker.
+REGPROXY_PASSWORD=
+
+# client id for remote broker.
+REGPROXY_CLIENT_ID=
+
+# client secret for remote broker.
+REGPROXY_CLIENT_SECRET=
+
+#
 # Certbot options
 #
 # Set a e-mail address for certbot. Defaul: a e-mail address of an admin user for Keyrock.
@@ -98,6 +128,7 @@ IMAGE_CRATE=crate:4.1.4
 
 IMAGE_TOKENPROXY=letsfiware/tokenproxy:0.5.0-next
 IMAGE_QUERYPROXY=letsfiware/queryproxy:0.5.0-next
+IMAGE_REGPROXY=letsfiware/regproxy:0.5.0-next
 
 IMAGE_NGINX=nginx:1.21
 IMAGE_REDIS=redis:6
@@ -128,7 +159,7 @@ LOGOPS_LEVEL=INFO
 
 # Quantumleap
 #   INFO, DEBUG
-LOGLEVEL=INFO
+QUANTUMLEAP_LOGLEVEL=INFO
 
 # WireCloud
 #   https://github.com/Wirecloud/docker-wirecloud/blob/master/README.md
@@ -140,6 +171,12 @@ TOKENPROXY_VERBOSE=
 
 # Queryproxy
 QUERYPROXY_LOGLEVEL=info
+
+# Regproxy log level
+REGPROXY_LOGLEVEL=info
+
+# Regproxy verbose
+REGPROXY_VERBOSE=false
 
 # Node-RED
 #   https://nodered.org/docs/user-guide/runtime/logging

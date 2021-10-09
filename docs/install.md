@@ -79,6 +79,15 @@ You can specify configurations by editing the `config.sh` file.
 | CERT\_TEST                      | Use --test-cert option. true or false               | false                                           |
 | CERT\_FORCE\_RENEWAL            | Use --force-renewal option. true or false           | false                                           |
 | QUERYPROXY                      | Use queryproxy. true or false                       | false                                           |
+| REGPROXY                        | Use regproxy. true or false                         | false                                           |
+| REGPROXY\_NGSITYPE              | NgsiType for remote broker. (v2 or ld) Default: v2  | (empty)                                         |
+| REGPROXY\_HOST                  | Host for remote broker.                             | (empty)                                         |
+| REGPROXY\_IDMTYPE               | IdM type for remote broker.                         | (empty)                                         |
+| REGPROXY\_IDMHOST               | IdM host for remote broker.                         | (empty)                                         |
+| REGPROXY\_USERNAME              | A username for remote broker.                       | (empty)                                         |
+| REGPROXY\_PASSWORD              | A password for remote broker.                       | (empty)                                         |
+| REGPROXY\_CLIENT\_ID            | A client id for remote broker.                      | (empty)                                         |
+| REGPROXY\_CLIENT\_SECRET        | A client secret for remote broker.                  | (empty)                                         |
 | MQTT\_1883                      | Use MQTT 1883 Port. true or false                   | false                                           |
 | MQTT\_TLS                       | Use MQTT TLS. true or false                         | true                                            |
 | NODE\_RED\_INSTANCE\_NUMBER     | Number of Node-RED instance.                        | 1                                               |
