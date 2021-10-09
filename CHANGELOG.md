@@ -1,5 +1,7 @@
 ## FIWARE Big Bang v0.5.0-next
 
+-   Add Queryproxy (#76)
+
 ## FIWARE Big Bang v0.5.0 - 9 Oct, 2021
 
 -   Hardening Node-RED support (#73)
