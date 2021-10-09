@@ -99,7 +99,7 @@ IMAGE_ELASTICSEARCH=elasticsearch:2.4
 IMAGE_MEMCACHED=memcached:1
 IMAGE_GRAFANA=grafana/grafana:6.1.6
 IMAGE_MOSQUITTO=eclipse-mosquitto:1.6
-IMAGE_NODE_RED=letsfiware/node-red:0.5.0
+IMAGE_NODE_RED=letsfiware/node-red:0.5.0-next
 
 IMAGE_CERTBOT=certbot/certbot:v1.18.0
 
