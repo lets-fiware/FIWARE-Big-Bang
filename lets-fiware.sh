@@ -134,6 +134,10 @@ set_and_check_values() {
     fi
   done
 
+  if [ -z "${QUERYPROXY}" ]; then
+    QUERYPROXY=false
+  fi
+
   if [ -z "${KEYROCK_POSTGRES}" ]; then
     KEYROCK_POSTGRES=false
   fi
@@ -262,6 +266,8 @@ IMAGE_NGSIPROXY=${IMAGE_NGSIPROXY}
 IMAGE_QUANTUMLEAP=${IMAGE_QUANTUMLEAP}
 IMAGE_IOTAGENT=${IMAGE_IOTAGENT}
 
+IMAGE_QUERYPROXY=${IMAGE_QUERYPROXY}
+
 IMAGE_MONGO=${IMAGE_MONGO}
 IMAGE_MYSQL=${IMAGE_MYSQL}
 IMAGE_POSTGRES=${IMAGE_POSTGRES}
@@ -281,6 +287,7 @@ CYGNUS_LOG_LEVEL=${CYGNUS_LOG_LEVEL}
 LOGOPS_LEVEL=${LOGOPS_LEVEL}
 LOGLEVEL=${LOGLEVEL}
 WIRECLOUD_LOGLEVEL=${WIRECLOUD_LOGLEVEL}
+QUERYPROXY_LOGLEVEL=${QUERYPROXY_LOGLEVEL}
 NODE_RED_LOGGING_LEVEL=${NODE_RED_LOGGING_LEVEL}
 NODE_RED_LOGGING_METRICS=${NODE_RED_LOGGING_METRICS}
 NODE_RED_LOGGING_AUDIT=${NODE_RED_LOGGING_AUDIT}
@@ -556,6 +563,7 @@ check_ngsi_go() {
     logging_info "${ver}"
     ver=$(/usr/local/bin/ngsi --version | sed -e "s/ngsi version \([^ ]*\) .*/\1/" | awk -F. '{printf "%2d%02d%02d", $1,$2,$3}')
     if [ "${ver}" -ge 900 ]; then
+        cp /usr/local/bin/ngsi "${WORK_DIR}"
         return
     fi
   fi
@@ -570,6 +578,8 @@ check_ngsi_go() {
     source /etc/bash_completion.d/ngsi_bash_autocomplete
     echo "source /etc/bash_completion.d/ngsi_bash_autocomplete" >> ~/.bashrc
   fi
+
+  cp /usr/local/bin/ngsi "${WORK_DIR}"
 }
 
 #
@@ -1267,7 +1277,52 @@ setup_orion() {
 CB_HOST=${CB_HOST}
 EOF
 }
- 
+
+#
+# Queryproxy
+#
+setup_queryproxy() {
+  if ! ${QUERYPROXY}; then
+    return
+  fi 
+
+  logging_info "${FUNCNAME[0]}"
+
+  cp -r "${SETUP_DIR}"/docker/queryproxy "${CONFIG_DIR}"/
+  cp "${WORK_DIR}"/ngsi "${CONFIG_DIR}"/queryproxy/
+
+  cd "${CONFIG_DIR}"/queryproxy > /dev/null
+  ${DOCKER} build -t "${IMAGE_QUERYPROXY}" .
+  rm -f ngsi
+  cd - > /dev/null
+
+  add_docker_compose_yml "docker-queryproxy.yml"
+
+  add_nginx_depends_on "queryproxy"
+
+  add_rsyslog_conf "queryproxy"
+
+  cat <<EOF > "${WORK_DIR}"/nginx_queryproxy
+  location /v2/ex/entities {
+    set \$req_uri "\$uri";
+    auth_request /_check_oauth2_token;
+
+    proxy_pass http://queryproxy:1030;
+    proxy_redirect     default;
+  }
+
+  location /health {
+    set \$req_uri "\$uri";
+    auth_request /_check_oauth2_token;
+
+    proxy_pass http://queryproxy:1030;
+    proxy_redirect     default;
+  }
+EOF
+
+  sed -i -e "/# __NGINX_ORION_/r ${WORK_DIR}/nginx_queryproxy" "${NGINX_SITES}/${ORION}"
+}
+
 #
 # Cygnus and Comet
 #
@@ -1594,12 +1649,12 @@ echo "}" >> "${nginx_conf}"
 #
 # IoT Agent
 #
-setup_iot_agent() {
-  logging_info "${FUNCNAME[0]}"
-
+setup_iotagent() {
   if [ -z "${IOTAGENT}" ]; then
     return
   fi
+
+  logging_info "${FUNCNAME[0]}"
 
   add_docker_compose_yml "docker-iotagent.yml"
 
@@ -1922,6 +1977,8 @@ setup_end() {
   delete_from_docker_compose_yml "__IOTA_"
   delete_from_docker_compose_yml "__MOSQUITTO_"
   delete_from_docker_compose_yml "__NODE_RED_"
+
+  sed -i -e "/# __NGINX_ORION_/d" "${NGINX_SITES}/${ORION}"
 }
 
 #
@@ -1974,10 +2031,11 @@ setup_main() {
   setup_keyrock
   setup_wilma
   setup_orion
+  setup_queryproxy
   setup_comet
   setup_quantumleap
   setup_wirecloud
-  setup_iot_agent
+  setup_iotagent
   setup_node_red
   setup_grafana
 

@@ -1,0 +1,13 @@
+version: "3"
+services:
+  queryproxy:
+    image: ${IMAGE_QUERYPROXY}
+    depends_on:
+      - orion
+    environment:
+      - LOG_LEVEL=${QUERYPROXY_LOGLEVEL}
+    restart: always
+    logging:
+      driver: syslog
+      options:
+        tag: "[queryproxy]"

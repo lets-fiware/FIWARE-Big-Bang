@@ -21,6 +21,9 @@ NODE_RED=
 GRAFANA=
 MOSQUITTO=
 
+# Use queryproxy. (true or false) Default: false
+QUERYPROXY=
+
 # Use MQTT (Port 1883). (true or false) Default: false
 MQTT_1883=
 
@@ -93,6 +96,8 @@ IMAGE_MYSQL=mysql:5.7
 IMAGE_POSTGRES=postgres:11
 IMAGE_CRATE=crate:4.1.4
 
+IMAGE_QUERYPROXY=letsfiware/queryproxy:0.5.0-next
+
 IMAGE_NGINX=nginx:1.21
 IMAGE_REDIS=redis:6
 IMAGE_ELASTICSEARCH=elasticsearch:2.4
@@ -127,6 +132,9 @@ LOGLEVEL=INFO
 # WireCloud
 #   https://github.com/Wirecloud/docker-wirecloud/blob/master/README.md
 WIRECLOUD_LOGLEVEL=INFO
+
+# Queryproxy
+QUERYPROXY_LOGLEVEL=info
 
 # Node-RED
 #   https://nodered.org/docs/user-guide/runtime/logging
