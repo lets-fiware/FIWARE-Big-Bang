@@ -1,4 +1,4 @@
-## FIWARE Big Bang v0.4.0-next
+## FIWARE Big Bang v0.5.0 - 9 Oct, 2021
 
 -   Hardening Node-RED support (#73)
 -   Improve coverage (#72)

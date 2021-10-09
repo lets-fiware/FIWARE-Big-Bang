@@ -35,8 +35,8 @@ Before running the setup script, you need to register sub-domain names of FIWARE
 Clone the FIWARE Big Bang repository and run the `lets-fiware.sh` script with your domain name.
 
 ```
-curl -sL https://github.com/lets-fiware/FIWARE-Big-Bang/archive/refs/tags/v0.4.0.tar.gz | tar zxf -
-cd FIWARE-Big-Bang-0.4.0/
+curl -sL https://github.com/lets-fiware/FIWARE-Big-Bang/archive/refs/tags/v0.5.0.tar.gz | tar zxf -
+cd FIWARE-Big-Bang-0.5.0/
 ./lets-fiware.sh example.com
 ```
 
