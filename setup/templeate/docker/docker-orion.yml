@@ -4,6 +4,7 @@ services:
     image: ${IMAGE_ORION}
     depends_on:
       - mongo
+    # __ORION_DEPENDS_ON__
     entrypoint: ["sh", "-c", "rm /tmp/contextBroker.pid; /usr/bin/contextBroker -fg -multiservice -dbhost mongo"]
     restart: always
     logging:

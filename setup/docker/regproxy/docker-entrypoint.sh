@@ -26,33 +26,52 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-set -ue
+set -eu
 
-cd "$(dirname "$0")"
-cd ../..
+ORION=remote-orion
 
-. ./config.sh
+NGSITYPE="${NGSITYPE:-v2}"
+: "${HOST:?HOST missing}"
+: "${IDMTYPE:?IDMTYPE missing}"
+: "${IDMHOST:?IDMHOST missing}"
+: "${USERNAME:?USERNAME missing}"
+: "${PASSWORD:?PASSWORD missing}"
+CLIENT_ID="${CLIENT_ID:-}"
+CLIENT_SECRET="${CLIENT_SECRET:-}"
+LOG_LEVEL="${LOG_LEVEL:-info}"
+VERBOSE="${VERBOSE:-false}"
 
-if [ "${ORION}" != "orion" ]; then
-  echo "Error ORION value in config.sh"
-  exit 1
+if [ -n "${CLIENT_ID}" ] && [ -n "${CLIENT_SECRET}" ]; then
+  CLIENT_ID="--clientId ${CLIENT_ID}"
+  CLIENT_SECRET="--clientSecret ${CLIENT_SECRET}"
+else
+  CLIENT_ID=""  
+  CLIENT_SECRET=""
 fi
 
-if [ "${KEYROCK}" != "keyrock" ]; then
-  echo "Error ORION value in config.sh"
-  exit 1
+if ${VERBOSE}; then
+  VERBOSE=--verbose
+else
+  VERBOSE=""
 fi
 
-for NAME in COMET QUANTUMLEAP WIRECLOUD NGSIPROXY NODE_RED GRAFANA IDM_ADMIN_USER IDM_ADMIN_EMAIL IDM_ADMIN_PASS FIREWALL CERT_EMAIL CERT_REVOKE CERT_TEST CERT_FORCE_RENEWAL KEYROCK_POSTGRES IOTAGENT MQTT_USERNAME MQTT_PASSWORD MOSQUITTO MQTT_TLS MQTT_1883 NODE_RED_INSTANCE_NUMBER NODE_RED_INSTANCE_USERNAME NODE_RED_INSTANCE_HTTP_NODE_ROOT NODE_RED_INSTANCE_HTTP_ADMIN_ROOT NODE_RED_LOGGING_METRICS NODE_RED_LOGGING_AUDIT QUERYPROXY REGPROXY REGPROXY_NGSITYPE REGPROXY_HOST REGPROXY_IDMTYPE REGPROXY_IDMHOST REGPROXY_USERNAME REGPROXY_PASSWORD REGPROXY_CLIENT_ID REGPROXY_CLIENT_SECRET
-do
-  eval VAL=\"\$$NAME\"
-  if [ -n "$VAL" ]; then
-    echo "${NAME} not empty: ${VAL}"
-    exit 1
-  fi
-done
+echo "HOST=${HOST}"
+echo "LOG_LEVEL=${LOG_LEVEL}"
+echo "VERBOSE=${VERBOSE}"
 
-if [ "${IMAGE_CERTBOT}" != "certbot/certbot:v1.18.0" ]; then
-  echo "Error IMAGE_CERTBOT"
-  exit 1
-fi
+NGSI_GO="/usr/local/bin/ngsi --stderr ${LOG_LEVEL} --config ./ngsi-go-config.json --cache ./ngsi-go-token-cache.json"
+
+${NGSI_GO} broker add \
+  --host "${ORION}" \
+  --ngsiType "${NGSITYPE}" \
+  --brokerHost "${HOST}" \
+  --idmType "${IDMTYPE}" \
+  --idmHost "${IDMHOST}" \
+  --username "${USERNAME}" \
+  --password "${PASSWORD}" \
+  ${CLIENT_ID} \
+  ${CLIENT_SECRET}
+
+${NGSI_GO} broker get --host "${ORION}"
+
+${NGSI_GO} regproxy server --host "${ORION}" ${VERBOSE}

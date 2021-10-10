@@ -28,10 +28,23 @@
 
 set -ue
 
-cd "$(dirname "$0")"
-cd ../..
+lint() {
+  echo "linting ${1}"
+  docker run --rm -i hadolint/hadolint < "${1}"
+}
 
-docker pull hadolint/hadolint
-docker run --rm -i hadolint/hadolint < ./setup/docker/node-red/Dockerfile
-docker run --rm -i hadolint/hadolint < ./setup/docker/tokenproxy/Dockerfile
-docker run --rm -i hadolint/hadolint < ./setup/docker/queryproxy/Dockerfile
+main() {
+  cd "$(dirname "$0")"
+  cd ../..
+
+  docker pull hadolint/hadolint
+
+  for name in node-red tokenproxy queryproxy regproxy
+  do
+    lint "./setup/docker/${name}/Dockerfile"
+  done
+
+  lint "./tests/certmock/Dockerfile"
+}
+
+main
