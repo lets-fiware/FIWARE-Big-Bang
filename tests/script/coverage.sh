@@ -142,6 +142,7 @@ install_test1() {
   sed -i -e "s/^\(CERT_REVOKE=\).*/\1true/" config.sh
   sed -i -e "s/^\(FIREWALL=\).*/\1true/" config.sh
   sed -i -e "s/^\(QUERYPROXY=\).*/\1true/" config.sh
+  sed -i -e "s/^\(POSTFIX=\).*/\1true/" config.sh
 
   sed -i -e "s/^\(REGPROXY=\).*/\1true/" config.sh
   sed -i -e "s/^\(REGPROXY_NGSITYPE=\).*/\1v2/" config.sh

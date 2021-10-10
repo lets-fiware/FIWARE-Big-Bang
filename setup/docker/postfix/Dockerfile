@@ -1,5 +1,3 @@
-#!/bin/sh
-
 # MIT License
 #
 # Copyright (c) 2021 Kazuhito Suda
@@ -26,25 +24,14 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-set -ue
+FROM alpine:3.14
 
-lint() {
-  echo "linting ${1}"
-  docker run --rm -i hadolint/hadolint < "${1}"
-}
+COPY ./docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 
-main() {
-  cd "$(dirname "$0")"
-  cd ../..
+# hadolint ignore=DL3018
+RUN \
+    apk add --no-cache postfix postfix-pcre mailx
 
-  docker pull hadolint/hadolint
+ENTRYPOINT ["docker-entrypoint.sh"]
 
-  for name in node-red tokenproxy queryproxy regproxy postfix
-  do
-    lint "./setup/docker/${name}/Dockerfile"
-  done
-
-  lint "./tests/certmock/Dockerfile"
-}
-
-main
+EXPOSE 25

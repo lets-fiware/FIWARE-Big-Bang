@@ -28,23 +28,11 @@
 
 set -ue
 
-lint() {
-  echo "linting ${1}"
-  docker run --rm -i hadolint/hadolint < "${1}"
-}
+NETWORK=$(hostname -i | awk -F. '{printf "%d.%d.%d.0/24", $1,$2,$3}')
+sed -e "/mydestination/amynetworks = $NETWORK" /etc/postfix/main.cf > /tmp/main.cf
+cat /tmp/main.cf > /etc/postfix/main.cf
+rm -f /tmp/main.cf
 
-main() {
-  cd "$(dirname "$0")"
-  cd ../..
+echo "${NETWORK}"
 
-  docker pull hadolint/hadolint
-
-  for name in node-red tokenproxy queryproxy regproxy postfix
-  do
-    lint "./setup/docker/${name}/Dockerfile"
-  done
-
-  lint "./tests/certmock/Dockerfile"
-}
-
-main
+postfix start-fg

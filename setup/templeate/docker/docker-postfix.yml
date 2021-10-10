@@ -1,0 +1,11 @@
+version: "3"
+services:
+  postfix:
+    image: ${IMAGE_POSTFIX}
+    volumes:
+    # __POSTFIX_VOLUMES__
+    restart: always
+    logging:
+      driver: syslog
+      options:
+        tag: "[postfix]"
