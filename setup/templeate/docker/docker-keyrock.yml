@@ -20,6 +20,9 @@ services:
       - IDM_SESSION_SECRET=${IDM_SESSION_SECRET}
       - IDM_ENCRYPTION_KEY=${IDM_ENCRYPTION_KEY}
       - IDM_DEBUG=${IDM_DEBUG}
+    # __KEYROCK_ENVIRONMENT__
+    volumes:
+    # __KEYROCK_VOLUMES__
     restart: always
     logging:
       driver: syslog

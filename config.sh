@@ -64,6 +64,9 @@ NODE_RED_INSTANCE_HTTP_NODE_ROOT=
 # httpAdminRoot for Node-RED instance. default: / or /node-red???
 NODE_RED_INSTANCE_HTTP_ADMIN_ROOT=
 
+# Use Postfix (local delivery). (true or false) Default: false
+POSTFIX=
+
 #
 # Regproxy options
 #
@@ -137,6 +140,7 @@ IMAGE_MEMCACHED=memcached:1
 IMAGE_GRAFANA=grafana/grafana:6.1.6
 IMAGE_MOSQUITTO=eclipse-mosquitto:1.6
 IMAGE_NODE_RED=letsfiware/node-red:0.5.0-next
+IMAGE_POSTFIX=letsfiware/postfix:0.5.0-next
 
 IMAGE_CERTBOT=certbot/certbot:v1.18.0
 

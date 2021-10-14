@@ -1,0 +1,13 @@
+myhostname = localhost.localdomain
+mydomain = localdomain
+myorigin = $myhostname
+mydestination = $myhostname, $mydomain
+
+smtpd_recipient_restrictions = permit_mynetworks, reject_unauth_destination
+
+alias_maps = pcre:/etc/postfix/aliases.regexp
+transport_maps = pcre:/etc/postfix/transport_maps
+
+# home_mailbox = Maildir/
+
+maillog_file = /dev/stdout

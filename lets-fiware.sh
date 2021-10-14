@@ -134,6 +134,10 @@ set_and_check_values() {
     fi
   done
 
+  if [ -z "${POSTFIX}" ]; then
+    POSTFIX=false
+  fi
+
   if [ -z "${QUERYPROXY}" ]; then
     QUERYPROXY=false
   fi
@@ -286,6 +290,7 @@ IMAGE_MEMCACHED=${IMAGE_MEMCACHED}
 IMAGE_GRAFANA=${IMAGE_GRAFANA}
 IMAGE_MOSQUITTO=${IMAGE_MOSQUITTO}
 IMAGE_NODE_RED=${IMAGE_NODE_RED}
+IMAGE_POSTFIX=${IMAGE_POSTFIX}
 
 # Logging settings
 IDM_DEBUG=${IDM_DEBUG}
@@ -1215,6 +1220,15 @@ setup_keyrock() {
 
   add_rsyslog_conf "keyrock"
 
+  mkdir "${CONFIG_DIR}"/keyrock
+  echo "${DOMAIN_NAME}" > "${CONFIG_DIR}"/keyrock/whitelist.txt
+
+  cp "${CONTRIB_DIR}/keyrock/list_users.js" "${CONFIG_DIR}/keyrock"
+
+  add_to_docker_compose_yml "__KEYROCK_VOLUMES__" "     - ${CONFIG_DIR}/keyrock/whitelist.txt:/opt/fiware-idm/etc/email_list/whitelist.txt"
+  add_to_docker_compose_yml "__KEYROCK_VOLUMES__" "     - ${CONFIG_DIR}/keyrock/list_users.js:/opt/fiware-idm/controllers/web/list_users.js"
+  add_to_docker_compose_yml "__KEYROCK_ENVIRONMENT__" "     - IDM_EMAIL_LIST=whitelist"
+
   if ${KEYROCK_POSTGRES}; then
     setup_postgres
   else
@@ -1948,6 +1962,43 @@ GF_INSTALL_PLUGINS="https://github.com/orchestracities/grafana-map-plugin/archiv
 EOF
 }
 
+setup_postfix() {
+  if ! ${POSTFIX}; then
+    return
+  fi
+
+  logging_info "${FUNCNAME[0]}"
+
+  cp -r "${SETUP_DIR}"/docker/postfix "${CONFIG_DIR}"/
+
+  cd "${CONFIG_DIR}"/postfix > /dev/null
+  ${DOCKER} build -t "${IMAGE_POSTFIX}" .
+  cd - > /dev/null
+
+  add_docker_compose_yml "docker-postfix.yml"
+
+  local file
+
+  for file in main.cf transport_maps aliases.regexp
+  do
+    sed -i -e "/__POSTFIX_VOLUMES__/i \      - ${CONFIG_DIR}/postfix/${file}:/etc/postfix/${file}" "${DOCKER_COMPOSE_YML}"
+    "${SUDO}" chown root.root "${CONFIG_DIR}/postfix/${file}"
+    "${SUDO}" chmod 0644 "${CONFIG_DIR}/postfix/${file}"
+  done
+
+  sudo sed -i -e "/^myhostname/s/localdomain/${DOMAIN_NAME}/" "${CONFIG_DIR}/postfix/main.cf"
+  sudo sed -i -e "/^mydomain/s/localdomain/${DOMAIN_NAME}/" "${CONFIG_DIR}/postfix/main.cf"
+
+  sed -i -e "/__POSTFIX_VOLUMES__/i \      - ${DATA_DIR}/postfix/mail:/var/mail" "${DOCKER_COMPOSE_YML}"
+
+  sed -i -e "/__KEYROCK_DEPENDS_ON__/i \      - postfix" "${DOCKER_COMPOSE_YML}"
+  sed -i -e "/__KEYROCK_ENVIRONMENT__/i \      - IDM_EMAIL_HOST=postfix" "${DOCKER_COMPOSE_YML}"
+  sed -i -e "/__KEYROCK_ENVIRONMENT__/i \      - IDM_EMAIL_POST=25" "${DOCKER_COMPOSE_YML}"
+  sed -i -e "/__KEYROCK_ENVIRONMENT__/i \      - IDM_EMAIL_ADDRESS=${IDM_ADMIN_EMAIL}" "${DOCKER_COMPOSE_YML}"
+
+  add_rsyslog_conf "postfix"
+}
+
 setup_ngsi_go() {
   logging_info "${FUNCNAME[0]}"
 
@@ -2039,11 +2090,13 @@ setup_end() {
   logging_info "${FUNCNAME[0]}"
 
   delete_from_docker_compose_yml "__NGINX_"
+  delete_from_docker_compose_yml "__KEYROCK_"
   delete_from_docker_compose_yml "__WIRECLOUD_"
   delete_from_docker_compose_yml "__IOTA_"
   delete_from_docker_compose_yml "__MOSQUITTO_"
   delete_from_docker_compose_yml "__NODE_RED_"
   delete_from_docker_compose_yml "__ORION_"
+  delete_from_docker_compose_yml "__POSTFIX_"
 
   sed -i -e "/# __NGINX_ORION_/d" "${NGINX_SITES}/${ORION}"
 }
@@ -2106,6 +2159,7 @@ setup_main() {
   setup_iotagent
   setup_node_red
   setup_grafana
+  setup_postfix
 
   down_keyrock
 

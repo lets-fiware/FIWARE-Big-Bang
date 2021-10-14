@@ -15,3 +15,4 @@ coverage/
 node-red_users.txt
 password.txt
 .mock
+whitelist

@@ -93,6 +93,8 @@ You can specify configurations by editing the `config.sh` file.
 | NODE\_RED\_INSTANCE\_NUMBER     | Number of Node-RED instance.                        | 1                                               |
 | NODE\_RED\_INSTANCE\_USERNAME   | Username for Node-RED instance.                     | node-red                                        |
 | NODE\_RED\_INSTANCE\_HTTP\_ROOT | HTTP root for Node-RED instance.                    | /node-red                                       |
+| POSTFIX                         | Use Postfix (local delivery). (true or false)       | false                                           |
+
 
 ## Files and directories layout
 
