@@ -116,7 +116,7 @@ CERT_FORCE_RENEWAL=
 # Docker images
 IMAGE_KEYROCK=fiware/idm:8.1.0
 IMAGE_WILMA=fiware/pep-proxy:8.1.0
-IMAGE_ORION=fiware/orion:3.2.0
+IMAGE_ORION=telefonicaiot/fiware-orion:3.3.0
 IMAGE_CYGNUS=fiware/cygnus-ngsi:2.10.0
 IMAGE_COMET=fiware/sth-comet:2.8.0
 IMAGE_WIRECLOUD=fiware/wirecloud:1.3.1
