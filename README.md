@@ -63,11 +63,11 @@ Before running the setup script, you need to register sub-domain names of FIWARE
 Download a tar.gz file for the FIWARE Big Bang and run the `lets-fiware.sh` script with your domain name.
 
 ```
-curl -sL https://github.com/lets-fiware/FIWARE-Big-Bang/archive/refs/tags/v0.5.0.tar.gz | tar zxf -
+curl -sL https://github.com/lets-fiware/FIWARE-Big-Bang/archive/refs/tags/v0.6.0.tar.gz | tar zxf -
 ```
 
 ```
-cd FIWARE-Big-Bang-0.5.0/
+cd FIWARE-Big-Bang-0.6.0/
 ./lets-fiware.sh letsfiware.jp
 ```
 
