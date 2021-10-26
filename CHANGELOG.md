@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.5.0-next
 
+-   Update Orion to version 3.3.0 (#80)
 -   Add postfix (#79)
 -   Add Regproxy (#78)
 -   Improve creating docker images (#77)
