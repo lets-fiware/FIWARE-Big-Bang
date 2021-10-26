@@ -1,4 +1,4 @@
-## FIWARE Big Bang v0.5.0-next
+## FIWARE Big Bang v0.6.0 - 26 Oct, 2021
 
 -   Update Orion to version 3.3.0 (#80)
 -   Add postfix (#79)
