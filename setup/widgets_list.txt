@@ -5,8 +5,10 @@ https://github.com/wirecloud-fiware/ngsi-type-browser-widget/releases/download/1
 https://github.com/wirecloud-fiware/ngsi-entity2poi-operator/releases/download/v3.2.0/CoNWeT_ngsientity2poi_3.2.0.wgt
 https://github.com/Wirecloud/ol3-map-widget/releases/download/1.2.3/CoNWeT_ol3-map_1.2.3.wgt
 https://github.com/Wirecloud/spy-wiring-widget/releases/download/1.0.3/CoNWeT_spy-wiring_1.0.3.wgt
+https://github.com/Wirecloud/echarts-widget/releases/download/v0.0.2/Ficodes_echarts_0.0.2.wgt
 https://github.com/lets-fiware/ol-map-ja-widget/releases/download/v1.0.0/FISUDA_ol-map-ja_1.0.0.wgt
 https://github.com/lets-fiware/maplibre-gl-widget/releases/download/v0.6.0/FISUDA_maplibregl_0.6.0.wgt
 https://github.com/lets-fiware/cesium-js-widget/releases/download/v0.3.0/FISUDA_cesiumjs_0.3.0.wgt
 https://github.com/lets-fiware/json-injector/releases/download/v0.1.5/FISUDA_json-injector_0.1.5.wgt
 https://github.com/Ficodes/quantumleap-source-operator/releases/download/0.2.1/FICODES_quantumleap-source_0.2.1.wgt
+https://github.com/Ficodes/quantumleap-2-echart-operator/releases/download/0.1.3/FICODES_quantumleap-2-echart_0.1.3.wgt

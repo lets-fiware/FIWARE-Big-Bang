@@ -1493,13 +1493,14 @@ login_and_logoff_wirecloud() {
 # patch widget
 #
 patch_widget() {
-  local widget widget_path
+  local widget widget_path patch_dir ql_patch
 
   widget=$1
   widget_path=$(cd "$(dirname "$2")"; pwd)/$(basename "$2")
   patch_dir="${WORK_DIR}/widget_patch"
+  ql_patch="\"URL of the QuantumLeap server to use for retrieving entity information\"\\n                default="
 
-  for name in ngsi-browser ngsi-source ngsi-type-browser
+  for name in ngsi-browser ngsi-source ngsi-type-browser quantumleap-source
   do
     # shellcheck disable=SC2143
     if [ "$(echo "${widget}" | grep "${name}")" ]; then
@@ -1509,6 +1510,7 @@ patch_widget() {
       unzip "${widget_path}" > /dev/null
       sed -i "s%http://orion.lab.fiware.org:1026%https://${ORION}%" config.xml
       sed -i "s%ngsiproxy.lab.fiware.org%${NGSIPROXY}%" config.xml
+      sed -i ":l; N; s/${ql_patch}\"\"/${ql_patch}\"https:\/\/${QUANTUMLEAP}\"/; b l;" config.xml
       rm "${widget_path}"
       # shellcheck disable=SC2035
       zip -r "${widget_path}" -b /tmp * > /dev/null
@@ -1545,7 +1547,9 @@ install_widgets_for_wirecloud() {
 
     curl -sL "${line}" -o "${fullpath}"
     patch_widget "${name}" "${fullpath}"
+    set +e
     ${NGSI_GO} macs --host "${WIRECLOUD}" install --file "${fullpath}" --overwrite
+    set -e
   done < "${SETUP_DIR}/widgets_list.txt"
 
   cat <<EOF > "${WORK_DIR}/patch.sql"
