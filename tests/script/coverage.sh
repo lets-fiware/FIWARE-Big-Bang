@@ -228,6 +228,10 @@ error_test() {
 
   reset_env
 
+  touch .install
+  touch docker-compose.yml
+  mkdir data
+
   echo "*** aarch64 not supported ***" 1>&2
   echo -e "#!/bin/sh\necho \"aarch64\"" >> "${MOCK_DIR}/uname"
   chmod +x "${MOCK_DIR}/uname"

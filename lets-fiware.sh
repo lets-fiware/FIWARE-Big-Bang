@@ -123,8 +123,6 @@ set_and_check_values() {
   SETUP_DIR=./setup
   TEMPLEATE=${SETUP_DIR}/templeate
 
-  NODE_RED_USERS_TEXT=node-red_users.txt
-
   for NAME in KEYROCK ORION
   do
     eval VAL=\"\$$NAME\"
@@ -335,6 +333,8 @@ add_domain_to_env() {
 #
 setup_complete() {
   logging_info "${FUNCNAME[0]}"
+
+  rm -f "${INSTALL}"
 
   . ./.env
 
@@ -601,14 +601,10 @@ check_ngsi_go() {
 setup_init() {
   logging_info "${FUNCNAME[0]}"
 
-  DATA_DIR=./data
-
-  WORK_DIR=./.work
   KEYROCK_DIR="${WORK_DIR}/keyrock"
   MYSQL_DIR="${WORK_DIR}/mysql"
   POSTGRES_DIR="${WORK_DIR}/postgres"
 
-  CONFIG_DIR=./config
   CONFIG_NGINX=${CONFIG_DIR}/nginx
   NGINX_SITES=${CONFIG_DIR}/nginx/sites-enable
 
@@ -956,7 +952,7 @@ IDM_SESSION_SECRET=$(pwgen -s 16 1)
 IDM_ENCRYPTION_KEY=$(pwgen -s 16 1)
 EOF
 
-  cat <<EOF > ${MYSQL_DIR}/init.sql
+  cat <<EOF > "${MYSQL_DIR}"/init.sql
 CREATE USER '${IDM_DB_USER}'@'%' IDENTIFIED BY '${IDM_DB_PASS}';
 GRANT ALL PRIVILEGES ON ${IDM_DB_NAME}.* TO '${IDM_DB_USER}'@'%';
 flush PRIVILEGES;
@@ -1008,7 +1004,7 @@ IDM_SESSION_SECRET=$(pwgen -s 16 1)
 IDM_ENCRYPTION_KEY=$(pwgen -s 16 1)
 EOF
 
-  cat <<EOF > ${POSTGRES_DIR}/init.sql
+  cat <<EOF > "${POSTGRES_DIR}"/init.sql
 create role ${IDM_DB_USER} with SUPERUSER CREATEDB login password '${IDM_DB_PASS}';
 EOF
 }
@@ -2207,6 +2203,43 @@ init_cmd() {
   HOST_CMD="${FIBB_TEST_HOST_CMD:-host}"
   WAIT_TIME=${FIBB_WAIT_TIME:-300}
   SKIP_INSTALL_WIDGET="${FIBB_TEST_SKIP_INSTALL_WIDGET:-false}"
+
+  INSTALL=".install"
+
+  DATA_DIR=./data
+  WORK_DIR=./.work
+  CONFIG_DIR=./config
+  ENV_FILE=.env
+  NODE_RED_USERS_TEXT=node-red_users.txt
+}
+
+#
+# Remove unnecessary directories and files
+#
+remove_files() {
+  if [ -e "${INSTALL}" ]; then
+    for file in docker-compose.yml docker-cert.yml docker-idm.yml
+    do
+      if [ -e "${file}" ]; then
+        set +e
+        "${DOCKER_COMPOSE}" -f "${file}" down
+        set -e
+        sleep 5
+        rm -f "${file}"
+      fi
+    done
+
+    if [ -d "${DATA_DIR}" ]; then
+      "${SUDO}" rm -fr "${DATA_DIR}"
+    fi
+
+    "${SUDO}" rm -fr "${CONFIG_DIR}"
+    rm -fr "${WORK_DIR}"
+    rm -f "${ENV_FILE}"
+    rm -f "${NODE_RED_USERS_TEXT}"
+  fi
+
+  touch "${INSTALL}"
 }
 
 #
@@ -2218,6 +2251,8 @@ main() {
   parse_args "$@"
 
   init_cmd
+
+  remove_files
 
   check_machine
 
