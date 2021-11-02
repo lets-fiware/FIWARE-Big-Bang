@@ -13,7 +13,8 @@ if [ -d ./data ]; then
   sudo rm -fr data
 fi
 
-rm -fr ./config
+sudo rm -fr ./config
 rm -fr ./.work
 rm -f ./.env
 rm -f ./node-red_users.txt
+rm -f .install
