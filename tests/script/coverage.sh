@@ -129,6 +129,7 @@ fibb_down() {
 install_test1() {
   logging "user.info" "${FUNCNAME[0]}"
 
+  sed -i -e "s/^\(CYGNUS=\).*/\1cygnus/" config.sh
   sed -i -e "s/^\(COMET=\).*/\1comet/" config.sh
   sed -i -e "s/^\(QUANTUMLEAP=\).*/\1quantumleap/" config.sh
   sed -i -e "s/^\(WIRECLOUD=\).*/\1wirecloud/" config.sh
@@ -137,12 +138,17 @@ install_test1() {
   sed -i -e "s/^\(GRAFANA=\).*/\1grafana/" config.sh
   sed -i -e "s/^\(IOTAGENT=\).*/\1iotagent/" config.sh
   sed -i -e "s/^\(MOSQUITTO=\).*/\1mosquitto/" config.sh
+  sed -i -e "s/^\(ELASTICSEARCH=\).*/\1elasticsearch/" config.sh
   sed -i -e "s/^\(MQTT_1883=\).*/\1true/" config.sh
   sed -i -e "s/^\(MQTT_TLS=\).*/\1true/" config.sh
   sed -i -e "s/^\(CERT_REVOKE=\).*/\1true/" config.sh
   sed -i -e "s/^\(FIREWALL=\).*/\1true/" config.sh
   sed -i -e "s/^\(QUERYPROXY=\).*/\1true/" config.sh
   sed -i -e "s/^\(POSTFIX=\).*/\1true/" config.sh
+  sed -i -e "s/^\(CYGNUS_MONGO=\).*/\1true/" config.sh
+  sed -i -e "s/^\(CYGNUS_MYSQL=\).*/\1true/" config.sh
+  sed -i -e "s/^\(CYGNUS_POSTGRES=\).*/\1true/" config.sh
+  sed -i -e "s/^\(CYGNUS_ELASTICSEARCH=\).*/\1true/" config.sh
 
   sed -i -e "s/^\(REGPROXY=\).*/\1true/" config.sh
   sed -i -e "s/^\(REGPROXY_NGSITYPE=\).*/\1v2/" config.sh
@@ -334,6 +340,15 @@ EOF
     sudo mv /etc/_debian_version /etc/debian_version
   fi
  
+  echo "*** ELASTICSEARCH is empty ***" 1>&2
+  sed -i -e "s/^\(CYGNUS=\).*/\1cygnus/" config.sh
+  sed -i -e "s/^\(CYGNUS_ELASTICSEARCH=\).*/\1true/" config.sh
+  ${KCOV} ./coverage ./lets-fiware.sh example.com
+  reset_env
+ 
+  echo "*** Specify one or more Cygnus sinks ***" 1>&2
+  sed -i -e "s/^\(CYGNUS=\).*/\1cygnus/" config.sh
+  ${KCOV} ./coverage ./lets-fiware.sh example.com
   reset_env
 }
 

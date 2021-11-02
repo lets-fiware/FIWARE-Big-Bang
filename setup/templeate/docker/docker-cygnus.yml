@@ -1,0 +1,18 @@
+version: "3"
+services:
+  cygnus:
+    image: ${IMAGE_CYGNUS}
+    depends_on:
+    # __CYGNUS_DEPENDS_ON__
+    environment:
+      - CYGNUS_MULTIAGENT=true
+      - CYGNUS_API_PORT=5080
+      # __CYGNUS_ENVIRONMENT__
+      - CYGNUS_LOG_LEVEL=${CYGNUS_LOG_LEVEL}
+    healthcheck:
+      test: curl --fail -s http://cygnus:5080/v1/version || exit 1
+    restart: always
+    logging:
+      driver: syslog
+      options:
+        tag: "[cygnus]"

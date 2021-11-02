@@ -1,26 +1,5 @@
 version: "3"
 services:
-  cygnus:
-    image: ${IMAGE_CYGNUS}
-    depends_on:
-      - mongo
-    ports:
-      - 127.0.0.1:5051:5051
-      - 127.0.0.1:5080:5080
-    environment:
-      - CYGNUS_MONGO_SERVICE_PORT=5051
-      - CYGNUS_MONGO_HOSTS=mongo:27017
-      - CYGNUS_SERVICE_PORT=5050
-      - CYGNUS_API_PORT=5080
-      - CYGNUS_LOG_LEVEL=${CYGNUS_LOG_LEVEL}
-    healthcheck:
-      test: curl --fail -s http://cygnus:5080/v1/version || exit 1
-    restart: always
-    logging:
-      driver: syslog
-      options:
-        tag: "[cygnus]"
-
   comet:
     image: ${IMAGE_COMET}
     depends_on:

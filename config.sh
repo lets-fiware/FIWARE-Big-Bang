@@ -10,8 +10,9 @@ ORION=orion
 # Optional parameters
 #
 
-# Set a sub-domain name of the FIWARE GE you want to set.
+# Set a sub-domain name of the FIWARE GE you want to install.
 COMET=
+CYGNUS=
 QUANTUMLEAP=
 WIRECLOUD=
 NGSIPROXY=
@@ -20,6 +21,13 @@ IOTAGENT=
 NODE_RED=
 GRAFANA=
 MOSQUITTO=
+ELASTICSEARCH=
+
+# Use Cygnus sink (true or false) Default: false
+CYGNUS_MONGO=
+CYGNUS_MYSQL=
+CYGNUS_POSTGRES=
+CYGNUS_ELASTICSEARCH=
 
 # Use queryproxy. (true or false) Default: false
 QUERYPROXY=
@@ -50,6 +58,9 @@ IDM_ADMIN_PASS=
 
 # Enable firewall. (true or false) Default: false
 FIREWALL=
+
+# Elasticsearch
+ELASTICSEARCH_JAVA_OPTS="-Xmx256m -Xms256m"
 
 # Node-RED multi instance
 # Number of Node-RED instance. default: 1
@@ -136,6 +147,7 @@ IMAGE_REGPROXY=letsfiware/regproxy:0.6.0-next
 IMAGE_NGINX=nginx:1.21
 IMAGE_REDIS=redis:6
 IMAGE_ELASTICSEARCH=elasticsearch:2.4
+IMAGE_ELASTICSEARCH_DB=elasticsearch:7.6.2
 IMAGE_MEMCACHED=memcached:1
 IMAGE_GRAFANA=grafana/grafana:6.1.6
 IMAGE_MOSQUITTO=eclipse-mosquitto:1.6

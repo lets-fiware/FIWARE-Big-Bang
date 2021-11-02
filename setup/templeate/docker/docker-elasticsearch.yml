@@ -1,0 +1,22 @@
+version: "3"
+services:
+  elasticsearch-db:
+    image: ${IMAGE_ELASTICSEARCH_DB}
+    volumes:
+      - ./data/elasticsearch-db:/usr/share/elasticsearch/data
+    environment:
+      ES_JAVA_OPTS: ${ELASTICSEARCH_JAVA_OPTS}
+      ELASTIC_PASSWORD: ${ELASTICSEARCH_PASSWORD}
+      # Use single node discovery in order to disable production mode and avoid bootstrap checks.
+      # see: https://www.elastic.co/guide/en/elasticsearch/reference/current/bootstrap-checks.html
+      discovery.type: single-node
+    healthcheck:
+      test: curl http://localhost:9200 >/dev/null; if [[ $$? == 52 ]]; then echo 0; else echo 1; fi
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: always
+    logging:
+      driver: syslog
+      options:
+        tag: "[elasticsearch-db]"

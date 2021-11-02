@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.6.0-next
 
+-   Hardening Cygnus integration (#86)
 -   Add feature to remove orphaned containers (#85)
 -   Manage installation state (#84)
 -   Add pre-install widgets (#83)
