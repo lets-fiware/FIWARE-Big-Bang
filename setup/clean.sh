@@ -3,7 +3,7 @@
 for file in docker-compose.yml docker-cert.yml docker-idm.yml
 do
   if [ -e ${file} ]; then
-    sudo /usr/local/bin/docker-compose -f ${file} down
+    sudo /usr/local/bin/docker-compose -f ${file} down --remove-orphan
     sleep 5
     rm -f ${file}
   fi
