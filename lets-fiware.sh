@@ -2222,7 +2222,7 @@ remove_files() {
     do
       if [ -e "${file}" ]; then
         set +e
-        "${DOCKER_COMPOSE}" -f "${file}" down
+        ${DOCKER_COMPOSE} -f "${file}" down --remove-orphans
         set -e
         sleep 5
         rm -f "${file}"
