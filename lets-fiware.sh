@@ -175,6 +175,38 @@ set_and_check_values() {
     exit "${ERR_CODE}"
   fi
 
+  if [ "${COMET}" != "" ] && [ "${CYGNUS}" != "" ]; then
+    CYGNUS_MONGO=true
+  fi
+
+  if [ "${CYGNUS}" != "" ]; then
+    if [ -z "${CYGNUS_MONGO}" ]; then
+      CYGNUS_MONGO=false
+    fi
+    if [ -z "${CYGNUS_MYSQL}" ]; then
+      CYGNUS_MYSQL=false
+    fi
+    if [ -z "${CYGNUS_POSTGRES}" ]; then
+      CYGNUS_POSTGRES=false
+    fi
+    if [ -z "${CYGNUS_ELASTICSEARCH}" ]; then
+      CYGNUS_ELASTICSEARCH=false
+    fi
+    if ! ${CYGNUS_MONGO} && ! ${CYGNUS_MYSQL} && ! ${CYGNUS_POSTGRES} && ! ${CYGNUS_ELASTICSEARCH} ; then
+      logging_err "error: Specify one or more Cygnus sinks"
+      exit "${ERR_CODE}"
+    fi
+    if ${CYGNUS_ELASTICSEARCH}; then
+      if [ "${ELASTICSEARCH}" = "" ]; then
+        logging_err "error: ELASTICSEARCH is empty"
+        exit "${ERR_CODE}"
+      fi
+    fi
+  else
+    ELASTICSEARCH=""
+  fi
+
+  
   if [ "${IOTAGENT}" = "" ]; then
     MOSQUITTO=""
   fi
@@ -284,6 +316,7 @@ IMAGE_CRATE=${IMAGE_CRATE}
 IMAGE_NGINX=${IMAGE_NGINX}
 IMAGE_REDIS=${IMAGE_REDIS}
 IMAGE_ELASTICSEARCH=${IMAGE_ELASTICSEARCH}
+IMAGE_ELASTICSEARCH_DB=${IMAGE_ELASTICSEARCH_DB}
 IMAGE_MEMCACHED=${IMAGE_MEMCACHED}
 IMAGE_GRAFANA=${IMAGE_GRAFANA}
 IMAGE_MOSQUITTO=${IMAGE_MOSQUITTO}
@@ -342,6 +375,7 @@ setup_complete() {
   echo "IDM: https://${KEYROCK}"
   echo "User: ${IDM_ADMIN_EMAIL}"
   echo "Password: ${IDM_ADMIN_PASS}"
+  echo "docs: https://fi-bb.letsfiware.jp/"
   echo "Please see the .env file for details."
   if [ -e "${NODE_RED_USERS_TEXT}" ]; then
     echo "User informatin for Node-RED is here: ${NODE_RED_USERS_TEXT}"
@@ -619,12 +653,16 @@ setup_init() {
 
   DOCKER_COMPOSE_YML=./docker-compose.yml
 
-  readonly APPS=(KEYROCK ORION COMET WIRECLOUD NGSIPROXY NODE_RED GRAFANA QUANTUMLEAP IOTAGENT MOSQUITTO)
+  readonly APPS=(KEYROCK ORION CYGNUS COMET WIRECLOUD NGSIPROXY NODE_RED GRAFANA QUANTUMLEAP IOTAGENT MOSQUITTO ELASTICSEARCH)
 
   val=
 
+  MYSQL_INSTALLED=false
+
   POSTGRES_INSTALLED=false
   POSTGRES_PASSWORD=
+
+  ELASTICSEARCH_INSTALLED=false
 
   CONTRIB_DIR=./CONTRIB
 }
@@ -704,6 +742,7 @@ validate_domain() {
     eval val=\"\$"${name}"\"
     if [ -n "${val}" ]; then
         logging_info "Sub-domain: ${val}"
+        # shellcheck disable=SC2086
         IP=$(${HOST_CMD} -4 ${val} | awk 'match($0,/[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/) { print substr($0, RSTART, RLENGTH) }' || true)
         if [ "$IP" = "" ]; then
           IP=$(sed -n -e "/${val}/s/\([^ ].*\) .*/\1/p" /etc/hosts)
@@ -1160,6 +1199,12 @@ setup_nginx() {
 setup_mysql() {
   logging_info "${FUNCNAME[0]}"
 
+  if "${MYSQL_INSTALLED}"; then
+    return
+  else
+    MYSQL_INSTALLED=true
+  fi
+
   add_docker_compose_yml "docker-mysql.yml"
 
   sed -i -e "/- IDM_DB_DIALECT/d" ${DOCKER_COMPOSE_YML}
@@ -1199,6 +1244,39 @@ setup_postgres() {
 # Postgres
 
 POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+EOF
+}
+
+#
+# Setup Elasticsearch
+#
+setup_elasticsearch() {
+  logging_info "${FUNCNAME[0]}"
+
+  if "${ELASTICSEARCH_INSTALLED}"; then
+    return
+  else
+    ELASTICSEARCH_INSTALLED=true
+  fi
+
+  add_docker_compose_yml "docker-elasticsearch.yml"
+
+  sed -i -e "/ __KEYROCK_DEPENDS_ON__/s/^.*/      - elasticsearch-db/" ${DOCKER_COMPOSE_YML}
+
+  create_nginx_conf "${ELASTICSEARCH}" "nginx-elasticsearch"
+
+  add_rsyslog_conf "elasticsearch-db"
+
+  ELASTICSEARCH_PASSWORD=$(pwgen -s 16 1)
+
+  mkdir -p "${DATA_DIR}"/elasticsearch-db
+
+  cat <<EOF >> .env
+
+# Elasticsearch
+
+ELASTICSEARCH_JAVA_OPTS="${ELASTICSEARCH_JAVA_OPTS}"
+ELASTICSEARCH_PASSWORD=${ELASTICSEARCH_PASSWORD}
 EOF
 }
 
@@ -1402,6 +1480,61 @@ EOF
 }
 
 #
+# Cygnus
+#
+setup_cygnus() {
+  if [ -z "${CYGNUS}" ]; then
+    return
+  fi
+
+  add_docker_compose_yml "docker-cygnus.yml"
+
+  if ${CYGNUS_MONGO}; then
+    sed -i -e "/__CYGNUS_DEPENDS_ON__/i \      - mongo" "${DOCKER_COMPOSE_YML}"
+    sed -i -e "/__CYGNUS_ENVIRONMENT__/i \      - CYGNUS_MONGO_SERVICE_PORT=5051" "${DOCKER_COMPOSE_YML}"
+    sed -i -e "/__CYGNUS_ENVIRONMENT__/i \      - CYGNUS_MONGO_HOSTS=mongo:27017" "${DOCKER_COMPOSE_YML}"
+  fi
+
+  if ${CYGNUS_MYSQL}; then
+    setup_mysql
+
+    sed -i -e "/__CYGNUS_DEPENDS_ON__/i \      - mysql" "${DOCKER_COMPOSE_YML}"
+    sed -i -e "/__CYGNUS_ENVIRONMENT__/i \      - CYGNUS_MYSQL_SERVICE_PORT=5050" "${DOCKER_COMPOSE_YML}"
+    sed -i -e "/__CYGNUS_ENVIRONMENT__/i \      - CYGNUS_MYSQL_HOST=mysql" "${DOCKER_COMPOSE_YML}"
+    sed -i -e "/__CYGNUS_ENVIRONMENT__/i \      - CYGNUS_MYSQL_PORT=3306" "${DOCKER_COMPOSE_YML}"
+    sed -i -e "/__CYGNUS_ENVIRONMENT__/i \      - CYGNUS_MYSQL_USER=root" "${DOCKER_COMPOSE_YML}"
+    sed -i -e "/__CYGNUS_ENVIRONMENT__/i \      - CYGNUS_MYSQL_PASS=\${MYSQL_ROOT_PASSWORD}" "${DOCKER_COMPOSE_YML}"
+  fi
+
+  if ${CYGNUS_POSTGRES}; then
+    setup_postgres
+
+    sed -i -e "/__CYGNUS_DEPENDS_ON__/i \      - postgres" "${DOCKER_COMPOSE_YML}"
+    sed -i -e "/__CYGNUS_ENVIRONMENT__/i \      - CYGNUS_POSTGRESQL_SERVICE_PORT=5055" "${DOCKER_COMPOSE_YML}"
+    sed -i -e "/__CYGNUS_ENVIRONMENT__/i \      - CYGNUS_POSTGRESQL_HOST=postgres" "${DOCKER_COMPOSE_YML}"
+    sed -i -e "/__CYGNUS_ENVIRONMENT__/i \      - CYGNUS_POSTGRESQL_PORT=5432" "${DOCKER_COMPOSE_YML}"
+    sed -i -e "/__CYGNUS_ENVIRONMENT__/i \      - CYGNUS_POSTGRESQL_USER=postgres" "${DOCKER_COMPOSE_YML}"
+    sed -i -e "/__CYGNUS_ENVIRONMENT__/i \      - CYGNUS_POSTGRESQL_PASS=\${POSTGRES_PASSWORD}" "${DOCKER_COMPOSE_YML}"
+    sed -i -e "/__CYGNUS_ENVIRONMENT__/i \      - CYGNUS_POSTGRESQL_ENABLE_CACHE=true" "${DOCKER_COMPOSE_YML}"
+  fi
+
+  if ${CYGNUS_ELASTICSEARCH}; then
+    setup_elasticsearch
+
+    sed -i -e "/__CYGNUS_DEPENDS_ON__/i \      - elasticsearch-db" "${DOCKER_COMPOSE_YML}"
+    sed -i -e "/__CYGNUS_ENVIRONMENT__/i \      - CYGNUS_ELASTICSEARCH_HOST=elasticsearch-db:9200" "${DOCKER_COMPOSE_YML}"
+    sed -i -e "/__CYGNUS_ENVIRONMENT__/i \      - CYGNUS_ELASTICSEARCH_PORT=5058" "${DOCKER_COMPOSE_YML}"
+    sed -i -e "/__CYGNUS_ENVIRONMENT__/i \      - CYGNUS_ELASTICSEARCH_SSL=false" "${DOCKER_COMPOSE_YML}"
+  fi
+
+  create_nginx_conf "${CYGNUS}" "nginx-cygnus"
+
+  add_nginx_depends_on "cygnus"
+
+  add_rsyslog_conf "cygnus"
+}
+
+#
 # Cygnus and Comet
 #
 setup_comet() {
@@ -1417,7 +1550,7 @@ setup_comet() {
 
   add_nginx_depends_on "comet"
 
-  add_rsyslog_conf "comet" "cygnus"
+  add_rsyslog_conf "comet"
 }
 
 #
@@ -2030,6 +2163,7 @@ setup_ngsi_go() {
       case "${NAME}" in
           "KEYROCK" ) ${NGSI_GO} server add --host "${VAL}" --serverType keyrock --serverHost "https://${VAL}" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" ;;
           "ORION" )  ${NGSI_GO} broker add --host "${VAL}" --ngsiType v2 --brokerHost "https://${VAL}" --idmType tokenproxy --idmHost "https://${ORION}/token" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" ;;
+          "CYGNUS" ) ${NGSI_GO} server add --host "${VAL}" --serverType cygnus --serverHost "https://${VAL}" --idmType tokenproxy --idmHost "https://${ORION}/token" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" ;;
           "COMET" ) ${NGSI_GO} server add --host "${VAL}" --serverType comet --serverHost "https://${VAL}" --idmType tokenproxy --idmHost "https://${ORION}/token" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" ;;
           "IOTAGENT" ) ${NGSI_GO} server add --host "${VAL}" --serverType iota --serverHost "https://${VAL}" --idmType tokenproxy --idmHost "https://${ORION}/token" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" --service openiot --path /;;
           "WIRECLOUD" ) ${NGSI_GO} server add --host "${VAL}" --serverType wirecloud --serverHost "https://${VAL}" --idmType keyrock --idmHost "https://${KEYROCK}/oauth2/token" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" --clientId "${WIRECLOUD_CLIENT_ID}" --clientSecret "${WIRECLOUD_CLIENT_SECRET}";;
@@ -2096,6 +2230,7 @@ setup_end() {
   delete_from_docker_compose_yml "__MOSQUITTO_"
   delete_from_docker_compose_yml "__NODE_RED_"
   delete_from_docker_compose_yml "__ORION_"
+  delete_from_docker_compose_yml "__CYGNUS_"
   delete_from_docker_compose_yml "__POSTFIX_"
 
   sed -i -e "/# __NGINX_ORION_/d" "${NGINX_SITES}/${ORION}"
@@ -2153,6 +2288,7 @@ setup_main() {
   setup_orion
   setup_queryproxy
   setup_regproxy
+  setup_cygnus
   setup_comet
   setup_quantumleap
   setup_wirecloud

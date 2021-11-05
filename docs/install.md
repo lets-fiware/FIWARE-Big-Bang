@@ -62,6 +62,7 @@ You can specify configurations by editing the `config.sh` file.
 | ------------------------------- | --------------------------------------------------- | ----------------------------------------------- |
 | KEYROCK                         | A sub-domain name of Keyrock (Required)             | keyrock                                         |
 | ORION                           | A sub-domain name of Orion (Required)               | orion                                           |
+| CYGNUS                          | A sub-domain name of Cygnus                         | (empty)                                         |
 | COMET                           | A sub-domain name of Comet                          | (empty)                                         |
 | QUANTUMLEAP                     | A sub-domain name of QuantumLeap                    | (empty)                                         |
 | WIRECLOUD                       | A sub-domain name of WireCloud                      | (empty)                                         |
@@ -70,6 +71,7 @@ You can specify configurations by editing the `config.sh` file.
 | GRAFANA                         | A sub-domain name of Grafana                        | (empty)                                         |
 | IOTAGENT                        | A sub-domain name of IoT Agent                      | (empty)                                         |
 | MOSQUITTO                       | A sub-domain name of MOSQUITTO                      | (empty)                                         |
+| ELASTICSEARCH                   | A sub-domain name of Elasticsearch                  | (empty)                                         |
 | IDM\_ADMIN\_NAME                | A name of an admin user for Keyrock                 | admin                                           |
 | IDM\_ADMIN\_EMAIL               | An email address of an admin user for Keyrock       | IDM\_ADMIN\_NAME @ DOMAIN\_NAME                 |
 | IDM\_ADMIN\_PASS                | A password of an admin user for Keyrock             | (Automatically generated)                       |
@@ -78,6 +80,10 @@ You can specify configurations by editing the `config.sh` file.
 | CERT\_REVOKE                    | Revoke and reacquire the certificate. true or false | false                                           |
 | CERT\_TEST                      | Use --test-cert option. true or false               | false                                           |
 | CERT\_FORCE\_RENEWAL            | Use --force-renewal option. true or false           | false                                           |
+| CYGNUS_MONGO                    | Use MongoDB sink for Cygnus. true or false          | false                                           |
+| CYGNUS_MYSQL                    | Use MySQL sink for Cygnus. true or false            | false                                           |
+| CYGNUS_POSTGRES                 | Use PostgreSQL sink for Cygnus. true or false       | false                                           |
+| CYGNUS_ELASTICSEARCH            | Use Elasticsearch sink for Cygnus. true or false    | false                                           |
 | QUERYPROXY                      | Use queryproxy. true or false                       | false                                           |
 | REGPROXY                        | Use regproxy. true or false                         | false                                           |
 | REGPROXY\_NGSITYPE              | NgsiType for remote broker. (v2 or ld) Default: v2  | (empty)                                         |

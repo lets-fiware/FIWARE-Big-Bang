@@ -48,6 +48,7 @@ FI-BB stands for FIWARE Big Bang.
     -   Node-RED
     -   Grafana
     -   Mosquitto
+    -   Elasticsearch (as a database for persitenting context data)
 
 ## Prerequisite
 
