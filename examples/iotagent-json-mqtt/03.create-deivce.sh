@@ -11,19 +11,18 @@ fi
 
 . ./.env
 
-if [ -z "${IOTAGENT_UL}" ]; then
-  echo "IoT Agent for UltraLight 2.0 not found"
+if [ -z "${IOTAGENT_JSON}" ]; then
+  echo "IoT Agent for JSON not found"
   exit 1
 fi
 
-ngsi devices --host "${IOTAGENT_UL}" create --data '{
+ngsi devices --host "${IOTAGENT_JSON}" create --data '{
  "devices": [
    {
-     "device_id":   "sensor001",
-     "entity_name": "urn:ngsi-ld:WeatherObserved:sensor001",
+     "device_id":   "sensor002",
+     "entity_name": "urn:ngsi-ld:WeatherObserved:sensor002",
      "entity_type": "Sensor",
      "timezone":    "Asia/Tokyo",
-     "protocol":    "PDI-IoTA-UltraLight",
      "transport":   "MQTT",
      "attributes": [
        { "object_id": "d", "name": "dateObserved", "type": "DateTime" },
@@ -38,4 +37,4 @@ ngsi devices --host "${IOTAGENT_UL}" create --data '{
  ]
 }'
 
-ngsi devices --host "${IOTAGENT_UL}" list -P
+ngsi devices --host "${IOTAGENT_JSON}" list -P

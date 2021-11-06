@@ -136,7 +136,8 @@ install_test1() {
   sed -i -e "s/^\(NGSIPROXY=\).*/\1ngsiproxy/" config.sh
   sed -i -e "s/^\(NODE_RED=\).*/\1node-red/" config.sh
   sed -i -e "s/^\(GRAFANA=\).*/\1grafana/" config.sh
-  sed -i -e "s/^\(IOTAGENT=\).*/\1iotagent/" config.sh
+  sed -i -e "s/^\(IOTAGENT_UL=\).*/\1iotagent-ul/" config.sh
+  sed -i -e "s/^\(IOTAGENT_JSON=\).*/\1iotagent-json/" config.sh
   sed -i -e "s/^\(MOSQUITTO=\).*/\1mosquitto/" config.sh
   sed -i -e "s/^\(ELASTICSEARCH=\).*/\1elasticsearch/" config.sh
   sed -i -e "s/^\(MQTT_1883=\).*/\1true/" config.sh
@@ -283,7 +284,7 @@ error_test() {
   reset_env
 
   echo "*** MOSQUITTO is empty ***" 1>&2
-  sed -i -e "s/^\(IOTAGENT=\).*/\1iotagent/" config.sh
+  sed -i -e "s/^\(IOTAGENT_UL=\).*/\1iotagent/" config.sh
   ${KCOV} ./coverage ./lets-fiware.sh example.com
   reset_env
 

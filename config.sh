@@ -16,7 +16,8 @@ CYGNUS=
 QUANTUMLEAP=
 WIRECLOUD=
 NGSIPROXY=
-IOTAGENT=
+IOTAGENT_UL=
+IOTAGENT_JSON=
 
 NODE_RED=
 GRAFANA=
@@ -40,6 +41,10 @@ MQTT_TLS=
 
 # Use PostgreSQL as back-end database for Keyrock. (true or false) Default: false
 KEYROCK_POSTGRES=
+
+# IoT Agent
+IOTA_UL_DEFAULT_RESOURCE=/iot/ul
+IOTA_JSON_DEFAULT_RESOURCE=/iot/json
 
 # Set username for MQTT. Defaut: fiware
 MQTT_USERNAME=
@@ -133,7 +138,8 @@ IMAGE_COMET=fiware/sth-comet:2.8.0
 IMAGE_WIRECLOUD=fiware/wirecloud:1.3.1
 IMAGE_NGSIPROXY=fiware/ngsiproxy:1.2.2
 IMAGE_QUANTUMLEAP=orchestracities/quantumleap:0.8.1
-IMAGE_IOTAGENT=fiware/iotagent-ul:1.16.2
+IMAGE_IOTAGENT_UL=fiware/iotagent-ul:1.16.2
+IMAGE_IOTAGENT_JSON=fiware/iotagent-json:1.19.0
 
 IMAGE_MONGO=mongo:4.4
 IMAGE_MYSQL=mysql:5.7
@@ -172,6 +178,12 @@ CYGNUS_LOG_LEVEL=INFO
 #   https://github.com/telefonicaid/fiware-sth-comet/blob/master/doc/manuals/running.md
 #   Possible values are: "DEBUG", "INFO", "WARN", "ERROR" and "FATAL" 
 LOGOPS_LEVEL=INFO
+
+# Iot Agent for UltraLight 2.0
+IOTA_UL_LOG_LEVEL=INFO
+
+# Iot Agent for JSON
+IOTA_JSON_LOG_LEVEL=INFO
 
 # Quantumleap
 #   INFO, DEBUG
