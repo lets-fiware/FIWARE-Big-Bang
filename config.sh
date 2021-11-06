@@ -42,9 +42,18 @@ MQTT_TLS=
 # Use PostgreSQL as back-end database for Keyrock. (true or false) Default: false
 KEYROCK_POSTGRES=
 
-# IoT Agent
+# Set a sub-domain name to use IoT Agent over HTTP.
+IOTAGENT_HTTP=
+
+# IoT Agent for UltraLight 2.0
 IOTA_UL_DEFAULT_RESOURCE=/iot/ul
+IOTA_UL_TIMESTAMP=true
+IOTA_UL_AUTOCAST=true
+
+# Iot Agent for JSON
 IOTA_JSON_DEFAULT_RESOURCE=/iot/json
+IOTA_JSON_TIMESTAMP=true
+IOTA_JSON_AUTOCAST=true
 
 # Set username for MQTT. Defaut: fiware
 MQTT_USERNAME=

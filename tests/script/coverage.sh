@@ -138,6 +138,7 @@ install_test1() {
   sed -i -e "s/^\(GRAFANA=\).*/\1grafana/" config.sh
   sed -i -e "s/^\(IOTAGENT_UL=\).*/\1iotagent-ul/" config.sh
   sed -i -e "s/^\(IOTAGENT_JSON=\).*/\1iotagent-json/" config.sh
+  sed -i -e "s/^\(IOTAGENT_HTTP=\).*/\1iotagent-http/" config.sh
   sed -i -e "s/^\(MOSQUITTO=\).*/\1mosquitto/" config.sh
   sed -i -e "s/^\(ELASTICSEARCH=\).*/\1elasticsearch/" config.sh
   sed -i -e "s/^\(MQTT_1883=\).*/\1true/" config.sh
