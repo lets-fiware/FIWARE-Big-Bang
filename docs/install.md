@@ -86,6 +86,9 @@ You can specify configurations by editing the `config.sh` file.
 | CYGNUS\_POSTGRES                | Use PostgreSQL sink for Cygnus. true or false                                                 | false                                           |
 | CYGNUS\_ELASTICSEARCH           | Use Elasticsearch sink for Cygnus. true or false                                              | false                                           |
 | IOTAGENT\_HTTP                  | Set a sub-domain name to use IoT Agent over HTTP.                                             | (empty)                                         |
+| IOTA\_HTTP\_AUTH                | Authorization for IoT Agent over HTTP. (none, basic or bearer)                                | bearer                                          |
+| IOTA\_HTTP\_BASIC\_USER         | User for Basic authorization for IoT Agent over HTTP.                                         | fiware                                          |
+| IOTA\_HTTP\_BASIC\_PASS         | Pasword for Basic authorization for IoT Agent over HTTP.                                      | (Automatically generated)                       |
 | IOTA\_UL\_DEFAULT\_RESOURCE     | The default path the IoT Agent uses listenening for UltraLight measures.                      | /iot/ul                                         |
 | IOTA\_UL\_TIMESTAMP             | Whether to supply timestamp information with each measurement received from attached devices. | true                                            |
 | IOTA\_UL\_AUTOCAST              | Ensure JSON number values are read as numbers not strings                                     |                                                 |

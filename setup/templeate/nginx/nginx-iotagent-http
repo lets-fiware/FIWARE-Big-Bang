@@ -3,7 +3,7 @@ server {
   server_name HOST;
 
   location / {
-      return 301 https://$host$request_uri;
+    return 301 https://$host$request_uri;
   }
 
   location ^~ /.well-known/acme-challenge/ {
@@ -30,7 +30,11 @@ server {
   add_header              Front-End-Https   on;
   add_header              Strict-Transport-Security 'max-age=15768000; includeSubdomains; always';
 
-  # __LOCATION__
+  location / {
+    return 404;
+  }
+
+  # __NGINX_IOTAGENT_HTTP__
 
   location = /_check_oauth2_token {
     internal;
