@@ -2,7 +2,7 @@
 
 -   [How to setup](#how-to-setup)
 -   [Sanity check for Cygnus](#sanity-check-for-cygnus)
--   [Persisting Context Data into MongoDB](persisting-context-data-into-mongodb)
+-   [Persisting Context Data into MongoDB](#persisting-context-data-into-mongodb)
 -   [Persisting Context Data into MySQL](#persisting-context-data-into-mysql)
 -   [Persisting Context Data into PostgreSQL](#persisting-context-data-into-postgresql)
 -   [Persisting Context Data into Elasticsearch](#persisting-context-data-into-elasticsearch)
