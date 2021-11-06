@@ -226,6 +226,26 @@ set_and_check_values() {
         exit "${ERR_CODE}"
       fi
     fi
+    if [ "${IOTAGENT_HTTP}" != "" ]; then
+      if [ -z "${IOTA_HTTP_AUTH}" ]; then
+        IOTA_HTTP_AUTH=bearer
+      fi
+      if [ "${IOTA_HTTP_AUTH}" != "none" ] && [ "${IOTA_HTTP_AUTH}" != "basic" ] && [ "${IOTA_HTTP_AUTH}" != "bearer" ]; then
+        logging_err "error: IOTA_HTTP_AUTH is unknwon value. (none, basic or bearer)"
+        exit "${ERR_CODE}"
+      fi
+      if [ "${IOTA_HTTP_AUTH}" = "basic" ]; then
+        if [ -z "${IOTA_HTTP_BASIC_USER}" ]; then
+          IOTA_HTTP_BASIC_USER=fiware
+        fi
+        if [ -z "${IOTA_HTTP_BASIC_PASS}" ]; then
+          IOTA_HTTP_BASIC_PASS=$(pwgen -s 16 1)
+        fi
+      else
+        IOTA_HTTP_BASIC_USER=
+        IOTA_HTTP_BASIC_PASS=
+      fi
+    fi
   fi
 
   if [ -n "${NODE_RED_INSTANCE_NUMBER}" ]; then
@@ -770,7 +790,6 @@ validate_domain() {
 
   logging_info "IP_ADDRESS: ${IP_ADDRESS}"
   cat <<EOF >> .env
-
 IP_ADDRESS=${IP_ADDRESS}
 EOF
 }
@@ -1373,6 +1392,8 @@ setup_orion() {
 
   cat <<EOF >> .env
 
+# Orion Context Broker host
+
 CB_HOST=${CB_HOST}
 EOF
 }
@@ -1863,8 +1884,27 @@ setup_iotagent_over_http() {
   if ! ${IOTAGENT_HTTP_INSTALLED}; then
     IOTAGENT_HTTP_INSTALLED=true
     create_nginx_conf "${IOTAGENT_HTTP}" "nginx-iotagent-http"
+  cat <<EOF >> .env
+
+# IoT Agent over HTTP
+
+IOTA_HTTP_AUTH=${IOTA_HTTP_AUTH}
+EOF
+  if [ "${IOTA_HTTP_AUTH}" = "basic" ]; then
+    echo "${IOTA_HTTP_BASIC_USER}":"$(openssl passwd -6 "${IOTA_HTTP_BASIC_PASS}")" >> "${CONFIG_NGINX}"/.htpasswd
+    add_nginx_volumes "${CONFIG_NGINX}/.htpasswd:/etc/nginx/.htpasswd:ro"
+    cat <<EOF >> .env
+IOTA_HTTP_BASIC_USER=${IOTA_HTTP_BASIC_USER}
+IOTA_HTTP_BASIC_PASS=${IOTA_HTTP_BASIC_PASS}
+EOF
+    fi
   fi
-  sed -i -e "/__LOCATION__/i \  location $1 {\n    proxy_pass $2$1;\n  }" "${NGINX_SITES}/${IOTAGENT_HTTP}"
+
+  case "${IOTA_HTTP_AUTH}" in
+    "none" ) sed -i -e "/__NGINX_IOTAGENT_HTTP__/i \  location $1 {\n    proxy_pass $2$1;\n  }" "${NGINX_SITES}/${IOTAGENT_HTTP}" ;;
+    "basic" ) sed -i -e "/__NGINX_IOTAGENT_HTTP__/i \  location $1 {\n    auth_basic \"Restricted\";\n    auth_basic_user_file /etc/nginx/.htpasswd;\n\n    proxy_pass $2$1;\n  }" "${NGINX_SITES}/${IOTAGENT_HTTP}" ;;
+    * ) sed -i -e "/__NGINX_IOTAGENT_HTTP__/i \  location $1 {\n    set \$req_uri \"\$uri\";\n    auth_request /_check_oauth2_token;\n\n    proxy_pass $2$1;\n  }" "${NGINX_SITES}/${IOTAGENT_HTTP}" ;;
+  esac
 }
 
 #
@@ -1886,6 +1926,8 @@ setup_iotagent_ul() {
   add_rsyslog_conf "iotagent-ul"
 
   cat <<EOF >> .env
+
+# IoT Agent for UltraLight 2.0
 
 IOTA_UL_DEFAULT_RESOURCE=${IOTA_UL_DEFAULT_RESOURCE}
 IOTA_UL_LOG_LEVEL=${IOTA_UL_LOG_LEVEL}
@@ -1928,6 +1970,8 @@ setup_iotagent_json() {
   add_rsyslog_conf "iotagent-json"
 
   cat <<EOF >> .env
+
+# IoT Agent for JSON
 
 IOTA_JSON_DEFAULT_RESOURCE=${IOTA_JSON_DEFAULT_RESOURCE}
 IOTA_JSON_LOG_LEVEL=${IOTA_JSON_LOG_LEVEL}
@@ -2304,6 +2348,9 @@ setup_end() {
   delete_from_docker_compose_yml "__POSTFIX_"
 
   sed -i -e "/# __NGINX_ORION_/d" "${NGINX_SITES}/${ORION}"
+  if [ -n "${IOTAGENT_HTTP}" ]; then
+    sed -i -e "/# __NGINX_IOTAGENT_HTTP__/d" "${NGINX_SITES}/${IOTAGENT_HTTP}"
+  fi
 }
 
 #

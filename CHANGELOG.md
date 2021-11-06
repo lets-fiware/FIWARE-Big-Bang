@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.6.0-next
 
+-   Add authorization feature for IoT Agent over HTTP (#89)
 -   Add feature to support IoT Agent over HTTP (#88)
 -   Add feature to support IoT Agent for JSON over MQTT (#87)
 -   Hardening Cygnus integration (#86)

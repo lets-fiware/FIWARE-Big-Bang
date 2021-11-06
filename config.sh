@@ -45,6 +45,15 @@ KEYROCK_POSTGRES=
 # Set a sub-domain name to use IoT Agent over HTTP.
 IOTAGENT_HTTP=
 
+# Authorization for IoT Agent over HTTP. (none, basic or bearer) Default: bearer
+IOTA_HTTP_AUTH=
+
+# User for Basic authorization for IoT Agent over HTTP. Default: fiware
+IOTA_HTTP_BASIC_USER=
+
+# Pasword for Basic authorization for IoT Agent over HTTP. Default: automatically generated
+IOTA_HTTP_BASIC_PASS=
+
 # IoT Agent for UltraLight 2.0
 IOTA_UL_DEFAULT_RESOURCE=/iot/ul
 IOTA_UL_TIMESTAMP=true

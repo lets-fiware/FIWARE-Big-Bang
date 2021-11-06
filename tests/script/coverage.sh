@@ -15,7 +15,7 @@ install_kcov() {
     return
   fi
   sudo apt update
-  sudo apt-get install binutils-dev libiberty-dev libcurl4-openssl-dev libelf-dev libdw-dev cmake gcc g++
+  sudo apt-get -y install binutils-dev libiberty-dev libcurl4-openssl-dev libelf-dev libdw-dev cmake gcc g++
 
   pushd /opt
   sudo sh -c "curl -sSL https://github.com/SimonKagstrom/kcov/archive/refs/tags/38.tar.gz | tar xz"
@@ -192,11 +192,17 @@ install_test4() {
 
   git checkout config.sh
 
+  mkdir .work
+
   sed -i -e "s/^\(KEYROCK_POSTGRES=\).*/\1true/" config.sh
   sed -i -e "s/^\(WIRECLOUD=\).*/\1wirecloud/" config.sh
   sed -i -e "s/^\(NGSIPROXY=\).*/\1ngsiproxy/" config.sh
   sed -i -e "s/^\(NODE_RED=\).*/\1node-red/" config.sh
   sed -i -e "s/^\(NODE_RED_INSTANCE_NUMBER=\).*/\13/" config.sh
+  sed -i -e "s/^\(IOTAGENT_UL=\).*/\1iotagent-ul/" config.sh
+  sed -i -e "s/^\(IOTAGENT_HTTP=\).*/\1iotagent-http/" config.sh
+  sed -i -e "s/^\(IOTA_HTTP_AUTH=\).*/\1basic/" config.sh
+  sed -i -e "s/^\(MOSQUITTO=\).*/\1mosquitto/" config.sh
   export FIBB_TEST_DOCKER_CMD=rekcod
   export FIBB_TEST_SKIP_INSTALL_WIDGET=true
 
@@ -217,6 +223,9 @@ install_on_centos() {
   reset_env
 
   sed -i -e "s/^\(FIREWALL=\).*/\1true/" config.sh
+  sed -i -e "s/^\(IOTAGENT_UL=\).*/\1iotagent-ul/" config.sh
+  sed -i -e "s/^\(IOTAGENT_HTTP=\).*/\1iotagent-http/" config.sh
+  sed -i -e "s/^\(IOTA_HTTP_AUTH=\).*/\1none/" config.sh
   export FIBB_TEST_DOCKER_CMD=rekcod
 
   ${KCOV} ./coverage ./lets-fiware.sh example.com
@@ -227,6 +236,25 @@ install_on_centos() {
   sleep 5
 
   fibb_down
+}
+
+install_test5() {
+  echo "*** Timeout was reached ***" 1>&2
+  export FIBB_WAIT_TIME=1
+  ${KCOV} ./coverage ./lets-fiware.sh example.com
+
+  sudo docker-compose -f docker-idm.yml down
+
+  while [ "1" != "$(sudo docker ps | wc -l)" ]
+  do
+    sleep 1
+  done
+
+  sleep 5
+
+  reset_env
+
+  unset FIBB_WAIT_TIME
 }
 
 error_test() {
@@ -284,12 +312,14 @@ error_test() {
   ${KCOV} ./coverage ./lets-fiware.sh example.com
   reset_env
 
-  echo "*** MOSQUITTO is empty ***" 1>&2
+  echo "*** IOTAGENT_UL is empty ***" 1>&2
   sed -i -e "s/^\(IOTAGENT_UL=\).*/\1iotagent/" config.sh
   ${KCOV} ./coverage ./lets-fiware.sh example.com
   reset_env
 
   echo "*** Both MQTT_1883 and MQTT_TLS are false ***" 1>&2
+  sed -i -e "s/^\(IOTAGENT_UL=\).*/\1iotagent-ul/" config.sh
+  sed -i -e "s/^\(MOSQUITTO=\).*/\1mosquitto/" config.sh
   sed -i -e "s/^\(MQTT_1883=\).*/\1false/" config.sh
   sed -i -e "s/^\(MQTT_TLS=\).*/\1false/" config.sh
   ${KCOV} ./coverage ./lets-fiware.sh example.com
@@ -352,48 +382,13 @@ EOF
   sed -i -e "s/^\(CYGNUS=\).*/\1cygnus/" config.sh
   ${KCOV} ./coverage ./lets-fiware.sh example.com
   reset_env
-}
 
-
-install_test5() {
-  echo "*** Timeout was reached ***" 1>&2
-  export FIBB_WAIT_TIME=1
+  echo "*** IOTA_HTTP_AUTH is unknwon value ***" 1>&2
+  sed -i -e "s/^\(IOTAGENT_UL=\).*/\1iotagent-ul/" config.sh
+  sed -i -e "s/^\(IOTAGENT_HTTP=\).*/\1iotagent-http/" config.sh
+  sed -i -e "s/^\(IOTA_HTTP_AUTH=\).*/\1error/" config.sh
   ${KCOV} ./coverage ./lets-fiware.sh example.com
-
-  sudo docker-compose -f docker-idm.yml down
-
-  while [ "1" != "$(sudo docker ps | wc -l)" ]
-  do
-    sleep 1
-  done
-
-  sleep 5
-
   reset_env
-
-  unset FIBB_WAIT_TIME
-}
-
-install_on_centos() {
-  logging "user.info" "${FUNCNAME[0]}"
-
-  sleep 5
-
-  sudo touch /etc/redhat-release
-
-  sudo apt remove -y jq
-
-  reset_env
-
-  sed -i -e "s/^\(FIREWALL=\).*/\1true/" config.sh
-
-  ${KCOV} ./coverage ./lets-fiware.sh example.com
-
-  sudo rm -f /etc/redhat-release
-
-  sleep 5
-
-  fibb_down
 }
 
 setup
