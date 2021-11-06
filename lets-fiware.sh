@@ -208,20 +208,23 @@ set_and_check_values() {
 
   if [ "${IOTAGENT_UL}" = "" ] && [ "${IOTAGENT_JSON}" = "" ]; then
     MOSQUITTO=""
+    IOTAGENT_HTTP=""
   else
-    if [ "${MOSQUITTO}" = "" ]; then
-      logging_err "error: MOSQUITTO is empty"
+    if [ "${MOSQUITTO}" = "" ] && [ "${IOTAGENT_HTTP}" = "" ]; then
+      logging_err "error: MOSQUITTO and IOTAGENT_HTTP are empty"
       exit "${ERR_CODE}"
     fi
-    if [ -z "${MQTT_1883}" ]; then
-      MQTT_1883=false
-    fi
-    if [ -z "${MQTT_TLS}" ]; then
-      MQTT_TLS=true
-    fi
-    if ! "${MQTT_1883}" && ! "${MQTT_TLS}"; then
-      logging_err "error: Both MQTT_1883 and MQTT_TLS are false"
-      exit "${ERR_CODE}"
+    if [ "${MOSQUITTO}" != "" ]; then
+      if [ -z "${MQTT_1883}" ]; then
+        MQTT_1883=false
+      fi
+      if [ -z "${MQTT_TLS}" ]; then
+        MQTT_TLS=true
+      fi
+      if ! "${MQTT_1883}" && ! "${MQTT_TLS}"; then
+        logging_err "error: Both MQTT_1883 and MQTT_TLS are false"
+        exit "${ERR_CODE}"
+      fi
     fi
   fi
 
@@ -650,7 +653,7 @@ setup_init() {
 
   DOCKER_COMPOSE_YML=./docker-compose.yml
 
-  readonly APPS=(KEYROCK ORION CYGNUS COMET WIRECLOUD NGSIPROXY NODE_RED GRAFANA QUANTUMLEAP IOTAGENT_UL IOTAGENT_JSON MOSQUITTO ELASTICSEARCH)
+  readonly APPS=(KEYROCK ORION CYGNUS COMET WIRECLOUD NGSIPROXY NODE_RED GRAFANA QUANTUMLEAP IOTAGENT_UL IOTAGENT_JSON IOTAGENT_HTTP MOSQUITTO ELASTICSEARCH)
 
   val=
 
@@ -659,9 +662,9 @@ setup_init() {
   POSTGRES_INSTALLED=false
   POSTGRES_PASSWORD=
 
-  ELASTICSEARCH_INSTALLED=false
-
   MOSQUITTO_INSTALLED=false
+
+  IOTAGENT_HTTP_INSTALLED=false
 
   CONTRIB_DIR=./CONTRIB
 }
@@ -1251,12 +1254,6 @@ EOF
 #
 setup_elasticsearch() {
   logging_info "${FUNCNAME[0]}"
-
-  if "${ELASTICSEARCH_INSTALLED}"; then
-    return
-  else
-    ELASTICSEARCH_INSTALLED=true
-  fi
 
   add_docker_compose_yml "docker-elasticsearch.yml"
 
@@ -1860,6 +1857,17 @@ echo "}" >> "${nginx_conf}"
 }
 
 #
+# Iot Agent over HTTP
+#
+setup_iotagent_over_http() {
+  if ! ${IOTAGENT_HTTP_INSTALLED}; then
+    IOTAGENT_HTTP_INSTALLED=true
+    create_nginx_conf "${IOTAGENT_HTTP}" "nginx-iotagent-http"
+  fi
+  sed -i -e "/__LOCATION__/i \  location $1 {\n    proxy_pass $2$1;\n  }" "${NGINX_SITES}/${IOTAGENT_HTTP}"
+}
+
+#
 # IoT Agent for UltraLight 2.0
 #
 setup_iotagent_ul() {
@@ -1881,15 +1889,24 @@ setup_iotagent_ul() {
 
 IOTA_UL_DEFAULT_RESOURCE=${IOTA_UL_DEFAULT_RESOURCE}
 IOTA_UL_LOG_LEVEL=${IOTA_UL_LOG_LEVEL}
+IOTA_UL_TIMESTAMP=${IOTA_UL_TIMESTAMP}
+IOTA_UL_AUTOCAST=${IOTA_UL_AUTOCAST}
 EOF
 
-  setup_mosquitto
+  if [ -n "${IOTAGENT_HTTP}" ]; then
+    add_to_docker_compose_yml "__IOTA_UL_ENVIRONMENT__" "     - IOTA_HTTP_PORT=7896"
+    setup_iotagent_over_http "${IOTA_UL_DEFAULT_RESOURCE}" "http://iotagent-ul:7896"
+  fi
 
-  add_to_docker_compose_yml "__IOTA_UL_DEPENDS_ON__" "     - mosquitto"
-  add_to_docker_compose_yml "__IOTA_UL_ENVIRONMENT__" "     - IOTA_MQTT_HOST=mosquitto"
-  add_to_docker_compose_yml "__IOTA_UL_ENVIRONMENT__" "     - IOTA_MQTT_PORT=1883"
-  add_to_docker_compose_yml "__IOTA_UL_ENVIRONMENT__" "     - IOTA_MQTT_USERNAME=\${MQTT_USERNAME}"
-  add_to_docker_compose_yml "__IOTA_UL_ENVIRONMENT__" "     - IOTA_MQTT_PASSWORD=\${MQTT_PASSWORD}"
+  if [ -n "${MOSQUITTO}" ]; then
+    setup_mosquitto
+
+    add_to_docker_compose_yml "__IOTA_UL_DEPENDS_ON__" "     - mosquitto"
+    add_to_docker_compose_yml "__IOTA_UL_ENVIRONMENT__" "     - IOTA_MQTT_HOST=mosquitto"
+    add_to_docker_compose_yml "__IOTA_UL_ENVIRONMENT__" "     - IOTA_MQTT_PORT=1883"
+    add_to_docker_compose_yml "__IOTA_UL_ENVIRONMENT__" "     - IOTA_MQTT_USERNAME=\${MQTT_USERNAME}"
+    add_to_docker_compose_yml "__IOTA_UL_ENVIRONMENT__" "     - IOTA_MQTT_PASSWORD=\${MQTT_PASSWORD}"
+  fi
 }
 
 #
@@ -1914,15 +1931,24 @@ setup_iotagent_json() {
 
 IOTA_JSON_DEFAULT_RESOURCE=${IOTA_JSON_DEFAULT_RESOURCE}
 IOTA_JSON_LOG_LEVEL=${IOTA_JSON_LOG_LEVEL}
+IOTA_JSON_TIMESTAMP=${IOTA_JSON_TIMESTAMP}
+IOTA_JSON_AUTOCAST=${IOTA_JSON_AUTOCAST}
 EOF
 
-  setup_mosquitto
+  if [ -n "${IOTAGENT_HTTP}" ]; then
+    add_to_docker_compose_yml "__IOTA_JSON_ENVIRONMENT__" "     - IOTA_HTTP_PORT=7896"
+    setup_iotagent_over_http "${IOTA_JSON_DEFAULT_RESOURCE}" "http://iotagent-json:7896"
+  fi
 
-  add_to_docker_compose_yml "__IOTA_JSON_DEPENDS_ON__" "     - mosquitto"
-  add_to_docker_compose_yml "__IOTA_JSON_ENVIRONMENT__" "     - IOTA_MQTT_HOST=mosquitto"
-  add_to_docker_compose_yml "__IOTA_JSON_ENVIRONMENT__" "     - IOTA_MQTT_PORT=1883"
-  add_to_docker_compose_yml "__IOTA_JSON_ENVIRONMENT__" "     - IOTA_MQTT_USERNAME=\${MQTT_USERNAME}"
-  add_to_docker_compose_yml "__IOTA_JSON_ENVIRONMENT__" "     - IOTA_MQTT_PASSWORD=\${MQTT_PASSWORD}"
+  if [ -n "${MOSQUITTO}" ]; then
+    setup_mosquitto
+
+    add_to_docker_compose_yml "__IOTA_JSON_DEPENDS_ON__" "     - mosquitto"
+    add_to_docker_compose_yml "__IOTA_JSON_ENVIRONMENT__" "     - IOTA_MQTT_HOST=mosquitto"
+    add_to_docker_compose_yml "__IOTA_JSON_ENVIRONMENT__" "     - IOTA_MQTT_PORT=1883"
+    add_to_docker_compose_yml "__IOTA_JSON_ENVIRONMENT__" "     - IOTA_MQTT_USERNAME=\${MQTT_USERNAME}"
+    add_to_docker_compose_yml "__IOTA_JSON_ENVIRONMENT__" "     - IOTA_MQTT_PASSWORD=\${MQTT_PASSWORD}"
+  fi
 }
 
 #
