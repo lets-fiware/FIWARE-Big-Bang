@@ -24,13 +24,13 @@ fi
 while true 
 do
   DATE=$(date "+%Y-%m-%dT%H:%M:%S+0000" -u)
-  MSG="d|${DATE}|t|$RANDOM|h|$RANDOM|p|$RANDOM"
+  MSG="{\"d\":\"${DATE}\",\"t\":$RANDOM,\"h\":$RANDOM,\"p\":$RANDOM}"
   echo "MSG: ${MSG}"
   mosquitto_pub \
     --debug \
     --host "${MOSQUITTO}" --port "${MQTT_PORT}" \
     --username "${MQTT_USERNAME}" --pw "${MQTT_PASSWORD}" \
-    --topic "/8f9z57ahxmtzx21oczr5vaabot/sensor001/attrs" \
+    --topic "/SMoCnNjlrAfeFOtlaC8XAhM8o1/sensor002/attrs" \
     --message "${MSG}"
   sleep 1
 done

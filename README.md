@@ -44,6 +44,7 @@ FI-BB stands for FIWARE Big Bang.
     -   WireCloud
     -   Ngsiproxy
     -   IoT Agent for UltraLight
+    -   IoT Agent for JSON
 -   Supported third party OSS:
     -   Node-RED
     -   Grafana

@@ -206,27 +206,23 @@ set_and_check_values() {
     ELASTICSEARCH=""
   fi
 
-  
-  if [ "${IOTAGENT}" = "" ]; then
+  if [ "${IOTAGENT_UL}" = "" ] && [ "${IOTAGENT_JSON}" = "" ]; then
     MOSQUITTO=""
-  fi
-
-  if [ "${IOTAGENT}" != "" ] && [ "${MOSQUITTO}" = "" ]; then
-    logging_err "error: MOSQUITTO is empty"
-    exit "${ERR_CODE}"
-  fi
-
-  if [ -z "${MQTT_1883}" ]; then
-    MQTT_1883=false
-  fi
-
-  if [ -z "${MQTT_TLS}" ]; then
-    MQTT_TLS=true
-  fi
-
-  if ! "${MQTT_1883}" && ! "${MQTT_TLS}"; then
-    logging_err "error: Both MQTT_1883 and MQTT_TLS are false"
-    exit "${ERR_CODE}"
+  else
+    if [ "${MOSQUITTO}" = "" ]; then
+      logging_err "error: MOSQUITTO is empty"
+      exit "${ERR_CODE}"
+    fi
+    if [ -z "${MQTT_1883}" ]; then
+      MQTT_1883=false
+    fi
+    if [ -z "${MQTT_TLS}" ]; then
+      MQTT_TLS=true
+    fi
+    if ! "${MQTT_1883}" && ! "${MQTT_TLS}"; then
+      logging_err "error: Both MQTT_1883 and MQTT_TLS are false"
+      exit "${ERR_CODE}"
+    fi
   fi
 
   if [ -n "${NODE_RED_INSTANCE_NUMBER}" ]; then
@@ -302,7 +298,8 @@ IMAGE_COMET=${IMAGE_COMET}
 IMAGE_WIRECLOUD=${IMAGE_WIRECLOUD}
 IMAGE_NGSIPROXY=${IMAGE_NGSIPROXY}
 IMAGE_QUANTUMLEAP=${IMAGE_QUANTUMLEAP}
-IMAGE_IOTAGENT=${IMAGE_IOTAGENT}
+IMAGE_IOTAGENT_UL=${IMAGE_IOTAGENT_UL}
+IMAGE_IOTAGENT_JSON=${IMAGE_IOTAGENT_JSON}
 
 IMAGE_TOKENPROXY=${IMAGE_TOKENPROXY}
 IMAGE_QUERYPROXY=${IMAGE_QUERYPROXY}
@@ -653,7 +650,7 @@ setup_init() {
 
   DOCKER_COMPOSE_YML=./docker-compose.yml
 
-  readonly APPS=(KEYROCK ORION CYGNUS COMET WIRECLOUD NGSIPROXY NODE_RED GRAFANA QUANTUMLEAP IOTAGENT MOSQUITTO ELASTICSEARCH)
+  readonly APPS=(KEYROCK ORION CYGNUS COMET WIRECLOUD NGSIPROXY NODE_RED GRAFANA QUANTUMLEAP IOTAGENT_UL IOTAGENT_JSON MOSQUITTO ELASTICSEARCH)
 
   val=
 
@@ -663,6 +660,8 @@ setup_init() {
   POSTGRES_PASSWORD=
 
   ELASTICSEARCH_INSTALLED=false
+
+  MOSQUITTO_INSTALLED=false
 
   CONTRIB_DIR=./CONTRIB
 }
@@ -1747,6 +1746,12 @@ EOF
 setup_mosquitto() {
   logging_info "${FUNCNAME[0]}"
 
+  if "${MOSQUITTO_INSTALLED}"; then
+    return
+  else
+    MOSQUITTO_INSTALLED=true
+  fi
+
   add_docker_compose_yml "docker-mosquitto.yml"
 
   add_nginx_depends_on "mosquitto"
@@ -1779,12 +1784,6 @@ EOF
 
   ${DOCKER} run --rm -v "${dir}":/work "${IMAGE_MOSQUITTO}" mosquitto_passwd -U /work/password.txt
 
-  add_to_docker_compose_yml "__IOTA_DEPENDS_ON__" "     - mosquitto"
-  add_to_docker_compose_yml "__IOTA_ENVIRONMENT__" "     - IOTA_MQTT_HOST=mosquitto"
-  add_to_docker_compose_yml "__IOTA_ENVIRONMENT__" "     - IOTA_MQTT_PORT=1883"
-  add_to_docker_compose_yml "__IOTA_ENVIRONMENT__" "     - IOTA_MQTT_USERNAME=\${MQTT_USERNAME}"
-  add_to_docker_compose_yml "__IOTA_ENVIRONMENT__" "     - IOTA_MQTT_PASSWORD=\${MQTT_PASSWORD}"
-
   cat <<EOF > "${dir}/mosquitto.conf"
 persistence true
 persistence_location /mosquitto/data/
@@ -1799,7 +1798,6 @@ password_file /mosquitto/config/password.txt
 connection_messages true
 log_timestamp true
 EOF
-
 
   local log_types
   local log_type
@@ -1862,24 +1860,69 @@ echo "}" >> "${nginx_conf}"
 }
 
 #
-# IoT Agent
+# IoT Agent for UltraLight 2.0
 #
-setup_iotagent() {
-  if [ -z "${IOTAGENT}" ]; then
+setup_iotagent_ul() {
+  if [ -z "${IOTAGENT_UL}" ]; then
     return
   fi
 
   logging_info "${FUNCNAME[0]}"
 
-  add_docker_compose_yml "docker-iotagent.yml"
+  add_docker_compose_yml "docker-iotagent-ul.yml"
 
-  create_nginx_conf "${IOTAGENT}" "nginx-iotagent"
+  create_nginx_conf "${IOTAGENT_UL}" "nginx-iotagent-ul"
 
-  add_nginx_depends_on "iot-agent"
+  add_nginx_depends_on "iotagent-ul"
 
-  add_rsyslog_conf "iotagent"
+  add_rsyslog_conf "iotagent-ul"
+
+  cat <<EOF >> .env
+
+IOTA_UL_DEFAULT_RESOURCE=${IOTA_UL_DEFAULT_RESOURCE}
+IOTA_UL_LOG_LEVEL=${IOTA_UL_LOG_LEVEL}
+EOF
 
   setup_mosquitto
+
+  add_to_docker_compose_yml "__IOTA_UL_DEPENDS_ON__" "     - mosquitto"
+  add_to_docker_compose_yml "__IOTA_UL_ENVIRONMENT__" "     - IOTA_MQTT_HOST=mosquitto"
+  add_to_docker_compose_yml "__IOTA_UL_ENVIRONMENT__" "     - IOTA_MQTT_PORT=1883"
+  add_to_docker_compose_yml "__IOTA_UL_ENVIRONMENT__" "     - IOTA_MQTT_USERNAME=\${MQTT_USERNAME}"
+  add_to_docker_compose_yml "__IOTA_UL_ENVIRONMENT__" "     - IOTA_MQTT_PASSWORD=\${MQTT_PASSWORD}"
+}
+
+#
+# IoT Agent for JSON
+#
+setup_iotagent_json() {
+  if [ -z "${IOTAGENT_JSON}" ]; then
+    return
+  fi
+
+  logging_info "${FUNCNAME[0]}"
+
+  add_docker_compose_yml "docker-iotagent-json.yml"
+
+  create_nginx_conf "${IOTAGENT_JSON}" "nginx-iotagent-json"
+
+  add_nginx_depends_on "iotagent-json"
+
+  add_rsyslog_conf "iotagent-json"
+
+  cat <<EOF >> .env
+
+IOTA_JSON_DEFAULT_RESOURCE=${IOTA_JSON_DEFAULT_RESOURCE}
+IOTA_JSON_LOG_LEVEL=${IOTA_JSON_LOG_LEVEL}
+EOF
+
+  setup_mosquitto
+
+  add_to_docker_compose_yml "__IOTA_JSON_DEPENDS_ON__" "     - mosquitto"
+  add_to_docker_compose_yml "__IOTA_JSON_ENVIRONMENT__" "     - IOTA_MQTT_HOST=mosquitto"
+  add_to_docker_compose_yml "__IOTA_JSON_ENVIRONMENT__" "     - IOTA_MQTT_PORT=1883"
+  add_to_docker_compose_yml "__IOTA_JSON_ENVIRONMENT__" "     - IOTA_MQTT_USERNAME=\${MQTT_USERNAME}"
+  add_to_docker_compose_yml "__IOTA_JSON_ENVIRONMENT__" "     - IOTA_MQTT_PASSWORD=\${MQTT_PASSWORD}"
 }
 
 #
@@ -2165,7 +2208,8 @@ setup_ngsi_go() {
           "ORION" )  ${NGSI_GO} broker add --host "${VAL}" --ngsiType v2 --brokerHost "https://${VAL}" --idmType tokenproxy --idmHost "https://${ORION}/token" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" ;;
           "CYGNUS" ) ${NGSI_GO} server add --host "${VAL}" --serverType cygnus --serverHost "https://${VAL}" --idmType tokenproxy --idmHost "https://${ORION}/token" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" ;;
           "COMET" ) ${NGSI_GO} server add --host "${VAL}" --serverType comet --serverHost "https://${VAL}" --idmType tokenproxy --idmHost "https://${ORION}/token" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" ;;
-          "IOTAGENT" ) ${NGSI_GO} server add --host "${VAL}" --serverType iota --serverHost "https://${VAL}" --idmType tokenproxy --idmHost "https://${ORION}/token" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" --service openiot --path /;;
+          "IOTAGENT_UL" ) ${NGSI_GO} server add --host "${VAL}" --serverType iota --serverHost "https://${VAL}" --idmType tokenproxy --idmHost "https://${ORION}/token" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" --service openiot --path /;;
+          "IOTAGENT_JSON" ) ${NGSI_GO} server add --host "${VAL}" --serverType iota --serverHost "https://${VAL}" --idmType tokenproxy --idmHost "https://${ORION}/token" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" --service openiot --path /;;
           "WIRECLOUD" ) ${NGSI_GO} server add --host "${VAL}" --serverType wirecloud --serverHost "https://${VAL}" --idmType keyrock --idmHost "https://${KEYROCK}/oauth2/token" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" --clientId "${WIRECLOUD_CLIENT_ID}" --clientSecret "${WIRECLOUD_CLIENT_SECRET}";;
           "QUANTUMLEAP" ) ${NGSI_GO} server add --host "${VAL}" --serverType quantumleap --serverHost "https://${VAL}" --idmType tokenproxy --idmHost "https://${ORION}/token" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" ;;
       esac
@@ -2292,7 +2336,8 @@ setup_main() {
   setup_comet
   setup_quantumleap
   setup_wirecloud
-  setup_iotagent
+  setup_iotagent_ul
+  setup_iotagent_json
   setup_node_red
   setup_grafana
   setup_postfix

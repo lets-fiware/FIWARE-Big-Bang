@@ -11,10 +11,10 @@ fi
 
 . ./.env
 
-if [ -z "${IOTAGENT}" ]; then
-  echo "IoT Agent not found"
-  exit
+if [ -z "${IOTAGENT_UL}" ]; then
+  echo "IoT Agent for UltraLight 2.0 not found"
+  exit 1
 fi
 
-ngsi services --host "${IOTAGENT}" create --apikey 8f9z57ahxmtzx21oczr5vaabot --type Thing --resource /iot/d --cbroker http://orion:1026
-ngsi services --host "${IOTAGENT}" list -P
+ngsi services --host "${IOTAGENT_UL}" create --apikey 8f9z57ahxmtzx21oczr5vaabot --type Thing --resource "${IOTA_UL_DEFAULT_RESOURCE}" --cbroker http://orion:1026
+ngsi services --host "${IOTAGENT_UL}" list -P

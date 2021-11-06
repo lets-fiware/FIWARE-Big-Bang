@@ -11,9 +11,9 @@ fi
 
 . ./.env
 
-if [ -z "${IOTAGENT_UL}" ]; then
-  echo "IoT Agent for UltraLight 2.0 not found"
+if [ -z "${IOTAGENT_JSON}" ]; then
+  echo "IoT Agent for JSON not found"
   exit 1
 fi
 
-ngsi version --host "${IOTAGENT_UL}" -P
+ngsi version --host "${IOTAGENT_JSON}" -P

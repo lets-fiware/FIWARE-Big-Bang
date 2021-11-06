@@ -1,0 +1,27 @@
+version: "3"
+services:
+  iotagent-ul:
+    image: ${IMAGE_IOTAGENT_UL}
+    depends_on:
+      - mongo
+      # __IOTA_UL_DEPENDS_ON__
+    environment:
+      - IOTA_CB_HOST=orion
+      - IOTA_CB_PORT=1026
+      - IOTA_NORTH_PORT=4041
+      - IOTA_REGISTRY_TYPE=mongodb
+      - IOTA_LOG_LEVEL=${IOTA_UL_LOG_LEVEL}
+      - IOTA_TIMESTAMP=true
+      - IOTA_CB_NGSI_VERSION=v2
+      - IOTA_AUTOCAST=true
+      - IOTA_MONGO_HOST=mongo
+      - IOTA_MONGO_PORT=27017
+      - IOTA_MONGO_DB=iotagentul
+      - IOTA_DEFAULT_RESOURCE=${IOTA_UL_DEFAULT_RESOURCE}
+      - IOTA_PROVIDER_URL=http://iotagent-ul:4041
+      # __IOTA_UL_ENVIRONMENT__
+    restart: always
+    logging:
+      driver: syslog
+      options:
+        tag: "[iotagent-ul]"

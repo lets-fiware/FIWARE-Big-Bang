@@ -58,48 +58,51 @@ Examples:
 
 You can specify configurations by editing the `config.sh` file.
 
-| Variable name                   | Description                                         | Default value                                   |
-| ------------------------------- | --------------------------------------------------- | ----------------------------------------------- |
-| KEYROCK                         | A sub-domain name of Keyrock (Required)             | keyrock                                         |
-| ORION                           | A sub-domain name of Orion (Required)               | orion                                           |
-| CYGNUS                          | A sub-domain name of Cygnus                         | (empty)                                         |
-| COMET                           | A sub-domain name of Comet                          | (empty)                                         |
-| QUANTUMLEAP                     | A sub-domain name of QuantumLeap                    | (empty)                                         |
-| WIRECLOUD                       | A sub-domain name of WireCloud                      | (empty)                                         |
-| NGSIPROXY                       | A sub-domain name of Ngsiproxy                      | (empty)                                         |
-| NODE\_RED                       | A sub-domain name of Node-RED                       | (empty)                                         |
-| GRAFANA                         | A sub-domain name of Grafana                        | (empty)                                         |
-| IOTAGENT                        | A sub-domain name of IoT Agent                      | (empty)                                         |
-| MOSQUITTO                       | A sub-domain name of MOSQUITTO                      | (empty)                                         |
-| ELASTICSEARCH                   | A sub-domain name of Elasticsearch                  | (empty)                                         |
-| IDM\_ADMIN\_NAME                | A name of an admin user for Keyrock                 | admin                                           |
-| IDM\_ADMIN\_EMAIL               | An email address of an admin user for Keyrock       | IDM\_ADMIN\_NAME @ DOMAIN\_NAME                 |
-| IDM\_ADMIN\_PASS                | A password of an admin user for Keyrock             | (Automatically generated)                       |
-| FIREWALL                        | Enable firewall. true or false                      | false                                           |
-| CERT\_EMAIL                     | An email address for certbot                        | (An email address of an admin user for Keyrock) |
-| CERT\_REVOKE                    | Revoke and reacquire the certificate. true or false | false                                           |
-| CERT\_TEST                      | Use --test-cert option. true or false               | false                                           |
-| CERT\_FORCE\_RENEWAL            | Use --force-renewal option. true or false           | false                                           |
-| CYGNUS_MONGO                    | Use MongoDB sink for Cygnus. true or false          | false                                           |
-| CYGNUS_MYSQL                    | Use MySQL sink for Cygnus. true or false            | false                                           |
-| CYGNUS_POSTGRES                 | Use PostgreSQL sink for Cygnus. true or false       | false                                           |
-| CYGNUS_ELASTICSEARCH            | Use Elasticsearch sink for Cygnus. true or false    | false                                           |
-| QUERYPROXY                      | Use queryproxy. true or false                       | false                                           |
-| REGPROXY                        | Use regproxy. true or false                         | false                                           |
-| REGPROXY\_NGSITYPE              | NgsiType for remote broker. (v2 or ld) Default: v2  | (empty)                                         |
-| REGPROXY\_HOST                  | Host for remote broker.                             | (empty)                                         |
-| REGPROXY\_IDMTYPE               | IdM type for remote broker.                         | (empty)                                         |
-| REGPROXY\_IDMHOST               | IdM host for remote broker.                         | (empty)                                         |
-| REGPROXY\_USERNAME              | A username for remote broker.                       | (empty)                                         |
-| REGPROXY\_PASSWORD              | A password for remote broker.                       | (empty)                                         |
-| REGPROXY\_CLIENT\_ID            | A client id for remote broker.                      | (empty)                                         |
-| REGPROXY\_CLIENT\_SECRET        | A client secret for remote broker.                  | (empty)                                         |
-| MQTT\_1883                      | Use MQTT 1883 Port. true or false                   | false                                           |
-| MQTT\_TLS                       | Use MQTT TLS. true or false                         | true                                            |
-| NODE\_RED\_INSTANCE\_NUMBER     | Number of Node-RED instance.                        | 1                                               |
-| NODE\_RED\_INSTANCE\_USERNAME   | Username for Node-RED instance.                     | node-red                                        |
-| NODE\_RED\_INSTANCE\_HTTP\_ROOT | HTTP root for Node-RED instance.                    | /node-red                                       |
-| POSTFIX                         | Use Postfix (local delivery). (true or false)       | false                                           |
+| Variable name                   | Description                                                              | Default value                                   |
+| ------------------------------- | ------------------------------------------------------------------------ | ----------------------------------------------- |
+| KEYROCK                         | A sub-domain name of Keyrock (Required)                                  | keyrock                                         |
+| ORION                           | A sub-domain name of Orion (Required)                                    | orion                                           |
+| CYGNUS                          | A sub-domain name of Cygnus                                              | (empty)                                         |
+| COMET                           | A sub-domain name of Comet                                               | (empty)                                         |
+| QUANTUMLEAP                     | A sub-domain name of QuantumLeap                                         | (empty)                                         |
+| WIRECLOUD                       | A sub-domain name of WireCloud                                           | (empty)                                         |
+| NGSIPROXY                       | A sub-domain name of Ngsiproxy                                           | (empty)                                         |
+| NODE\_RED                       | A sub-domain name of Node-RED                                            | (empty)                                         |
+| GRAFANA                         | A sub-domain name of Grafana                                             | (empty)                                         |
+| IOTAGENT\_UL                    | A sub-domain name of IoT Agent for UltraLight 2.0                        | (empty)                                         |
+| IOTAGENT\_JSON                  | A sub-domain name of IoT Agent for JSON                                  | (empty)                                         |
+| MOSQUITTO                       | A sub-domain name of MOSQUITTO                                           | (empty)                                         |
+| ELASTICSEARCH                   | A sub-domain name of Elasticsearch                                       | (empty)                                         |
+| IDM\_ADMIN\_NAME                | A name of an admin user for Keyrock                                      | admin                                           |
+| IDM\_ADMIN\_EMAIL               | An email address of an admin user for Keyrock                            | IDM\_ADMIN\_NAME @ DOMAIN\_NAME                 |
+| IDM\_ADMIN\_PASS                | A password of an admin user for Keyrock                                  | (Automatically generated)                       |
+| FIREWALL                        | Enable firewall. true or false                                           | false                                           |
+| CERT\_EMAIL                     | An email address for certbot                                             | (An email address of an admin user for Keyrock) |
+| CERT\_REVOKE                    | Revoke and reacquire the certificate. true or false                      | false                                           |
+| CERT\_TEST                      | Use --test-cert option. true or false                                    | false                                           |
+| CERT\_FORCE\_RENEWAL            | Use --force-renewal option. true or false                                | false                                           |
+| CYGNUS\_MONGO                   | Use MongoDB sink for Cygnus. true or false                               | false                                           |
+| CYGNUS\_MYSQL                   | Use MySQL sink for Cygnus. true or false                                 | false                                           |
+| CYGNUS\_POSTGRES                | Use PostgreSQL sink for Cygnus. true or false                            | false                                           |
+| CYGNUS\_ELASTICSEARCH           | Use Elasticsearch sink for Cygnus. true or false                         | false                                           |
+| IOTA\_UL\_DEFAULT\_RESOURCE     | The default path the IoT Agent uses listenening for UltraLight measures. | /iot/ul                                         |
+| IOTA\_JSON\_DEFAULT\_RESOURCE   | The default path the IoT Agent uses listenening for JSON measures.       | /iot/json                                       |
+| QUERYPROXY                      | Use queryproxy. true or false                                            | false                                           |
+| REGPROXY                        | Use regproxy. true or false                                              | false                                           |
+| REGPROXY\_NGSITYPE              | NgsiType for remote broker. (v2 or ld) Default: v2                       | (empty)                                         |
+| REGPROXY\_HOST                  | Host for remote broker.                                                  | (empty)                                         |
+| REGPROXY\_IDMTYPE               | IdM type for remote broker.                                              | (empty)                                         |
+| REGPROXY\_IDMHOST               | IdM host for remote broker.                                              | (empty)                                         |
+| REGPROXY\_USERNAME              | A username for remote broker.                                            | (empty)                                         |
+| REGPROXY\_PASSWORD              | A password for remote broker.                                            | (empty)                                         |
+| REGPROXY\_CLIENT\_ID            | A client id for remote broker.                                           | (empty)                                         |
+| REGPROXY\_CLIENT\_SECRET        | A client secret for remote broker.                                       | (empty)                                         |
+| MQTT\_1883                      | Use MQTT 1883 Port. true or false                                        | false                                           |
+| MQTT\_TLS                       | Use MQTT TLS. true or false                                              | true                                            |
+| NODE\_RED\_INSTANCE\_NUMBER     | Number of Node-RED instance.                                             | 1                                               |
+| NODE\_RED\_INSTANCE\_USERNAME   | Username for Node-RED instance.                                          | node-red                                        |
+| NODE\_RED\_INSTANCE\_HTTP\_ROOT | HTTP root for Node-RED instance.                                         | /node-red                                       |
+| POSTFIX                         | Use Postfix (local delivery). (true or false)                            | false                                           |
 
 
 ## Files and directories layout

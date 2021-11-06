@@ -34,7 +34,7 @@
       set $req_uri "$uri";
       auth_request /_check_oauth2_token;
 
-      proxy_pass http://iot-agent:4041;
+      proxy_pass http://iotagent-json:4041;
     }
 
     location = /_check_oauth2_token {
