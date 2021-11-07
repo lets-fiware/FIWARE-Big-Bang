@@ -1567,6 +1567,10 @@ setup_comet() {
 
   add_nginx_depends_on "comet"
 
+  if [ -n "${CYGNUS}" ]; then
+    add_to_docker_compose_yml "__COMET_DEPENDS_ON__" "     - cygnus"
+  fi
+
   add_rsyslog_conf "comet"
 }
 
@@ -2345,6 +2349,7 @@ setup_end() {
   delete_from_docker_compose_yml "__NODE_RED_"
   delete_from_docker_compose_yml "__ORION_"
   delete_from_docker_compose_yml "__CYGNUS_"
+  delete_from_docker_compose_yml "__COMET_"
   delete_from_docker_compose_yml "__POSTFIX_"
 
   sed -i -e "/# __NGINX_ORION_/d" "${NGINX_SITES}/${ORION}"
