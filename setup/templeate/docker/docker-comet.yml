@@ -3,7 +3,7 @@ services:
   comet:
     image: ${IMAGE_COMET}
     depends_on:
-      - cygnus
+      # __COMET_DEPENDS_ON__
       - mongo
     networks:
       - default
