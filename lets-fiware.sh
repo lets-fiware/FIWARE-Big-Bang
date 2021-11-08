@@ -686,6 +686,8 @@ setup_init() {
 
   IOTAGENT_HTTP_INSTALLED=false
 
+  TOKENPROXY=true
+
   CONTRIB_DIR=./CONTRIB
 }
 
@@ -1323,51 +1325,72 @@ setup_keyrock() {
   else
     setup_mysql
   fi
+
+  if ${TOKENPROXY}; then
+    sed -i -e "/# __NGINX_KEYROCK__/i \  location /token {\n    proxy_pass http://tokenproxy:1029/token;\n    proxy_redirect     default;\n  }" "${NGINX_SITES}/${KEYROCK}"
+  fi
 }
 
 #
-# Wilma and Tokenproxy
+# Wilma
 #
 setup_wilma() {
   logging_info "${FUNCNAME[0]}"
 
   add_docker_compose_yml "docker-wilma.yml"
 
-  add_docker_compose_yml "docker-tokenproxy.yml"
+  add_nginx_depends_on "wilma"
 
-  add_nginx_depends_on "wilma" "tokenproxy"
-
-  add_rsyslog_conf "pep-proxy" "tokenproxy"
+  add_rsyslog_conf "pep-proxy"
 
   # Create Applicaton for Orion
   AID=$(${NGSI_GO} applications --host "${IDM}" create --name "Wilma" --description "Wilma application" --url "http://localhost/" --redirectUri "http://localhost/")
   SECRET=$(${NGSI_GO} applications --host "${IDM}" get --aid "${AID}" | jq -r .application.secret )
 
   ORION_CLIENT_ID=${AID}
+  ORION_CLIENT_SECRET=${SECRET}
 
   # Create PEP Proxy for FIWARE Orion
   PEP_PASSWORD=$(${NGSI_GO} applications --host "${IDM}" pep --aid "${AID}" create --run | jq -r .pep_proxy.password)
   PEP_ID=$(${NGSI_GO} applications --host "${IDM}" pep --aid "${AID}" list | jq -r .pep_proxy.id)
 
-  cp -r "${SETUP_DIR}"/docker/tokenproxy "${CONFIG_DIR}"/
-  cp "${WORK_DIR}"/ngsi "${CONFIG_DIR}"/tokenproxy/
-
-  cd "${CONFIG_DIR}"/tokenproxy > /dev/null
-  ${DOCKER} build -t "${IMAGE_TOKENPROXY}" .
-  rm -f ngsi
-  cd - > /dev/null
-
   cat <<EOF >> .env
-
-# Tokenproxy
-TOKENPROXY_CLIENT_ID=${AID}
-TOKENPROXY_CLIENT_SECRET=${SECRET}
 
 # PEP Proxy
 PEP_PROXY_APP_ID=${AID}
 PEP_PROXY_USERNAME=${PEP_ID}
 PEP_PASSWORD=${PEP_PASSWORD}
 EOF
+}
+
+#
+# Tokenproxy
+#
+setup_tokenproxy() {
+  if ${TOKENPROXY}; then
+    logging_info "${FUNCNAME[0]}"
+
+    add_docker_compose_yml "docker-tokenproxy.yml"
+
+    add_nginx_depends_on "tokenproxy"
+
+    add_rsyslog_conf "tokenproxy"
+
+    cp -r "${SETUP_DIR}"/docker/tokenproxy "${CONFIG_DIR}"/
+    cp "${WORK_DIR}"/ngsi "${CONFIG_DIR}"/tokenproxy/
+
+    cd "${CONFIG_DIR}"/tokenproxy > /dev/null
+    ${DOCKER} build -t "${IMAGE_TOKENPROXY}" .
+    rm -f ngsi
+    cd - > /dev/null
+
+    cat <<EOF >> .env
+
+# Tokenproxy
+TOKENPROXY_CLIENT_ID=${ORION_CLIENT_ID}
+TOKENPROXY_CLIENT_SECRET=${ORION_CLIENT_SECRET}
+EOF
+  fi
 }
 
 #
@@ -1438,9 +1461,14 @@ setup_queryproxy() {
     proxy_pass http://queryproxy:1030;
     proxy_redirect     default;
   }
+
 EOF
 
-  sed -i -e "/# __NGINX_ORION_/r ${WORK_DIR}/nginx_queryproxy" "${NGINX_SITES}/${ORION}"
+  sed -i -e "/# __NGINX_ORION__/r ${WORK_DIR}/nginx_queryproxy" "${NGINX_SITES}/${ORION}"
+
+  if ${TOKENPROXY}; then
+    sed -i -e "/# __NGINX_ORION__/i \  location /token {\n    proxy_pass http://tokenproxy:1029/token;\n    proxy_redirect     default;\n  }" "${NGINX_SITES}/${ORION}"
+  fi
 }
 
 #
@@ -2279,13 +2307,13 @@ setup_ngsi_go() {
     if [ -n "$VAL" ]; then
       case "${NAME}" in
           "KEYROCK" ) ${NGSI_GO} server add --host "${VAL}" --serverType keyrock --serverHost "https://${VAL}" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" ;;
-          "ORION" )  ${NGSI_GO} broker add --host "${VAL}" --ngsiType v2 --brokerHost "https://${VAL}" --idmType tokenproxy --idmHost "https://${ORION}/token" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" ;;
-          "CYGNUS" ) ${NGSI_GO} server add --host "${VAL}" --serverType cygnus --serverHost "https://${VAL}" --idmType tokenproxy --idmHost "https://${ORION}/token" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" ;;
-          "COMET" ) ${NGSI_GO} server add --host "${VAL}" --serverType comet --serverHost "https://${VAL}" --idmType tokenproxy --idmHost "https://${ORION}/token" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" ;;
-          "IOTAGENT_UL" ) ${NGSI_GO} server add --host "${VAL}" --serverType iota --serverHost "https://${VAL}" --idmType tokenproxy --idmHost "https://${ORION}/token" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" --service openiot --path /;;
-          "IOTAGENT_JSON" ) ${NGSI_GO} server add --host "${VAL}" --serverType iota --serverHost "https://${VAL}" --idmType tokenproxy --idmHost "https://${ORION}/token" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" --service openiot --path /;;
+          "ORION" )  ${NGSI_GO} broker add --host "${VAL}" --ngsiType v2 --brokerHost "https://${VAL}" --idmType tokenproxy --idmHost "https://${KEYROCK}/token" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" ;;
+          "CYGNUS" ) ${NGSI_GO} server add --host "${VAL}" --serverType cygnus --serverHost "https://${VAL}" --idmType tokenproxy --idmHost "https://${KEYROCK}/token" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" ;;
+          "COMET" ) ${NGSI_GO} server add --host "${VAL}" --serverType comet --serverHost "https://${VAL}" --idmType tokenproxy --idmHost "https://${KEYROCK}/token" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" ;;
+          "IOTAGENT_UL" ) ${NGSI_GO} server add --host "${VAL}" --serverType iota --serverHost "https://${VAL}" --idmType tokenproxy --idmHost "https://${KEYROCK}/token" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" --service openiot --path /;;
+          "IOTAGENT_JSON" ) ${NGSI_GO} server add --host "${VAL}" --serverType iota --serverHost "https://${VAL}" --idmType tokenproxy --idmHost "https://${KEYROCK}/token" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" --service openiot --path /;;
           "WIRECLOUD" ) ${NGSI_GO} server add --host "${VAL}" --serverType wirecloud --serverHost "https://${VAL}" --idmType keyrock --idmHost "https://${KEYROCK}/oauth2/token" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" --clientId "${WIRECLOUD_CLIENT_ID}" --clientSecret "${WIRECLOUD_CLIENT_SECRET}";;
-          "QUANTUMLEAP" ) ${NGSI_GO} server add --host "${VAL}" --serverType quantumleap --serverHost "https://${VAL}" --idmType tokenproxy --idmHost "https://${ORION}/token" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" ;;
+          "QUANTUMLEAP" ) ${NGSI_GO} server add --host "${VAL}" --serverType quantumleap --serverHost "https://${VAL}" --idmType tokenproxy --idmHost "https://${KEYROCK}/token" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" ;;
       esac
     fi
   done
@@ -2352,7 +2380,12 @@ setup_end() {
   delete_from_docker_compose_yml "__COMET_"
   delete_from_docker_compose_yml "__POSTFIX_"
 
-  sed -i -e "/# __NGINX_ORION_/d" "${NGINX_SITES}/${ORION}"
+  if [ -n "${KEYROCK}" ]; then
+    sed -i -e "/# __NGINX_KEYROCK__/d" "${NGINX_SITES}/${KEYROCK}"
+  fi
+  if [ -n "${ORION}" ]; then
+    sed -i -e "/# __NGINX_ORION__/d" "${NGINX_SITES}/${ORION}"
+  fi
   if [ -n "${IOTAGENT_HTTP}" ]; then
     sed -i -e "/# __NGINX_IOTAGENT_HTTP__/d" "${NGINX_SITES}/${IOTAGENT_HTTP}"
   fi
@@ -2407,6 +2440,7 @@ setup_main() {
   setup_nginx
   setup_keyrock
   setup_wilma
+  setup_tokenproxy
   setup_orion
   setup_queryproxy
   setup_regproxy

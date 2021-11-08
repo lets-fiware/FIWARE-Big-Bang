@@ -53,8 +53,7 @@ server {
     proxy_redirect     default;
   }
 
-  # __NGINX_ORION_
-
+  # __NGINX_ORION__
   access_log /var/log/nginx/HOST-access.log;
   error_log /var/log/nginx/HOST-error.log;
 }

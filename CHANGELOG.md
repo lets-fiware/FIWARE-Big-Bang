@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.6.0-next
 
+-   Improve Tokenproxy (#91)
 -   Fix comet depends\_on in docker-compose.yml (#90)
 -   Add authorization feature for IoT Agent over HTTP (#89)
 -   Add feature to support IoT Agent over HTTP (#88)
