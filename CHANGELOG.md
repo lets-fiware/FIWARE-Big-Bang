@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.6.0-next
 
+-   Improve mongodb index (#93)
 -   Fix nginx-orion templeate (#92)
 -   Improve Tokenproxy (#91)
 -   Fix comet depends\_on in docker-compose.yml (#90)

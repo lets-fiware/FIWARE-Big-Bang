@@ -688,6 +688,8 @@ setup_init() {
 
   TOKENPROXY=true
 
+  OPENIOT_MONGO_INDEX=false
+
   CONTRIB_DIR=./CONTRIB
 }
 
@@ -1409,7 +1411,7 @@ setup_orion() {
   add_rsyslog_conf "orion" "mongo"
 
   mkdir -p "${CONFIG_DIR}/mongo"
-  cp "${TEMPLEATE}/mongo-init.js" "${CONFIG_DIR}/mongo/"
+  cp "${TEMPLEATE}/mongo/orion.js" "${CONFIG_DIR}/mongo/mongo-init.js"
 
   if ${TOKENPROXY}; then
     sed -i -e "/# __NGINX_ORION__/i \  location /token {\n    proxy_pass http://tokenproxy:1029/token;\n    proxy_redirect     default;\n  }\n" "${NGINX_SITES}/${ORION}"
@@ -1940,6 +1942,17 @@ EOF
 }
 
 #
+# Create openiot mongo index
+#
+create_openiot_mongo_index() {
+  if ${OPENIOT_MONGO_INDEX}; then
+    return
+  fi
+  OPENIOT_MONGO_INDEX=true
+  cat "${TEMPLEATE}/mongo/orion-openiot.js" >> "${CONFIG_DIR}/mongo/mongo-init.js"
+}
+
+#
 # IoT Agent for UltraLight 2.0
 #
 setup_iotagent_ul() {
@@ -1956,6 +1969,9 @@ setup_iotagent_ul() {
   add_nginx_depends_on "iotagent-ul"
 
   add_rsyslog_conf "iotagent-ul"
+
+  create_openiot_mongo_index
+  cat "${TEMPLEATE}/mongo/iotagentul.js" >> "${CONFIG_DIR}/mongo/mongo-init.js"
 
   cat <<EOF >> .env
 
@@ -2000,6 +2016,9 @@ setup_iotagent_json() {
   add_nginx_depends_on "iotagent-json"
 
   add_rsyslog_conf "iotagent-json"
+
+  create_openiot_mongo_index
+  cat "${TEMPLEATE}/mongo/iotagentjson.js" >> "${CONFIG_DIR}/mongo/mongo-init.js"
 
   cat <<EOF >> .env
 
