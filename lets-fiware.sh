@@ -1411,6 +1411,10 @@ setup_orion() {
   mkdir -p "${CONFIG_DIR}/mongo"
   cp "${TEMPLEATE}/mongo-init.js" "${CONFIG_DIR}/mongo/"
 
+  if ${TOKENPROXY}; then
+    sed -i -e "/# __NGINX_ORION__/i \  location /token {\n    proxy_pass http://tokenproxy:1029/token;\n    proxy_redirect     default;\n  }\n" "${NGINX_SITES}/${ORION}"
+  fi
+
   CB_HOST=https://${ORION}
 
   cat <<EOF >> .env
@@ -1465,10 +1469,6 @@ setup_queryproxy() {
 EOF
 
   sed -i -e "/# __NGINX_ORION__/r ${WORK_DIR}/nginx_queryproxy" "${NGINX_SITES}/${ORION}"
-
-  if ${TOKENPROXY}; then
-    sed -i -e "/# __NGINX_ORION__/i \  location /token {\n    proxy_pass http://tokenproxy:1029/token;\n    proxy_redirect     default;\n  }" "${NGINX_SITES}/${ORION}"
-  fi
 }
 
 #
