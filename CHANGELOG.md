@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.6.0-next
 
+-   Improve coverage (#94)
 -   Improve mongodb index (#93)
 -   Fix nginx-orion templeate (#92)
 -   Improve Tokenproxy (#91)
