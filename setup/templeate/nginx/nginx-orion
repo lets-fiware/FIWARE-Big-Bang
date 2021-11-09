@@ -48,11 +48,6 @@ server {
     proxy_pass http://wilma:1026;
   }
 
-  location /token {
-    proxy_pass http://tokenproxy:1029/token;
-    proxy_redirect     default;
-  }
-
   # __NGINX_ORION__
   access_log /var/log/nginx/HOST-access.log;
   error_log /var/log/nginx/HOST-error.log;
