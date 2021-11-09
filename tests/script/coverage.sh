@@ -39,11 +39,17 @@ reset_env() {
   git checkout config.sh
 }
 
+remove_example_com_from_hosts() {
+  sudo sed -i -e "/example.com/d" /etc/hosts
+}
+
 setup() {
   logging "user.info" "${FUNCNAME[0]}"
 
   install_kcov
   build_certmock
+
+  remove_example_com_from_hosts
 
   export FIBB_TEST=true
   export FIBB_TEST_MOCK_PATH="${PWD}/.mock/"
@@ -143,7 +149,6 @@ install_test1() {
   sed -i -e "s/^\(ELASTICSEARCH=\).*/\1elasticsearch/" config.sh
   sed -i -e "s/^\(MQTT_1883=\).*/\1true/" config.sh
   sed -i -e "s/^\(MQTT_TLS=\).*/\1true/" config.sh
-  sed -i -e "s/^\(CERT_REVOKE=\).*/\1true/" config.sh
   sed -i -e "s/^\(FIREWALL=\).*/\1true/" config.sh
   sed -i -e "s/^\(QUERYPROXY=\).*/\1true/" config.sh
   sed -i -e "s/^\(POSTFIX=\).*/\1true/" config.sh
@@ -178,6 +183,8 @@ install_test3() {
   sleep 5
 
   git checkout config.sh
+
+  sed -i -e "s/^\(CERT_REVOKE=\).*/\1true/" config.sh
 
   ${KCOV} ./coverage ./lets-fiware.sh example.com
 }
@@ -288,13 +295,13 @@ error_test() {
   echo -e "#!/bin/sh" >> "${MOCK_DIR}/host"
   chmod +x "${MOCK_DIR}/host"
   FIBB_TEST_HOST_CMD="${MOCK_DIR}/host"
-  rm config.sh
   ${KCOV} ./coverage ./lets-fiware.sh example.com 0.0.0.0
   reset_env
   unset FIBB_TEST_HOST_CMD
 
+  sudo sed -i -e "/example.com/d" /etc/hosts
+
   echo "*** IP address error ***" 1>&2
-  rm config.sh
   ${KCOV} ./coverage ./lets-fiware.sh example.com 0.0.0.0
   reset_env
 
@@ -412,3 +419,5 @@ fibb_down
 install_on_centos
 
 install_test5
+
+remove_example_com_from_hosts

@@ -722,6 +722,10 @@ make_directories() {
 add_etc_hosts() {
   logging_info "${FUNCNAME[0]}"
 
+  if [ "$1" = "0.0.0.0" ]; then
+    return
+  fi
+
   for name in "${APPS[@]}"
   do
     eval val=\"\$"${name}"\"
