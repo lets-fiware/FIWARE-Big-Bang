@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.6.0-next
 
+-   Remove duplicate environment variables (#95)
 -   Improve coverage (#94)
 -   Improve mongodb index (#93)
 -   Fix nginx-orion templeate (#92)
