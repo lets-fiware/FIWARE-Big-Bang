@@ -5,7 +5,6 @@ services:
     depends_on:
     # __CYGNUS_DEPENDS_ON__
     environment:
-      - CYGNUS_MULTIAGENT=true
       - CYGNUS_API_PORT=5080
       # __CYGNUS_ENVIRONMENT__
       - CYGNUS_LOG_LEVEL=${CYGNUS_LOG_LEVEL}
