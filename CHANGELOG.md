@@ -1,8 +1,9 @@
 ## FIWARE Big Bang v0.6.0-next
 
--   Fix Keyrock version (#97)
--   Fix cygnus management interface port (#96)
--   Remove duplicate environment variables (#95)
+-   Update Orion to version 3.3.1 (#99)
+-   Fix Keyrock version (#98)
+-   Fix cygnus management interface port (#97)
+-   Remove duplicate environment variables (#96)
 -   Improve coverage (#94)
 -   Improve mongodb index (#93)
 -   Fix nginx-orion templeate (#92)
