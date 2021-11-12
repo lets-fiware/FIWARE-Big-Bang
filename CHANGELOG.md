@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.6.0-next
 
+-   Fix Keyrock version (#97)
 -   Fix cygnus management interface port (#96)
 -   Remove duplicate environment variables (#95)
 -   Improve coverage (#94)

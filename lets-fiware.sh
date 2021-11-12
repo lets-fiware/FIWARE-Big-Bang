@@ -1319,9 +1319,11 @@ setup_keyrock() {
   echo "${DOMAIN_NAME}" > "${CONFIG_DIR}"/keyrock/whitelist.txt
 
   cp "${CONTRIB_DIR}/keyrock/list_users.js" "${CONFIG_DIR}/keyrock"
+  cp "${CONTRIB_DIR}/keyrock/version.json" "${CONFIG_DIR}/keyrock"
 
   add_to_docker_compose_yml "__KEYROCK_VOLUMES__" "     - ${CONFIG_DIR}/keyrock/whitelist.txt:/opt/fiware-idm/etc/email_list/whitelist.txt"
   add_to_docker_compose_yml "__KEYROCK_VOLUMES__" "     - ${CONFIG_DIR}/keyrock/list_users.js:/opt/fiware-idm/controllers/web/list_users.js"
+  add_to_docker_compose_yml "__KEYROCK_VOLUMES__" "     - ${CONFIG_DIR}/keyrock/version.json:/opt/fiware-idm/version.json"
   add_to_docker_compose_yml "__KEYROCK_ENVIRONMENT__" "     - IDM_EMAIL_LIST=whitelist"
 
   if ${KEYROCK_POSTGRES}; then
