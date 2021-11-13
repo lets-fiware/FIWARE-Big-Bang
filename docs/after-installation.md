@@ -122,6 +122,7 @@ the lets-fiware.sh script.
 | ------------ | ------------------------------------------------------------ |
 | admin        | Print a username and a password for Admin user               |
 | get-token    | Get an OAuth2 access token                                   |
+| collect      | Collect system information                                   |
 | log          | Print log for FIWARE Big Bang (/var/log/fiware/fi-bb.log)    |
 | log-dir      | List files in the log directory (/var/log/fiware)            |
 | logrotation  | Rotate log files                                             |
