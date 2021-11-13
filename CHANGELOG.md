@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.6.0-next
 
+-   Add script to collect system information (#101)
 -   Update documentations (#100)
 -   Update Orion to version 3.3.1 (#99)
 -   Fix Keyrock version (#98)

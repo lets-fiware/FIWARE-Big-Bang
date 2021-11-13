@@ -28,3 +28,5 @@ admin:
 	./config/script/admin.sh
 get-token:
 	./config/script/get_token.sh
+collect:
+	./config/script/collect.sh
