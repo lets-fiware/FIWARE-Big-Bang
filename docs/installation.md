@@ -30,7 +30,7 @@ The recommended Linux distribution is Ubuntu 20.04.
 -   Ubuntu 18.04
 -   CentOS 7, 8
 
-## Supported FIWARE GEs and third party open source software
+## Supported FIWARE GEs and third-party open source software
 
 ### Supported FIWARE GEs
 
@@ -45,7 +45,7 @@ The recommended Linux distribution is Ubuntu 20.04.
 -   IoT Agent for UltraLight (over HTTP and MQTT)
 -   IoT Agent for JSON (over HTTP and MQTT)
 
-### Supported third party open source software
+### Supported third-party open source software
 
 -   Node-RED
 -   Grafana (Experimental support)
@@ -83,7 +83,7 @@ Run the `lets-fiware.sh` script with your own domain name and a public IP addres
 ## Command syntax
 
 The `lets-fiware.sh` command accepts two arguments. The first argument is a domain name. The second one is
-a public IP address. It can be omitted when your virtual machine have a public IP address.
+a public IP address. It can be omitted when your virtual machine has a public IP address.
 
 ```
 ./lets-fiware.sh DOMAIN_NAME [PUBLIC_IP_ADDRESS]
@@ -147,14 +147,14 @@ You can specify configurations by editing the `config.sh` file.
 | IOTAGENT\_HTTP          | Set a sub-domain name to use IoT Agent over HTTP.              | (empty)                   |
 | IOTA\_HTTP\_AUTH        | Authorization for IoT Agent over HTTP. (none, basic or bearer) | bearer                    |
 | IOTA\_HTTP\_BASIC\_USER | User for Basic authorization for IoT Agent over HTTP.          | fiware                    |
-| IOTA\_HTTP\_BASIC\_PASS | Pasword for Basic authorization for IoT Agent over HTTP.       | (Automatically generated) |
+| IOTA\_HTTP\_BASIC\_PASS | Password for Basic authorization for IoT Agent over HTTP.      | (Automatically generated) |
 
 ### IoT Agent for UltraLight
 
 | Variable name               | Description                                                                                   | Default value |
 | --------------------------- | --------------------------------------------------------------------------------------------- | ------------- |
 | IOTAGENT\_UL                | A sub-domain name of IoT Agent for UltraLight 2.0                                             | (empty)       |
-| IOTA\_UL\_DEFAULT\_RESOURCE | The default path the IoT Agent uses listenening for UltraLight measures.                      | /iot/ul       |
+| IOTA\_UL\_DEFAULT\_RESOURCE | The default path the IoT Agent uses listening for UltraLight measures.                        | /iot/ul       |
 | IOTA\_UL\_TIMESTAMP         | Whether to supply timestamp information with each measurement received from attached devices. | true          |
 | IOTA\_UL\_AUTOCAST          | Ensure JSON number values are read as numbers not strings                                     |               |
 
@@ -163,7 +163,7 @@ You can specify configurations by editing the `config.sh` file.
 | Variable name                 | Description                                                                                   | Default value |
 | ----------------------------- | --------------------------------------------------------------------------------------------- | ------------- |
 | IOTAGENT\_JSON                | A sub-domain name of IoT Agent for JSON                                                       | (empty)       |
-| IOTA\_JSON\_DEFAULT\_RESOURCE | The default path the IoT Agent uses listenening for JSON measures.                            | /iot/json     |
+| IOTA\_JSON\_DEFAULT\_RESOURCE | The default path the IoT Agent uses listening for JSON measures.                              | /iot/json     |
 | IOTA\_JSON\_TIMESTAMP         | Whether to supply timestamp information with each measurement received from attached devices. | true          |
 | IOTA\_JSON\_AUTOCAST          | Ensure JSON number values are read as numbers not strings                                     |               |
 
