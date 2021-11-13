@@ -10,6 +10,7 @@
     -   [List devices](#list-devices)
     -   [Send data](#send-data)
     -   [List entities](#list-entities)
+    -   [Examples](#examples)
 -   [IoT Agent for UL over HTTP](#iot-agent-for-ul-over-http-1)
     -   [Create service](#create-service-1)
     -   [List services](#list-services-1)
@@ -17,6 +18,7 @@
     -   [List devices](#list-devices-1)
     -   [Send data](#send-data-1)
     -   [Get entity](#get-entity)
+    -   [Examples](#examples-1)
 -   [Related information](#related-information)
 
 
@@ -58,6 +60,10 @@ The default listener is 8883 port (TLS).
 MQTT_1883=
 MQTT_TLS=
 ```
+
+### Examples
+
+Look at examples [here](https://github.com/lets-fiware/FIWARE-Big-Bang/tree/main/examples/iotagent-ul-mqtt).
 
 ### IoT Agent for UL over HTTP
 
@@ -593,6 +599,10 @@ ngsi get \
   }
 }
 ```
+
+### Examples
+
+Look at examples [here](https://github.com/lets-fiware/FIWARE-Big-Bang/tree/main/examples/iotagent-ul-http).
 
 ## Related information
 

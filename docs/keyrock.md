@@ -4,6 +4,7 @@
 -   [How to setup](#how-to-setup)
 -   [Sanity check for Keyrock](#sanity-check-for-keyrock)
 -   [Access Keyrock GUI](#access-keyrock-gui)
+-   [Examples](#examples)
 -   [Related information](#related-information)
 
 ## Configuration parameters
@@ -58,6 +59,10 @@ curl https://keyrock.example.com/version
 ## Access Keyrock GUI
 
 Open at `https://keyrock.example.com` to access the Keyrock GUI.
+
+## Examples
+
+Look at examples [here](https://github.com/lets-fiware/FIWARE-Big-Bang/tree/main/examples/keyrock).
 
 ## Related information
 

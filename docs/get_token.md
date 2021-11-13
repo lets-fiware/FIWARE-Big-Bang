@@ -4,6 +4,7 @@
 -   [Get an access token from Tokenproxy](#get-an-access-token-from-tokenproxy)
 -   [Get an access token from Keyrock](#get-an-access-token-from-keyrock)
 -   [Get an access token with NGSI Go](#get-an-access-token-with-ngsi-go)
+-   [Examples](#examples)
 -   [Related information](#related-information)
 
 ## Prerequisite
@@ -240,6 +241,9 @@ ngsi token --host orion.example.com --verbose
   "token_type": "bearer"
 }
 ```
+## Examples
+
+Look at examples [here](https://github.com/lets-fiware/FIWARE-Big-Bang/tree/main/examples/get-token).
 
 ## Related information
 

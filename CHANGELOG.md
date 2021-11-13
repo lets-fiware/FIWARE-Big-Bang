@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.6.0-next
 
+-   Add link to example (#103)
 -   Add documentations about NGSI Go (#102)
 -   Add script to collect system information (#101)
 -   Update documentations (#100)
