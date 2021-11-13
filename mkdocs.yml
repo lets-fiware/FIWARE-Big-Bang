@@ -4,6 +4,15 @@ site_description: FIWARE Big Bang (Let's FIWARE)
 nav:
   - 'Home':
     - 'Index': index.md
-    - 'installation': installation.md
-    - 'Cygnus': cygnus.md
-    - 'Node-RED': node-red.md
+    - 'Installation': installation.md
+      - 'Keyrock': keyrock.md
+      - 'Orion': orion.md
+      - 'Cygnus': cygnus.md
+      - 'Comet': comet.md
+      - 'Quantumleap': quantumleap.md
+      - 'IoT Agent for UL': iotagent-ul.md
+      - 'IoT Agent for JSON': iotagent-json.md
+      - 'WireCloud': wirecloud.md
+      - 'Node-RED': node-red.md
+    - 'After installation': after-installation.md
+    - 'Get token': get_token.md
