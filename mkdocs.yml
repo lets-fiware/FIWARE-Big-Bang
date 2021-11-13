@@ -15,4 +15,5 @@ nav:
       - 'WireCloud': wirecloud.md
       - 'Node-RED': node-red.md
     - 'After installation': after-installation.md
+    - 'NGSI Go': ngsi-go.md
     - 'Get token': get_token.md
