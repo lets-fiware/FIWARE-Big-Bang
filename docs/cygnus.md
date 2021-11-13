@@ -7,6 +7,7 @@
 -   [Persisting Context Data into MySQL](#persisting-context-data-into-mysql)
 -   [Persisting Context Data into PostgreSQL](#persisting-context-data-into-postgresql)
 -   [Persisting Context Data into Elasticsearch](#persisting-context-data-into-elasticsearch)
+-   [Examples](#examples)
 -   [Related information](#related-information)
 
 ## Configuration parameters
@@ -660,6 +661,10 @@ curl -sXGET "https://elasticsearch.example.com/_sql?format=json" \
   ]
 }
 ```
+
+## Examples
+
+Look at examples [here](https://github.com/fisuda/FIWARE-Big-Bang/tree/update/documentaion/examples/cygnus).
 
 ## Related information
 

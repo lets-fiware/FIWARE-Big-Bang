@@ -6,6 +6,7 @@
 -   [Access Node-RED API](#access-node-red-api)
 -   [How to use NGSI node](#how-to-use-ngsi-node)
 -   [Configration for Context-Broker node](#configration-for-context-broker-node)
+-   [Examples](#examples)
 -   [Related information](#related-information)
 
 ## Configuration parameters
@@ -205,6 +206,10 @@ ngsi get \
 ### Inject payload
 
 ![](./images/node-red-004.png)
+
+## Examples
+
+Look at examples [here](https://github.com/lets-fiware/FIWARE-Big-Bang/tree/main/examples/node-red).
 
 ## Related information
 

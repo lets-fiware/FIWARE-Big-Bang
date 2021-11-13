@@ -9,6 +9,7 @@
     -   [List subscriptions](#list-subscriptions)
     -   [Raw data consumption](#raw-data-consumption)
     -   [Aggregated data consumption by aggregation method and resolution](#aggregated-data-consumption-by-aggregation-method-and-resolution)
+    -   [Examples](#examples)
 -   [Formal mode (Cygnus + STH-Comet)](#formal-mode-cygnus--sth-comet)
     -   [How to setup](#how-to-setup-1)
     -   [Sanity check for Cygnus and comet](#sanity-check-for-cygnus-and-comet)
@@ -17,6 +18,7 @@
     -   [List subscriptions](#list-subscriptions-1)
     -   [Raw data consumption](#raw-data-consumption-1)
     -   [Aggregated data consumption by aggregation method and resolution](#aggregated-data-consumption-by-aggregation-method-and-resolution-1)
+    -   [Examples](#examples-1)
 -   [Related information](#related-information)
 
 ## Configuration parameters
@@ -234,6 +236,10 @@ ngsi hget \
   ]
 }
 ```
+
+### Examples
+
+Look at examples [here](https://github.com/lets-fiware/FIWARE-Big-Bang/tree/main/examples/comet).
 
 ## Formal mode (Cygnus + STH-Comet)
 
@@ -458,6 +464,10 @@ ngsi hget \
   ]
 }
 ```
+
+### Examples
+
+Look at examples [here](https://github.com/lets-fiware/FIWARE-Big-Bang/tree/main/examples/comet-cygnus).
 
 ## Related information
 

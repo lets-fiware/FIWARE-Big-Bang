@@ -4,6 +4,7 @@
 -   [How to setup](#how-to-setup)
 -   [Get version](#get-version)
 -   [Sanity check for Orion](#sanity-check-for-orion)
+-   [Examples](#examples)
 -   [Related information](#related-information)
 
 ## Configuration parameters
@@ -60,6 +61,10 @@ ngsi version --host orion.example.com
 }
 }
 ```
+
+## Examples
+
+Look at examples [here](https://github.com/lets-fiware/FIWARE-Big-Bang/tree/main/examples/orion).
 
 ## Related information
 
