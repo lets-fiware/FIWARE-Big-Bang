@@ -1,18 +1,32 @@
 # Cygnus
 
+-   [Configuration parameters](#configuration-parameters)
 -   [How to setup](#how-to-setup)
 -   [Sanity check for Cygnus](#sanity-check-for-cygnus)
--   [Persisting Context Data into MongoDB](persisting-context-data-into-mongodb)
+-   [Persisting Context Data into MongoDB](#persisting-context-data-into-mongodb)
 -   [Persisting Context Data into MySQL](#persisting-context-data-into-mysql)
 -   [Persisting Context Data into PostgreSQL](#persisting-context-data-into-postgresql)
 -   [Persisting Context Data into Elasticsearch](#persisting-context-data-into-elasticsearch)
 -   [Related information](#related-information)
 
+## Configuration parameters
+
+You can specify configurations by editing the `config.sh` file.
+
+| Variable name         | Description                                      | Default value |
+| --------------------- | ------------------------------------------------ | ------------- |
+| CYGNUS                | A sub-domain name of Cygnus                      | (empty)       |
+| ELASTICSEARCH         | A sub-domain name of Elasticsearch               | (empty)       |
+| CYGNUS\_MONGO         | Use MongoDB sink for Cygnus. true or false       | false         |
+| CYGNUS\_MYSQL         | Use MySQL sink for Cygnus. true or false         | false         |
+| CYGNUS\_POSTGRES      | Use PostgreSQL sink for Cygnus. true or false    | false         |
+| CYGNUS\_ELASTICSEARCH | Use Elasticsearch sink for Cygnus. true or false | false         |
+
 ## How to setup
 
 To set up Cygnus, configure some environment variables in config.sh.
 
-First, Set a sub-domain name for Cygnus to `CYGNUS=` as shown:
+First, set a sub-domain name for Cygnus to `CYGNUS=` as shown:
 
 ```bash
 CYGNUS=cygnus
