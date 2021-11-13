@@ -1,4 +1,4 @@
-## FIWARE Big Bang v0.6.0-next
+## FIWARE Big Bang v0.7.0 - 13 Nov, 2021
 
 -   Add link to example (#103)
 -   Add documentations about NGSI Go (#102)

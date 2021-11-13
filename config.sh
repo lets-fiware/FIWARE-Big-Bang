@@ -164,9 +164,9 @@ IMAGE_MYSQL=mysql:5.7
 IMAGE_POSTGRES=postgres:11
 IMAGE_CRATE=crate:4.1.4
 
-IMAGE_TOKENPROXY=letsfiware/tokenproxy:0.6.0-next
-IMAGE_QUERYPROXY=letsfiware/queryproxy:0.6.0-next
-IMAGE_REGPROXY=letsfiware/regproxy:0.6.0-next
+IMAGE_TOKENPROXY=letsfiware/tokenproxy:0.7.0
+IMAGE_QUERYPROXY=letsfiware/queryproxy:0.7.0
+IMAGE_REGPROXY=letsfiware/regproxy:0.7.0
 
 IMAGE_NGINX=nginx:1.21
 IMAGE_REDIS=redis:6
@@ -175,8 +175,8 @@ IMAGE_ELASTICSEARCH_DB=elasticsearch:7.6.2
 IMAGE_MEMCACHED=memcached:1
 IMAGE_GRAFANA=grafana/grafana:6.1.6
 IMAGE_MOSQUITTO=eclipse-mosquitto:1.6
-IMAGE_NODE_RED=letsfiware/node-red:0.6.0-next
-IMAGE_POSTFIX=letsfiware/postfix:0.6.0-next
+IMAGE_NODE_RED=letsfiware/node-red:0.7.0
+IMAGE_POSTFIX=letsfiware/postfix:0.7.0
 
 IMAGE_CERTBOT=certbot/certbot:v1.18.0
 
