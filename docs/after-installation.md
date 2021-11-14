@@ -15,7 +15,7 @@ Please see the .env file for details.
 
 It has a URL, a username and a password for Keyrock.
 
-## Sanify check
+## Sanity check
 
 You can check if the FIWARE instance is healthy by running some commands.
 
@@ -102,7 +102,7 @@ The following files and directories will be created.
 | .                             | A root directory of FI-BB. It's a directory in which you ran lets-fiware.sh command.    |
 | ./docker-compose.yml          | A config file for docker-compose which has the configuration information of FIWARE GEs. |
 | ./.env                        | A file which has environment variables for docker-compose.yml file.                     |
-| ./Mailefile                   | A file for make command.                                                                |
+| ./Makefile                    | A file for make command.                                                                |
 | ./config                      | A directory which has configuration files for running Docker containers.                |
 | ./data                        | A directory which has persistent data for running Docker containers.                    |
 | /etc/letsencrypt              | A directory which has server certificate files.                                         |
@@ -111,9 +111,9 @@ The following files and directories will be created.
 | /etc/logrotate.d/fiware       | A config file for logroate.                                                             |
 | /etc/cron.d/fiware-big-bang   | A config file for cron                                                                  |
 
-## System management
+## System administration
 
-### Make command for system management
+### Make command for system administration
 
 You can manage your FIWARE instance with make command.  Run the make command in a directory you ran
 the lets-fiware.sh script.
