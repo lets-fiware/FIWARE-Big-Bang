@@ -10,6 +10,7 @@ assignees: ''
 **Checklist**
 [ ] I have run the latest release.
 [ ] I have inspeced the status of docker containers.
+[ ] I have run the sanity check described in after-installation.md.
 [ ] I have inspected all error messages.
 [ ] I have inspected the log files in the /var/log/fiware directory.
 [ ] I have run the `make collect` command. 
@@ -18,8 +19,8 @@ assignees: ''
 A clear and concise description of what the bug is.
 You need to show why you think this issue is a bug.
 
-**Your sytem information**
-Run `make collect` in the directory where you ran the lets-fiware.sh script and paste the results.
+**Your system environment**
+Run `make collect` in a directory where you ran the lets-fiware.sh script and paste the results here.
 
 **To Reproduce**
 Steps to reproduce the behavior:
@@ -30,13 +31,10 @@ A clear and concise description of what you expected to happen.
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
 
-**Server  (please complete the following information):**
-- OS:
-
-**Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
+**Server (please complete the following information):**
+- OS and OS version:
+- Docker version:
+- Dokcer-compose version:
 
 **Additional context**
 Add any other context about the problem here.

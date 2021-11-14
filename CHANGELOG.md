@@ -1,5 +1,7 @@
 ## FIWARE Big Bang v0.7.0-next
 
+-   Update issue templates (#106)
+
 ## FIWARE Big Bang v0.7.0 - 13 Nov, 2021
 
 -   Add link to example (#103)
