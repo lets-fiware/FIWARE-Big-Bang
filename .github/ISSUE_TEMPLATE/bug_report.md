@@ -8,12 +8,14 @@ assignees: ''
 ---
 
 **Checklist**
-[ ] I have run the latest release.
-[ ] I have inspeced the status of docker containers.
-[ ] I have run the sanity check described in after-installation.md.
-[ ] I have inspected all error messages.
-[ ] I have inspected the log files in the /var/log/fiware directory.
-[ ] I have run the `make collect` command. 
+_Put an `x` in the boxes that apply_
+
+-   [ ] I have run the latest release.
+-   [ ] I have inspeced the status of docker containers.
+-   [ ] I have run the sanity check described in after-installation.md.
+-   [ ] I have inspected all error messages.
+-   [ ] I have inspected the log files in the /var/log/fiware directory.
+-   [ ] I have run the `make collect` command.
 
 **Describe the bug**
 A clear and concise description of what the bug is.
