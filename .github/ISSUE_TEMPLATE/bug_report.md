@@ -36,7 +36,7 @@ If applicable, add screenshots to help explain your problem.
 **Server (please complete the following information):**
 - OS and OS version:
 - Docker version:
-- Dokcer-compose version:
+- Docker-compose version:
 
 **Additional context**
 Add any other context about the problem here.
