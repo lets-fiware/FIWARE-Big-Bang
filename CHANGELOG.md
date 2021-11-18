@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.7.0-next
 
+-   Update documentaion (#111)
 -   Add feature to support perseo (#110)
 -   Improve coverage (#109)
 -   Fix internal error when editing user information (#108)
