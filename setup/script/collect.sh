@@ -58,7 +58,7 @@ echo -n "Hash: "
 
 check_cmd shasum
 if "$FOUND"; then
-  cat lets-fiware.sh | shasum -a 256
+  shasum -a 256 lets-fiware.sh
 fi
 
 check_cmd git
