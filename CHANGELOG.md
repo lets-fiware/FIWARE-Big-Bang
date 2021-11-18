@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.7.0-next
 
+-   Improve coverage (#109)
 -   Fix internal error when editing user information (#108)
 -   Update documentaion (#107)
 -   Update issue templates (#106)

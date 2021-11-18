@@ -1735,7 +1735,8 @@ install_widgets_for_wirecloud() {
 
   mkdir -p "${WORK_DIR}/widgets/"
 
-  while read -r line
+  # shellcheck disable=SC2002
+  cat "${SETUP_DIR}/widgets_list.txt" | while read -r line
   do
     name="$(basename "${line}")"
     logging_info "Installing ${name}"
@@ -1746,7 +1747,7 @@ install_widgets_for_wirecloud() {
     set +e
     ${NGSI_GO} macs --host "${WIRECLOUD}" install --file "${fullpath}" --overwrite
     set -e
-  done < "${SETUP_DIR}/widgets_list.txt"
+  done
 
   cat <<EOF > "${WORK_DIR}/patch.sql"
 UPDATE catalogue_catalogueresource SET public = true;
