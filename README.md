@@ -27,21 +27,6 @@ The FIWARE Big Bang is a turnkey solution for setting up a FIWARE instance in th
 The FIWARE Big Bang allows you to install FIWARE Generic enablers easily into your virtual machine in the cloud.
 FI-BB stands for FIWARE Big Bang.
 
-## Requirements
-
--   A virtual machine with a public IP address (global IP address) or a virtual machine that can be accessed
-    from the Internet via a network equipment
--   An own domain name
--   Ports exposed on the internet
-    -   443 (HTTPS)
-    -   80 (HTTP)
-    -   1883 when enabling MQTT
-    -   8883 when enabling MQTT TLS
--   Supported Linux distribution
-    -   Ubuntu 20.04 (Recommended Linux distribution)
-    -   Ubuntu 18.04
-    -   CentOS 7, 8
-
 ## Supported FIWARE GEs and third-party open source software
 
 ### Supported FIWARE GEs
@@ -56,6 +41,7 @@ FI-BB stands for FIWARE Big Bang.
 -   Ngsiproxy
 -   IoT Agent for UltraLight (over HTTP and MQTT)
 -   IoT Agent for JSON (over HTTP and MQTT)
+-   Perseo
 
 ### Supported third-party open source software
 
@@ -63,6 +49,21 @@ FI-BB stands for FIWARE Big Bang.
 -   Grafana
 -   Mosquitto
 -   Elasticsearch (as a database for persitenting context data)
+
+## Requirements
+
+-   A virtual machine with a public IP address (global IP address) or a virtual machine that can be accessed
+    from the Internet via a network equipment
+-   An own domain name
+-   Ports exposed on the internet
+    -   443 (HTTPS)
+    -   80 (HTTP)
+    -   1883 when enabling MQTT
+    -   8883 when enabling MQTT TLS
+-   Supported Linux distribution
+    -   Ubuntu 20.04 (Recommended Linux distribution)
+    -   Ubuntu 18.04
+    -   CentOS 7, 8
 
 ## Prerequisite
 

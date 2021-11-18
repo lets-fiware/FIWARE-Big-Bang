@@ -1,0 +1,52 @@
+server {
+  listen 80;
+  server_name HOST;
+
+  location / {
+      return 301 https://$host$request_uri;
+  }
+
+  location ^~ /.well-known/acme-challenge/ {
+    default_type "text/plain";
+    root         /var/www/html/HOST;
+  }
+
+  access_log /var/log/nginx/HOST-access-http.log;
+  error_log /var/log/nginx/HOST-error-http.log;
+}
+
+server {
+  listen 443 http2 ssl;
+  server_name HOST;
+
+  ssl_certificate /etc/letsencrypt/live/HOST/SSL_CERTIFICATE;
+  ssl_certificate_key /etc/letsencrypt/live/HOST/SSL_CERTIFICATE_KEY;
+
+  proxy_set_header        Accept-Encoding   "";
+  proxy_set_header        Host            $host;
+  proxy_set_header        X-Real-IP       $remote_addr;
+  proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
+  proxy_set_header        X-Forwarded-Proto $scheme;
+  add_header              Front-End-Https   on;
+  add_header              Strict-Transport-Security 'max-age=15768000; includeSubdomains; always';
+
+  location / {
+    set $req_uri "$uri";
+    auth_request /_check_oauth2_token;
+
+    proxy_pass http://perseo-fe:9090;
+  }
+
+  location = /_check_oauth2_token {
+    internal;
+    proxy_method $request_method;
+    proxy_pass_request_headers on;
+    proxy_set_header Content-Length "";
+    proxy_pass_request_body off;
+    rewrite (.*) $req_uri break;
+    proxy_pass http://wilma:1026;
+  }
+
+  access_log /var/log/nginx/HOST-access.log;
+  error_log /var/log/nginx/HOST-error.log;
+}

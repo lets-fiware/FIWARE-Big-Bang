@@ -185,6 +185,10 @@ install_test3() {
   git checkout config.sh
 
   sed -i -e "s/^\(CERT_REVOKE=\).*/\1true/" config.sh
+  sed -i -e "s/^\(PERSEO=\).*/\1perseo/" config.sh
+  sed -i -e "s/^\(PERSEO_SMTP_HOST=\).*/\1www.hostname.com/" config.sh
+  sed -i -e "s/^\(PERSEO_SMTP_PORT=\).*/\125/" config.sh
+  sed -i -e "s/^\(PERSEO_SMTP_SECURE=\).*/\1false/" config.sh
 
   ${KCOV} ./coverage ./lets-fiware.sh example.com
 }

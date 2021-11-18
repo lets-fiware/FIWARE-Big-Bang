@@ -321,6 +321,8 @@ IMAGE_NGSIPROXY=${IMAGE_NGSIPROXY}
 IMAGE_QUANTUMLEAP=${IMAGE_QUANTUMLEAP}
 IMAGE_IOTAGENT_UL=${IMAGE_IOTAGENT_UL}
 IMAGE_IOTAGENT_JSON=${IMAGE_IOTAGENT_JSON}
+IMAGE_PERSEO_CORE=${IMAGE_PERSEO_CORE}
+IMAGE_PERSEO_FE=${IMAGE_PERSEO_FE}
 
 IMAGE_TOKENPROXY=${IMAGE_TOKENPROXY}
 IMAGE_QUERYPROXY=${IMAGE_QUERYPROXY}
@@ -671,7 +673,7 @@ setup_init() {
 
   DOCKER_COMPOSE_YML=./docker-compose.yml
 
-  readonly APPS=(KEYROCK ORION CYGNUS COMET WIRECLOUD NGSIPROXY NODE_RED GRAFANA QUANTUMLEAP IOTAGENT_UL IOTAGENT_JSON IOTAGENT_HTTP MOSQUITTO ELASTICSEARCH)
+  readonly APPS=(KEYROCK ORION CYGNUS COMET WIRECLOUD NGSIPROXY NODE_RED GRAFANA QUANTUMLEAP PERSEO IOTAGENT_UL IOTAGENT_JSON IOTAGENT_HTTP MOSQUITTO ELASTICSEARCH)
 
   val=
 
@@ -1540,6 +1542,8 @@ setup_cygnus() {
     return
   fi
 
+  logging_info "${FUNCNAME[0]}"
+
   add_docker_compose_yml "docker-cygnus.yml"
 
   sink=0
@@ -1643,7 +1647,59 @@ setup_quantumleap() {
 }
 
 #
+# Perseo
 #
+setup_perseo() {
+  if [ -z "${PERSEO}" ]; then
+    return
+  fi
+
+  logging_info "${FUNCNAME[0]}"
+
+  add_docker_compose_yml "docker-perseo.yml"
+
+  create_nginx_conf "${PERSEO}" "nginx-perseo"
+
+  add_nginx_depends_on "perseo-fe"
+
+  add_rsyslog_conf "perseo-fe" "perseo-core"
+
+  PERSEO_ORION_URL="http://orion:1026/"
+
+  if [ -z "${PERSEO_MAX_AGE}" ]; then
+    PERSEO_MAX_AGE=6000
+  fi
+
+  if [ -z "${PERSEO_LOG_LEVEL}" ]; then
+    PERSEO_LOG_LEVEL=info
+  fi
+
+  cat <<EOF >> .env
+
+# Perseo
+PERSEO_MAX_AGE=${PERSEO_MAX_AGE}
+PERSEO_LOG_LEVEL=${PERSEO_LOG_LEVEL}
+PERSEO_ORION_URL=${PERSEO_ORION_URL}
+EOF
+
+  if [ -n "${PERSEO_SMTP_HOST}" ]; then
+    sed -i -e "/__PERSEO_FE_ENVIRONMENT__/i \      - PERSEO_SMTP_HOST=\${PERSEO_SMTP_HOST}" "${DOCKER_COMPOSE_YML}"
+    echo "PERSEO_SMTP_HOST=${PERSEO_SMTP_HOST}" >> .env
+  fi
+
+  if [ -n "${PERSEO_SMTP_PORT}" ]; then
+    sed -i -e "/__PERSEO_FE_ENVIRONMENT__/i \      - PERSEO_SMTP_PORT=\${PERSEO_SMTP_PORT}" "${DOCKER_COMPOSE_YML}"
+    echo "PERSEO_SMTP_PORT=${PERSEO_SMTP_PORT}" >> .env
+  fi
+
+  if [ -n "${PERSEO_SMTP_SECURE}" ]; then
+    sed -i -e "/__PERSEO_FE_ENVIRONMENT__/i \      - PERSEO_SMTP_SECURE=\${PERSEO_SMTP_SECURE}" "${DOCKER_COMPOSE_YML}"
+    echo "PERSEO_SMTP_SECURE=${PERSEO_SMTP_SECURE}" >> .env
+  fi
+}
+
+#
+# Login and logoff for WireCloud
 #
 login_and_logoff_wirecloud() {
   logging_info "${FUNCNAME[0]}"
@@ -2350,6 +2406,7 @@ setup_ngsi_go() {
           "IOTAGENT_JSON" ) ${NGSI_GO} server add --host "${VAL}" --serverType iota --serverHost "https://${VAL}" --idmType tokenproxy --idmHost "https://${KEYROCK}/token" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" --service openiot --path /;;
           "WIRECLOUD" ) ${NGSI_GO} server add --host "${VAL}" --serverType wirecloud --serverHost "https://${VAL}" --idmType keyrock --idmHost "https://${KEYROCK}/oauth2/token" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" --clientId "${WIRECLOUD_CLIENT_ID}" --clientSecret "${WIRECLOUD_CLIENT_SECRET}";;
           "QUANTUMLEAP" ) ${NGSI_GO} server add --host "${VAL}" --serverType quantumleap --serverHost "https://${VAL}" --idmType tokenproxy --idmHost "https://${KEYROCK}/token" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" ;;
+          "PERSEO" ) ${NGSI_GO} server add --host "${VAL}" --serverType perseo --serverHost "https://${VAL}" --idmType tokenproxy --idmHost "https://${KEYROCK}/token" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" ;;
       esac
     fi
   done
@@ -2414,6 +2471,7 @@ setup_end() {
   delete_from_docker_compose_yml "__ORION_"
   delete_from_docker_compose_yml "__CYGNUS_"
   delete_from_docker_compose_yml "__COMET_"
+  delete_from_docker_compose_yml "__PERSEO_"
   delete_from_docker_compose_yml "__POSTFIX_"
 
   if [ -n "${KEYROCK}" ]; then
@@ -2486,6 +2544,7 @@ setup_main() {
   setup_wirecloud
   setup_iotagent_ul
   setup_iotagent_json
+  setup_perseo
   setup_node_red
   setup_grafana
   setup_postfix

@@ -12,6 +12,7 @@ nav:
       - 'Quantumleap': quantumleap.md
       - 'IoT Agent for UL': iotagent-ul.md
       - 'IoT Agent for JSON': iotagent-json.md
+      - 'Perseo': perseo.md
       - 'WireCloud': wirecloud.md
       - 'Node-RED': node-red.md
     - 'After installation': after-installation.md
