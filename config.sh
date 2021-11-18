@@ -102,6 +102,30 @@ NODE_RED_INSTANCE_HTTP_ADMIN_ROOT=
 POSTFIX=
 
 #
+# Perseo
+#
+PERSEO=
+
+# Perseo Max age (default: 6000)
+PERSEO_MAX_AGE=
+
+# Perseo SMTP host
+PERSEO_SMTP_HOST=
+
+# Perseo SMTP port
+PERSEO_SMTP_PORT=
+
+# Perseo SMTP secure
+PERSEO_SMTP_SECURE=
+
+# Perseo LOG LEVEL
+PERSEO_LOG_LEVEL=
+
+# Perseo docker images
+IMAGE_PERSEO_CORE=telefonicaiot/perseo-core:1.8.0
+IMAGE_PERSEO_FE=telefonicaiot/perseo-fe:1.20.0
+
+#
 # Regproxy options
 #
 # Use regproxy. (true or false) Default: false

@@ -1,26 +1,5 @@
 # Installation
 
-## Requirements
-
-### Virtual machine
-
-A virtual machine with a public IP address (global IP address) or a virtual machine that can be accessed
-from the Internet via a network equipment
-
-### Domain name
-
-An own domain name is needed to access Web Applications and APIs with a domain name.
-You can access each Web Application or API with a sub-domain name.
-
-### Ports exposed on the internet
-
-The Web Applications and APIs installed by FIWARE Big Bang uses some ports.
-
--   Port 443 (HTTPS) is used by Web Applications and APIs
--   Port 80 (HTTP) is used to get Let's encrypt Server certificates
--   Port 1883 is used by Mosquitto when enabling MQTT
--   Port 8883 is used by Mosquitto when enabling MQTT TLS
-
 ### Supported Linux distribution
 
 The FIWARE Big Bang supports CentOS and Ubuntu as Linux distribution.
@@ -44,6 +23,7 @@ The recommended Linux distribution is Ubuntu 20.04.
 -   Ngsiproxy
 -   IoT Agent for UltraLight (over HTTP and MQTT)
 -   IoT Agent for JSON (over HTTP and MQTT)
+-   Perseo
 
 ### Supported third-party open source software
 
@@ -51,6 +31,27 @@ The recommended Linux distribution is Ubuntu 20.04.
 -   Grafana (Experimental support)
 -   Mosquitto
 -   Elasticsearch (as a database for persitenting context data)
+
+## Requirements
+
+### Virtual machine
+
+A virtual machine with a public IP address (global IP address) or a virtual machine that can be accessed
+from the Internet via a network equipment
+
+### Domain name
+
+An own domain name is needed to access Web Applications and APIs with a domain name.
+You can access each Web Application or API with a sub-domain name.
+
+### Ports exposed on the internet
+
+The Web Applications and APIs installed by FIWARE Big Bang uses some ports.
+
+-   Port 443 (HTTPS) is used by Web Applications and APIs
+-   Port 80 (HTTP) is used to get Let's encrypt Server certificates
+-   Port 1883 is used by Mosquitto when enabling MQTT
+-   Port 8883 is used by Mosquitto when enabling MQTT TLS
 
 ## Prerequisite
 
@@ -166,6 +167,17 @@ You can specify configurations by editing the `config.sh` file.
 | IOTA\_JSON\_DEFAULT\_RESOURCE | The default path the IoT Agent uses listening for JSON measures.                              | /iot/json     |
 | IOTA\_JSON\_TIMESTAMP         | Whether to supply timestamp information with each measurement received from attached devices. | true          |
 | IOTA\_JSON\_AUTOCAST          | Ensure JSON number values are read as numbers not strings                                     |               |
+
+### Perseo
+
+| Variable name        | Description                                                      | Default value |
+| -------------------- | ---------------------------------------------------------------- | ------------- |
+| PERSEO               | A sub-domain name of Perseo                                      | (empty)       |
+| PERSEO\_MAX\_AGE     | The expiration time for dangling rules in milliseconds.          | 6000          |
+| PERSEO\_SMTP\_HOST   | Host of the SMTP server for Perseo.                              | (empty)       |
+| PERSEO\_SMTP\_PORT   | Port of the SMTP server for Perseo.                              | (empty)       |
+| PERSEO\_SMTP\_SECURE | true if SSL should be used with the SMTP server. (true or false) | (empty)       |
+| PERSEO\_LOG\_LEVEL   | Log level for Perseo.                                            | info          |
 
 ### WireCloud
 

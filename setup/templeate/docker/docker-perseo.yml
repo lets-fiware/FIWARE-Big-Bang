@@ -1,0 +1,30 @@
+version: "3"
+services:
+  perseo-core:
+    image: ${IMAGE_PERSEO_CORE}
+    environment:
+      - PERSEO_FE_URL=http://perseo-fe:9090
+      - MAX_AGE=${PERSEO_MAX_AGE}
+    depends_on:
+      - mongo
+    restart: always
+    logging:
+      driver: syslog
+      options:
+        tag: "[perseo-core]"
+
+  perseo-fe:
+    image: ${IMAGE_PERSEO_FE}
+    depends_on:
+      - perseo-core
+    environment:
+      - PERSEO_MONGO_ENDPOINT=mongo
+      - PERSEO_CORE_URL=http://perseo-core:8080
+      - PERSEO_LOG_LEVEL=${PERSEO_LOG_LEVEL}
+      - PERSEO_ORION_URL=${PERSEO_ORION_URL}
+      # __PERSEO_FE_ENVIRONMENT__
+    restart: always
+    logging:
+      driver: syslog
+      options:
+        tag: "[perseo-fe]"
