@@ -1,9 +1,7 @@
 # Comet
 
--   [Configuration parameters](#configuration-parameters)
 -   [Minimal mode (STH-Comet ONLY)](#minimal-mode-sth-comet-only)
-    -   [How to setup](#how-to-setup)
-    -   [Sanity check for Cygnus](#sanity-check-for-cygnus)
+    -   [Sanity check for Comet](#sanity-check-for-comet)
     -   [Subscribing to Context Changes](subscribing-to-context-changes)
     -   [Create context data](#create-context-data)
     -   [List subscriptions](#list-subscriptions)
@@ -11,7 +9,6 @@
     -   [Aggregated data consumption by aggregation method and resolution](#aggregated-data-consumption-by-aggregation-method-and-resolution)
     -   [Examples](#examples)
 -   [Formal mode (Cygnus + STH-Comet)](#formal-mode-cygnus--sth-comet)
-    -   [How to setup](#how-to-setup-1)
     -   [Sanity check for Cygnus and comet](#sanity-check-for-cygnus-and-comet)
     -   [Subscribing to Context Changes](#subscribing-to-context-changes-1)
     -   [Create context data](#create-context-data-1)
@@ -21,29 +18,11 @@
     -   [Examples](#examples-1)
 -   [Related information](#related-information)
 
-## Configuration parameters
-
-You can specify configurations by editing the `config.sh` file.
-
-| Variable name | Description                 | Default value |
-| ------------- | --------------------------- | ------------- |
-| COMET         | A sub-domain name of Comet  | (empty)       |
-| CYGNUS        | A sub-domain name of Cygnus | (empty)       |
-
 ## Minimal mode (STH-Comet ONLY)
 
 Persist Time Series Context Data into MongoDB through Comet.
 
-### How to setup
-
-To set up Comet with minimal mode (STH-Comet ONLY), configure an environment variable in config.sh. Set a sub-domain name
-for Comet to `COMET` as shown:
-
-```bash
-COMET=comet
-```
-
-### Sanity check for Cygnus
+### Sanity check for Comet
 
 Once Comet is running, you can check the status by the following command:
 
@@ -244,16 +223,6 @@ Look at examples [here](https://github.com/lets-fiware/FIWARE-Big-Bang/tree/main
 ## Formal mode (Cygnus + STH-Comet)
 
 Persist Time Series Context Data into MongoDB through Cygnus.
-
-### How to setup
-
-To set up Comet with formal mode (Cygnus + STH-Comet), configure an environment variable in config.sh. Set a sub-domain name
-for Comet and Cygnus to `COMET` and `CYGNUS` as shown:
-
-```bash
-COMET=comet
-CYGNUS=cygnus
-```
 
 ### Sanity check for Cygnus and comet
 

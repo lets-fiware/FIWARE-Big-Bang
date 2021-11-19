@@ -2,6 +2,7 @@ version: "3"
 services:
   elasticsearch-db:
     image: ${IMAGE_ELASTICSEARCH_DB}
+    # __ELASTICSEARCH_PORTS__
     volumes:
       - ./data/elasticsearch-db:/usr/share/elasticsearch/data
     environment:

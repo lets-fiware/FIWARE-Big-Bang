@@ -28,23 +28,35 @@
 
 set -ue
 
-: "${CLIENT_ID:?CLIENT_ID not found}"
-: "${CLIENT_SECRET:?CLIENT_SECRET not found}"
+cd "$(dirname "$0")"
+cd ../..
 
-LOG_LEVEL="${LOG_LEVEL:-info}"
-HOST="${HOST:-http://keyrock:3000}"
-VERBOSE="${VERBOSE:-false}"
-
-if ${VERBOSE}; then
-  VERBOSE=--verbose
-else
-  VERBOSE=""
+if [ ! -e .env ]; then
+  echo ".env file not fuond"
+  exit 1
 fi
 
-echo "HOST=${HOST}"
-echo "LOG_LEVEL=${LOG_LEVEL}"
-echo "VERBOSE=${VERBOSE}"
+. ./.env
 
-NGSI_GO="/usr/local/bin/ngsi --stderr ${LOG_LEVEL} --config ./ngsi-go-config.json --cache ./ngsi-go-token-cache.json"
+if ${MULTI_SERVER}; then
+  echo "This command shoud be run on a base VM."
+  exit 1
+fi
 
-${NGSI_GO} tokenproxy server --idmHost "${HOST}" --clientId "${CLIENT_ID}" --clientSecret "${CLIENT_SECRET}" "${VERBOSE}"
+echo "MULTI_SERVER_KEYROCK=https://${KEYROCK}"
+echo "MULTI_SERVER_ADMIN_EMAIL=${IDM_ADMIN_EMAIL}"
+printf 'MULTI_SERVER_ADMIN_PASS=%s\n' "${IDM_ADMIN_PASS}"
+
+echo "MULTI_SERVER_PEP_PROXY_USERNAME=${PEP_PROXY_USERNAME}"
+printf 'MULTI_SERVER_PEP_PASSWORD=%s\n' "${PEP_PASSWORD}"
+
+echo "MULTI_SERVER_CLIENT_ID=${TOKENPROXY_CLIENT_ID}"
+echo "MULTI_SERVER_CLIENT_SECRET=${TOKENPROXY_CLIENT_SECRET}"
+
+if [ -n "${ORION}" ]; then
+  printf '\nMULTI_SERVER_ORION_URL=https://%s/' "${ORION}"
+fi
+
+if [ -n "${QUANTUMLEAP}" ]; then
+  printf '\nMULTI_SERVER_QUANTUMLEAP_URL=https://%s/' "${QUANTUMLEAP}"
+fi

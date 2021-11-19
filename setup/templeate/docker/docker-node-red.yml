@@ -2,8 +2,7 @@ version: "3"
 services:
   node-red:
     image: ${IMAGE_NODE_RED}
-    depends_on:
-      - keyrock
+    # __NODE_RED_DEPENDS_ON__
     volumes:
       - ./data/node-red:/data
     environment:

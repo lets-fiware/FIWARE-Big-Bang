@@ -1,5 +1,23 @@
 # After installation
 
+-   [Installation completion message](#installation-completion-message)
+-   [Sanity check](#sanity-check)
+    -   [Get the status of docker containers](#get-the-status-of-docker-containers)
+    -   [Get an access token](#get-an-access-token)
+    -   [Get Orion version](#get-orion-version)
+    -   [Get Keyrock version](#get-keyrock-version)
+    -   [Keyrock GUI](#keyrock-gui)
+    -   [Sanity check for Cygnus](#sanity-check-for-cygnus)
+    -   [Sanity check for Comet](#sanity-check-for-comet)
+    -   [Sanity check for Perseo](#sanity-check-for-perseo)
+    -   [Get QuantumLeap version](#get-quantumleap-version)
+    -   [Sanity check for QuantumLeap](#sanity-check-for-quantumleap)
+    -   [Sanity check for IoT Agent for UL](#sanity-check-for-iot-agent-for-ul)
+    -   [Sanity check for IoT Agent for JSON](#sanity-check-for-iot-agent-for-json)
+    -   [Sanity check for WireCloud](#sanity-check-for-wirecloud)
+    -   [Sanity check for Node-RED](#sanity-check-for-node-red)
+    -   [Access Node-RED API](#access-node-red-api)
+
 ## Installation completion message
 
 After installation, you will get a completion message as shown:
@@ -19,11 +37,15 @@ It has a URL, a username and a password for Keyrock.
 
 You can check if the FIWARE instance is healthy by running some commands.
 
-### Get the status of docker containers.
+### Get the status of docker containers
+
+#### Request:
 
 ```bash
 make ps
 ```
+
+#### Response:
 
 ```text
 sudo /usr/local/bin/docker-compose ps
@@ -89,61 +111,264 @@ ngsi version --host orion.example.com
 }
 ```
 
+### Get Keyrock version
+
+Once Keyrock is running, you can check the status by the following command:
+
+#### Request:
+
+```bash
+curl https://keyrock.example.com/version
+```
+
+#### Response:
+
+```json
+{
+  "keyrock": {
+    "version": "8.1.0",
+    "release_date": "2021-07-22",
+    "uptime": "00:23:14.3",
+    "git_hash": "https://github.com/ging/fiware-idm/releases/tag/8.1.0",
+    "doc": "https://fiware-idm.readthedocs.io/en/8.1.0/",
+    "api": {
+      "version": "v1",
+      "link": "https://keyrock.example.com/v1"
+    }
+  }
+}
+```
+
 ### Keyrock GUI
 
 To access the Keyrock GUI,  Open at https://keyrock.example.com with Web browser.
 
-## Files and directories layout
+### Sanity check for Cygnus
 
-The following files and directories will be created.
+Once Cygnus is running, you can check the status by the following command:
 
-| File or directory             | Description                                                                             |
-| ----------------------------- | --------------------------------------------------------------------------------------- |
-| .                             | A root directory of FI-BB. It's a directory in which you ran lets-fiware.sh command.    |
-| ./docker-compose.yml          | A config file for docker-compose which has the configuration information of FIWARE GEs. |
-| ./.env                        | A file which has environment variables for docker-compose.yml file.                     |
-| ./Makefile                    | A file for make command.                                                                |
-| ./config                      | A directory which has configuration files for running Docker containers.                |
-| ./data                        | A directory which has persistent data for running Docker containers.                    |
-| /etc/letsencrypt              | A directory which has server certificate files.                                         |
-| /var/log/fiware               | A directory which has log files.                                                        |
-| /etc/rsyslog.d/10-fiware.conf | A config file for rsyslog. In the case of CentOS, the filename is 'fiware.conf'.        |
-| /etc/logrotate.d/fiware       | A config file for logroate.                                                             |
-| /etc/cron.d/fiware-big-bang   | A config file for cron                                                                  |
+#### Request:
 
-## System administration
+```bash
+ngsi version --host cygnus.example.com --pretty
+```
 
-### Make command for system administration
+#### Response:
 
-You can manage your FIWARE instance with make command.  Run the make command in a directory you ran
-the lets-fiware.sh script.
+```json
+{
+  "success": "true",
+  "version": "2.10.0.5bb41dfcca1e25db664850e6b7806e3cf6a2aa7b"
+}
+```
 
-| Command      | Description                                                  |
-| ------------ | ------------------------------------------------------------ |
-| admin        | Print a username and a password for Admin user               |
-| get-token    | Get an OAuth2 access token                                   |
-| collect      | Collect system information                                   |
-| log          | Print log for FIWARE Big Bang (/var/log/fiware/fi-bb.log)    |
-| log-dir      | List files in the log directory (/var/log/fiware)            |
-| logrotation  | Rotate log files                                             |
-| ps           | List docker containers for FIWARE instance                   |
-| build        | Build docker containers for FIWARE instance                  |
-| up           | Create and start docker containers for FIWARE instance       |
-| down         | Stop and remove docker containers for FIWARE instance        |
-| clean        | !CAUTION! Clean up FIWARE instance                           |
-| nginx-test   | Test configuration for nginx                                 |
-| nginx-reload | Reload configuration for nginx                               |
-| cert-renew   | Renew all server certificates                                |
-| cert-revoke  | !CAUTION! Revoke all server certificates for FIWARE instance |
-| cert-list    | List server certificate files for FIWARE instance            |
+### Sanity check for Comet
 
-### Log files
+Once Comet is running, you can check the status by the following command:
 
-The log files for FIWARE instance is created in the `/var/log/fiware` directory.
-And also the log files are rotated on a regular basis. Look at the `/etc/logrotate.d/fiware` file.
+#### Request:
 
-### Server certificates
+```bash
+ngsi version --host comet.example.com
+```
 
-When installing, server certificates automatically are created or reused if already exists.
-They are renewed by a cron job. Look at the `/etc/cron.d/fiware-big-bang` file. And also you can
-renew or revoke server certificates manually with make command.
+#### Response:
+
+```json
+{"version":"2.8.0-next"}
+```
+
+### Sanity check for Perseo
+
+Once Perseo is running, you can check the status by the following command:
+
+#### Request:
+
+```bash
+ngsi version --host perseo.example.com --pretty
+```
+
+#### Response:
+
+```json
+{
+  "error": null,
+  "data": {
+    "name": "perseo",
+    "description": "IOT CEP front End",
+    "version": "1.20.0"
+  }
+}
+```
+
+### Get QuantumLeap version
+
+Once QuantumLeap is running, you can get the version by the following command:
+
+#### Request:
+
+```bash
+ngsi version --host quantumleap.example.com
+```
+
+#### Response:
+
+```json
+{
+  "version": "0.8.1"
+}
+```
+
+### Sanity check for QuantumLeap
+
+You can check the status by the following command:
+
+#### Request:
+
+```bash
+ngsi health --host quantumleap.example.com
+```
+
+#### Response:
+
+```json
+{
+  "status": "pass"
+}
+```
+
+### Sanity check for IoT Agent for UL
+
+Once IoT Agent for UltraLight 2.0 is running, you can check the status by the following command:
+
+#### Request:
+
+```bash
+ngsi version --host iotagent-ul.example.com --pretty
+```
+
+#### Response:
+
+```json
+{
+  "libVersion": "2.15.1",
+  "port": "4041",
+  "baseRoot": "/",
+  "version": "1.16.2"
+}
+```
+
+### Sanity check for IoT Agent for JSON
+
+Once IoT Agent for JSON is running, you can check the status by the following command:
+
+#### Request:
+
+```bash
+ngsi version --host iotagent-json.example.com --pretty
+```
+
+#### Response:
+
+```json
+{
+  "libVersion": "2.17.0",
+  "port": "4041",
+  "baseRoot": "/",
+  "version": "1.19.0"
+}
+```
+
+### Sanity check for WireCloud 
+
+Once Orion is running, you can access the WireCloud web application.
+Open at `https://wirecloud.example.com` to access the WireCloud GUI.
+
+### Sanity check for Node-RED
+
+Open at `https://node-red.example.com` to access the Node-RED GUI.
+
+### Access Node-RED API
+
+Access Node-RED Admin HTTP API with an OAuth2 access token as the Node-RED API endpoint is
+protected by Wilma.
+
+#### Request:
+
+```bash
+ngsi token --host orion.example.com
+```
+
+#### Response:
+
+```text
+75eaea327a874b7e78be78364493b2e5906996ae
+```
+
+And request to the Admin HTTP API with an access token.
+
+#### Request:
+
+```bash
+curl https://node-red.example.com/settings \
+  --header 'Authorization: Bearer 75eaea327a874b7e78be78364493b2e5906996ae'
+```
+
+#### Response:
+
+```json
+{
+  "httpNodeRoot": "/",
+  "version": "2.0.6",
+  "user": {
+    "username": "admin",
+    "permissions": "*"
+  },
+  "context": {
+    "default": "memory",
+    "stores": [
+      "memory"
+    ]
+  },
+  "libraries": [
+    {
+      "id": "local",
+      "label": "editor:library.types.local",
+      "user": false,
+      "icon": "font-awesome/fa-hdd-o"
+    },
+    {
+      "id": "examples",
+      "label": "editor:library.types.examples",
+      "user": false,
+      "icon": "font-awesome/fa-life-ring",
+      "types": [
+        "flows"
+      ],
+      "readOnly": true
+    }
+  ],
+  "flowFilePretty": true,
+  "externalModules": {},
+  "flowEncryptionType": "system",
+  "functionExternalModules": false,
+  "tlsConfigDisableLocalFiles": false,
+  "editorTheme": {
+    "projects": {
+      "enabled": false,
+      "workflow": {
+        "mode": "manual"
+      }
+    },
+    "languages": [
+      "de",
+      "en-US",
+      "ja",
+      "ko",
+      "ru",
+      "zh-CN",
+      "zh-TW"
+    ]
+  }
+}
+```

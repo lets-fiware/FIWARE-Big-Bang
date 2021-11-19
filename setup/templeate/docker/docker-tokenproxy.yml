@@ -2,9 +2,9 @@ version: "3"
 services:
   tokenproxy:
     image: ${IMAGE_TOKENPROXY}
-    depends_on:
-      - keyrock
+    # __TOKENPROXY_DEPENDS_ON__
     environment:
+      - HOST=${TOKENPROXY_KEYROCK}
       - CLIENT_ID=${TOKENPROXY_CLIENT_ID}
       - CLIENT_SECRET=${TOKENPROXY_CLIENT_SECRET}
       - VERBOSE=${TOKENPROXY_VERBOSE}

@@ -20,6 +20,7 @@ services:
     volumes:
       - ./data/wirecloud/wirecloud-data:/opt/wirecloud_instance/data
       - ./data/wirecloud/wirecloud-static:/var/www/static
+      - ./data/wirecloud/widgets:/widgets
       # __WIRECLOUD_VOLUMES__
     restart: always
     logging:

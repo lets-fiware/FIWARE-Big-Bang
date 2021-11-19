@@ -6,8 +6,8 @@ services:
       - mongo
       # __IOTA_JSON_DEPENDS_ON__
     environment:
-      - IOTA_CB_HOST=orion
-      - IOTA_CB_PORT=1026
+      - IOTA_CB_HOST=${ORION_INTERNAL_HOST}
+      - IOTA_CB_PORT=${ORION_INTERNAL_PORT}
       - IOTA_NORTH_PORT=4041
       - IOTA_REGISTRY_TYPE=mongodb
       - IOTA_CB_NGSI_VERSION=v2

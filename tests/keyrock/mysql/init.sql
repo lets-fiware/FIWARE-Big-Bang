@@ -1,0 +1,3 @@
+CREATE USER 'idm'@'%' IDENTIFIED BY 'keyrock2020';
+GRANT ALL PRIVILEGES ON idm.* TO 'idm'@'%';
+flush PRIVILEGES;

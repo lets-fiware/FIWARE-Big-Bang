@@ -110,27 +110,42 @@ get_config_sh() {
 }
 
 #
-# Set and check values
+# Set default values
 #
-set_and_check_values() {
+set_default_values() {
   logging_info "${FUNCNAME[0]}"
 
-  SSL_CERTIFICATE=fullchain.pem
-  SSL_CERTIFICATE_KEY=privkey.pem
+  if [ -z "${ORION_EXPOSE_PORT}" ]; then
+    ORION_EXPOSE_PORT=none
+  fi
 
-  IDM_ADMIN_UID="admin"
+  if [ -z "${CYGNUS_EXPOSE_PORT}" ]; then
+    CYGNUS_EXPOSE_PORT=none
+  fi
 
-  SETUP_DIR=./setup
-  TEMPLEATE=${SETUP_DIR}/templeate
+  if [ -z "${COMET_EXPOSE_PORT}" ]; then
+    COMET_EXPOSE_PORT=none
+  fi
 
-  for NAME in KEYROCK ORION
-  do
-    eval VAL=\"\$$NAME\"
-    if [ "$VAL" = "" ]; then
-        logging_err "${NAME} is empty"
-        exit "${ERR_CODE}"
-    fi
-  done
+  if [ -z "${QUANTUMLEAP_EXPOSE_PORT}" ]; then
+    QUANTUMLEAP_EXPOSE_PORT=none
+  fi
+
+  if [ -z "${ELASTICSEARCH_EXPOSE_PORT}" ]; then
+    ELASTICSEARCH_EXPOSE_PORT=none
+  fi
+
+  if [ -z "${MONGO_EXPOSE_PORT}" ]; then
+    MONGO_EXPOSE_PORT=none
+  fi
+
+  if [ -z "${MYSQL_EXPOSE_PORT}" ]; then
+    MYSQL_EXPOSE_PORT=none
+  fi
+
+  if [ -z "${POSTGRES_EXPOSE_PORT}" ]; then
+    POSTGRES_EXPOSE_PORT=none
+  fi
 
   if [ -z "${POSTFIX}" ]; then
     POSTFIX=false
@@ -166,18 +181,69 @@ set_and_check_values() {
 
   CERT_DIR=/etc/letsencrypt
 
-  if [ "${WIRECLOUD}" = "" ]; then
-    NGSIPROXY=""
-  fi
+}
 
-  if [ "${WIRECLOUD}" != "" ] && [ "${NGSIPROXY}" = "" ]; then
-    logging_err "error: NGSIPROXY is empty"
+#
+# Check multi server values
+#
+check_multi_server_values() {
+  logging_info "${FUNCNAME[0]}"
+
+  if echo "${MULTI_SERVER_KEYROCK}" | grep "^https://" > /dev/null || echo "${MULTI_SERVER_KEYROCK}" | grep "^http://" > /dev/null ; then
+    logging_info "multiple servers mode"
+    if [ "${MULTI_SERVER_ADMIN_EMAIL}" = "" ] || [ "${MULTI_SERVER_ADMIN_PASS}" = "" ]; then
+      logging_err "MULTI_SERVER_ADMIN_EMAIL or MULTI_SERVER_ADMIN_PASS is empty"
+      exit "${ERR_CODE}"
+    fi
+    if [ "${MULTI_SERVER_PEP_PROXY_USERNAME}" = "" ] || [ "${MULTI_SERVER_PEP_PASSWORD}" = "" ]; then
+      logging_err "MULTI_SERVER_PEP_PROXY_USERNAME or MULTI_SERVER_PEP_PASSWORD is empty"
+      exit "${ERR_CODE}"
+    fi
+    if [ "${MULTI_SERVER_CLIENT_ID}" = "" ] || [ "${MULTI_SERVER_CLIENT_SECRET}" = "" ]; then
+      logging_err "MULTI_SERVER_CLIENT_ID or MULTI_SERVER_CLIENT_SECRET is empty"
+      exit "${ERR_CODE}"
+    fi
+    KEYROCK_HOST="${MULTI_SERVER_KEYROCK}"
+    KEYROCK=$(echo "${MULTI_SERVER_KEYROCK}" | sed -E 's/^.*(http|https):\/\/([^/]+).*/\2/g')
+    IDM_ADMIN_EMAIL="${MULTI_SERVER_ADMIN_EMAIL}"
+    IDM_ADMIN_PASS="${MULTI_SERVER_ADMIN_PASS}"
+    ORION_CLIENT_ID="${MULTI_SERVER_CLIENT_ID}"
+    ORION_CLIENT_SECRET="${MULTI_SERVER_CLIENT_SECRET}"
+    MULTI_SERVER=true
+  else
+    logging_err "MULTI_SERVER_KEYROCK not http or https"
     exit "${ERR_CODE}"
   fi
 
-  if [ "${COMET}" != "" ] && [ "${CYGNUS}" != "" ]; then
-    CYGNUS_MONGO=true
+  if [ -z "${ORION}" ]; then
+    if [ -n "${PERSEO}" ] || [ -n "${IOTAGENT_UL}" ] || [ -n "${IOTAGENT_JSON}" ]; then
+      if [ -z "${MULTI_SERVER_ORION_INTERNAL_IP}" ]; then
+        logging_err "MULTI_SERVER_ORION_INTERNAL_IP not found"
+        exit "${ERR_CODE}"
+      fi
+      ORION_INTERNAL_HOST=${MULTI_SERVER_ORION_INTERNAL_IP}
+      ORION_INTERNAL_URL="http://${ORION_INTERNAL_HOST}:${ORION_INTERNAL_PORT}/"
+    fi
+
+    if [ -n "${PERSEO}" ] || [ -n "${IOTAGENT_UL}" ] || [ -n "${IOTAGENT_JSON}" ] || [ -n "${WIRECLOUD}" ]; then
+      if [ -z "${MULTI_SERVER_ORION_HOST}" ]; then
+        logging_err "MULTI_SERVER_ORION_HOST not found"
+        exit "${ERR_CODE}"
+      fi
+      MULTI_SERVER_ORION_URL="https://${MULTI_SERVER_ORION_HOST}/"
+    fi
   fi
+
+  if [ -n "${MULTI_SERVER_QUANTUMLEAP_HOST}" ]; then
+    MULTI_SERVER_QUANTUMLEAP_URL="https://${MULTI_SERVER_QUANTUMLEAP_HOST}"
+  fi
+}
+
+#
+# Check Cygnus values
+#
+check_cygnus_values() {
+  logging_info "${FUNCNAME[0]}"
 
   if [ "${CYGNUS}" != "" ]; then
     if [ -z "${CYGNUS_MONGO}" ]; then
@@ -205,6 +271,13 @@ set_and_check_values() {
   else
     ELASTICSEARCH=""
   fi
+}
+
+#
+# Check IoT Agent values
+#
+check_iot_agent_values() {
+  logging_info "${FUNCNAME[0]}"
 
   if [ "${IOTAGENT_UL}" = "" ] && [ "${IOTAGENT_JSON}" = "" ]; then
     MOSQUITTO=""
@@ -247,6 +320,13 @@ set_and_check_values() {
       fi
     fi
   fi
+}
+
+#
+# Check Node-RED values
+#
+check_node_red_values() {
+  logging_info "${FUNCNAME[0]}"
 
   if [ -n "${NODE_RED_INSTANCE_NUMBER}" ]; then
     if [ "${NODE_RED_INSTANCE_NUMBER}" -lt 2 ] || [ "${NODE_RED_INSTANCE_NUMBER}" -gt 20 ]; then
@@ -265,6 +345,70 @@ set_and_check_values() {
 }
 
 #
+# Set and check values
+#
+set_and_check_values() {
+  logging_info "${FUNCNAME[0]}"
+
+  SSL_CERTIFICATE=fullchain.pem
+  SSL_CERTIFICATE_KEY=privkey.pem
+
+  IDM_ADMIN_UID="admin"
+
+  SETUP_DIR=./setup
+  TEMPLEATE=${SETUP_DIR}/templeate
+
+  set_default_values
+
+  ORION_INTERNAL_HOST=orion
+  ORION_INTERNAL_PORT=1026
+  ORION_INTERNAL_URL="http://${ORION_INTERNAL_HOST}:${ORION_INTERNAL_PORT}/"
+
+  if [ -n "${KEYROCK}" ] && [ -z "${MULTI_SERVER_KEYROCK}" ]; then
+    MULTI_SERVER=false
+    MULTI_SERVER_KEYROCK=
+    MULTI_SERVER_ADMIN_EMAIL=
+    MULTI_SERVER_ADMIN_PASS=
+    MULTI_SERVER_CLIENT_ID=
+    MULTI_SERVER_CLIENT_SECRET=
+    MULTI_SERVER_ORION_HOST=
+    MULTI_SERVER_ORION_URL=
+    MULTI_SERVER_QUANTUMLEAP_HOST=
+    MULTI_SERVER_QUANTUMLEAP_URL=
+    MULTI_SERVER_ORION_INTERNAL_IP=
+  elif [ -n "${MULTI_SERVER_KEYROCK}" ] && [ -z "${KEYROCK}" ]; then
+    check_multi_server_values
+  else
+    logging_err "Set either KEYROCK or MULTI_SERVER_KEYROCK"
+    exit "${ERR_CODE}"
+  fi
+
+  if [ "${WIRECLOUD}" = "" ]; then
+    NGSIPROXY=""
+  fi
+
+  if [ "${WIRECLOUD}" != "" ] && [ "${NGSIPROXY}" = "" ]; then
+    logging_err "error: NGSIPROXY is empty"
+    exit "${ERR_CODE}"
+  fi
+
+  if [ "${COMET}" != "" ] && [ "${CYGNUS}" != "" ]; then
+    CYGNUS_MONGO=true
+  fi
+
+  if ${QUERYPROXY} && [ -z "${ORION}" ]; then
+    logging_err "error: Queryroxy is enabled but Orion not found"
+    exit "${ERR_CODE}"
+  fi
+
+  check_cygnus_values
+
+  check_iot_agent_values
+
+  check_node_red_values
+}
+
+#
 # Add variables to .env file
 #
 add_env() {
@@ -277,6 +421,7 @@ add_env() {
   cat <<EOF >> .env
 VERSION=${VERSION}
 
+MULTI_SERVER=${MULTI_SERVER}
 DATA_DIR=${DATA_DIR}
 CERTBOT_DIR=${CERTBOT_DIR}
 CONFIG_DIR=${CONFIG_DIR}
@@ -310,6 +455,10 @@ CERT_FORCE_RENEWAL=${CERT_FORCE_RENEWAL}
 
 IDM_ADMIN_UID=${IDM_ADMIN_UID}
 IDM_ADMIN_USER=${IDM_ADMIN_USER}
+
+ORION_INTERNAL_HOST=${ORION_INTERNAL_HOST}
+ORION_INTERNAL_PORT=${ORION_INTERNAL_PORT}
+ORION_INTERNAL_URL=${ORION_INTERNAL_URL}
 
 IMAGE_KEYROCK=${IMAGE_KEYROCK}
 IMAGE_WILMA=${IMAGE_WILMA}
@@ -346,7 +495,7 @@ IMAGE_POSTFIX=${IMAGE_POSTFIX}
 # Logging settings
 IDM_DEBUG=${IDM_DEBUG}
 CYGNUS_LOG_LEVEL=${CYGNUS_LOG_LEVEL}
-LOGOPS_LEVEL=${LOGOPS_LEVEL}
+COMET_LOGOPS_LEVEL=${COMET_LOGOPS_LEVEL}
 QUANTUMLEAP_LOGLEVEL=${QUANTUMLEAP_LOGLEVEL}
 WIRECLOUD_LOGLEVEL=${WIRECLOUD_LOGLEVEL}
 TOKENPROXY_LOGLEVEL=${TOKENPROXY_LOGLEVEL}
@@ -369,6 +518,10 @@ add_domain_to_env() {
 
   for NAME in "${APPS[@]}"
   do
+    if ${MULTI_SERVER} && [ "${NAME}" = "KEYROCK" ]; then
+      echo "KEYROCK=${KEYROCK}" >> .env
+      continue
+    fi
     eval VAL=\"\$"$NAME"\"
     if [ -n "$VAL" ]; then
         eval echo "${NAME}"=\"\$"${NAME}"."${DOMAIN_NAME}"\" >> .env
@@ -391,8 +544,11 @@ setup_complete() {
 
   . ./.env
 
+  if ! ${MULTI_SERVER}; then
+    KEYROCK_HOST="https://${KEYROCK}"
+  fi
   echo "*** Setup has been completed ***"
-  echo "IDM: https://${KEYROCK}"
+  echo "IDM: ${KEYROCK_HOST}"
   echo "User: ${IDM_ADMIN_EMAIL}"
   echo "Password: ${IDM_ADMIN_PASS}"
   echo "docs: https://fi-bb.letsfiware.jp/"
@@ -643,7 +799,14 @@ check_ngsi_go() {
     curl -OL https://raw.githubusercontent.com/lets-fiware/ngsi-go/main/autocomplete/ngsi_bash_autocomplete
     ${SUDO} mv ngsi_bash_autocomplete /etc/bash_completion.d/
     source /etc/bash_completion.d/ngsi_bash_autocomplete
-    echo "source /etc/bash_completion.d/ngsi_bash_autocomplete" >> ~/.bashrc
+    if [ -e ~/.bashrc ]; then
+      set +e
+      FOUND=$(grep -c "ngsi_bash_autocomplete" ~/.bashrc)
+      set -e
+      if [ "${FOUND}" -eq 0 ]; then
+        echo "source /etc/bash_completion.d/ngsi_bash_autocomplete" >> ~/.bashrc
+      fi
+    fi
   fi
 
   cp /usr/local/bin/ngsi "${WORK_DIR}"
@@ -676,6 +839,12 @@ setup_init() {
   readonly APPS=(KEYROCK ORION CYGNUS COMET WIRECLOUD NGSIPROXY NODE_RED GRAFANA QUANTUMLEAP PERSEO IOTAGENT_UL IOTAGENT_JSON IOTAGENT_HTTP MOSQUITTO ELASTICSEARCH)
 
   val=
+
+  WILMA_INSTALLED=false
+
+  TOKENPROXY_INSTALLED=false
+
+  MONGO_INSTALLED=false
 
   MYSQL_INSTALLED=false
 
@@ -728,6 +897,9 @@ add_etc_hosts() {
 
   for name in "${APPS[@]}"
   do
+    if ${MULTI_SERVER} && [ "${name}" = "KEYROCK" ]; then
+      continue
+    fi 
     eval val=\"\$"${name}"\"
     if [ -n "${val}" ]; then
       result=0
@@ -735,7 +907,7 @@ add_etc_hosts() {
       echo "${output}" > /dev/null
       if [ ! "$result" = "0" ]; then
         ${SUDO} bash -c "echo $1 ${val} >> /etc/hosts"
-        echo "Add '$1 ${val}' to /etc/hosts"
+        logging_info "Add '$1 ${val}' to /etc/hosts"
       fi
     fi
   done
@@ -752,23 +924,27 @@ validate_domain() {
   local IPS
 
   if [ -n "${IP_ADDRESS}" ]; then
-      IPS=("${IP_ADDRESS}")
+      IPS="${IP_ADDRESS}"
   else
       # shellcheck disable=SC2207
-      IPS=($(hostname -I))
+      IPS=$(hostname -I)
   fi
 
   if "$FIBB_TEST"; then
     IP_ADDRESS=${IPS[0]}
-    echo "${IP_ADDRESS}"
+    IP_ADDRESS=$(echo "${IP_ADDRESS}" | awk '{ print $1 }')
+    logging_info "${IP_ADDRESS}"
     add_etc_hosts "${IP_ADDRESS}" 
   fi
 
-  logging_info "${IPS[@]}"
+  logging_info "IPS=$IPS"
 
   # shellcheck disable=SC2068
   for name in ${APPS[@]}
   do
+    if ${MULTI_SERVER} && [ "${name}" = "KEYROCK" ]; then
+      continue
+    fi 
     eval val=\"\$"${name}"\"
     if [ -n "${val}" ]; then
         logging_info "Sub-domain: ${val}"
@@ -780,7 +956,7 @@ validate_domain() {
         logging_info "IP address: ${IP}"
         found=false
         # shellcheck disable=SC2068
-        for ip_addr in ${IPS[@]}
+        for ip_addr in $IPS
         do
           if [ "${IP}" = "${ip_addr}" ] ; then
             found=true
@@ -820,6 +996,7 @@ wait() {
   do
     # shellcheck disable=SC2086
     if [ "${ret}" == "$(${CURL} ${host} -o /dev/null -w '%{http_code}\n' -s)" ]; then
+      logging_info "${host} is ready."
       return
     fi
     sleep 1
@@ -870,6 +1047,9 @@ setup_cert() {
 
   for name in "${APPS[@]}"
   do
+    if ${MULTI_SERVER} && [ "${name}" = "KEYROCK" ]; then
+      continue
+    fi 
     eval val=\"\$"${name}"\"
     if [ -n "${val}" ]; then
       if [ ! -d "${CERTBOT_DIR}"/"${val}" ]; then
@@ -886,6 +1066,9 @@ setup_cert() {
 
   for name in "${APPS[@]}"
   do
+    if ${MULTI_SERVER} && [ "${name}" = "KEYROCK" ]; then
+      continue
+    fi 
     eval val=\"\$"${name}"\"
     if [ -n "${val}" ]; then
       get_cert "${val}"
@@ -1081,18 +1264,31 @@ EOF
 # Up keyrock
 #
 up_keyrock() {
+  logging_info "${FUNCNAME[0]}"
 
-  if "${KEYROCK_POSTGRES}"; then
-    up_keyrock_postgres
+  if ${MULTI_SERVER}; then
+    SERVER_HOST="${KEYROCK_HOST}"
+  cat <<EOF >> .env
+
+# Keyrock
+
+IDM_HOST=${KEYROCK_HOST}
+IDM_ADMIN_EMAIL=${MULTI_SERVER_ADMIN_EMAIL}
+IDM_ADMIN_PASS=${MULTI_SERVER_ADMIN_PASS}
+EOF
   else
-    up_keyrock_mysql
+    if "${KEYROCK_POSTGRES}"; then
+      up_keyrock_postgres
+    else
+      up_keyrock_mysql
+    fi
+    ${DOCKER_COMPOSE} -f docker-idm.yml up -d
+    SERVER_HOST="http://localhost:3000"
   fi
 
-  ${DOCKER_COMPOSE} -f docker-idm.yml up -d
+  wait "${SERVER_HOST}" "200"
 
-  wait "http://localhost:3000/" "200"
-
-  ${NGSI_GO} server add --host "${IDM}" --serverType keyrock --serverHost http://localhost:3000 --idmType idm --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}"
+  ${NGSI_GO} server add --host "${IDM}" --serverType keyrock --serverHost "${SERVER_HOST}" --idmType idm --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}"
 }
 
 #
@@ -1100,6 +1296,10 @@ up_keyrock() {
 #
 down_keyrock() {
   logging_info "${FUNCNAME[0]}"
+
+  if ${MULTI_SERVER}; then
+    return
+  fi
 
   ${DOCKER_COMPOSE} -f docker-idm.yml down
 }
@@ -1205,6 +1405,47 @@ EOF
 }
 
 #
+# Add exposed ports
+#
+add_exposed_ports() {
+  logging_info "${FUNCNAME[0]}"
+
+  local mode
+  local key
+  local ports
+
+  mode=$1
+  shift
+  key=$1
+  shift
+
+  case "${mode}" in
+    "all" )
+      ports="   ports:"
+      set +u
+      while [ "$1" ]
+      do
+        ports="${ports}\n      - $1:$1"
+        shift
+      done
+      set -u
+      sed -i -e "/${key}/i \ ${ports}" "${DOCKER_COMPOSE_YML}"
+      ;;
+    "local" )
+      ports="   ports:"
+      set +u
+      while [ "$1" ]
+      do
+        ports="${ports}\n      - 127.0.0.1:$1:$1"
+        shift
+      done
+      set -u
+      sed -i -e "/${key}/i \ ${ports}" "${DOCKER_COMPOSE_YML}"
+      ;;
+  esac
+}
+
+#
 # Nginx
 #
 setup_nginx() {
@@ -1236,6 +1477,8 @@ setup_mysql() {
 
   add_docker_compose_yml "docker-mysql.yml"
 
+  add_exposed_ports "${MYSQL_EXPOSE_PORT}" "__MYSQL_PORTS__" "3306"
+
   sed -i -e "/- IDM_DB_DIALECT/d" ${DOCKER_COMPOSE_YML}
   sed -i -e "/- IDM_DB_PORT/d" ${DOCKER_COMPOSE_YML}
 
@@ -1257,6 +1500,8 @@ setup_postgres() {
   fi
 
   add_docker_compose_yml "docker-postgres.yml"
+
+  add_exposed_ports "${POSTGRES_EXPOSE_PORT}" "__POSTGRES_PORTS__" "5432"
 
   sed -i -e "/ __KEYROCK_DEPENDS_ON__/s/^.*/      - postgres/" ${DOCKER_COMPOSE_YML}
 
@@ -1284,6 +1529,8 @@ setup_elasticsearch() {
 
   add_docker_compose_yml "docker-elasticsearch.yml"
 
+  add_exposed_ports "${ELASTICSEARCH_EXPOSE_PORT}" "__ELASTICSEARCH_PORTS__" "9200"
+
   sed -i -e "/ __KEYROCK_DEPENDS_ON__/s/^.*/      - elasticsearch-db/" ${DOCKER_COMPOSE_YML}
 
   create_nginx_conf "${ELASTICSEARCH}" "nginx-elasticsearch"
@@ -1304,10 +1551,125 @@ EOF
 }
 
 #
-# Keyrock 
+# Wilma
+#
+setup_wilma() {
+  if ${WILMA_INSTALLED}; then
+    return
+  fi
+  WILMA_INSTALLED=true
+
+  logging_info "${FUNCNAME[0]}"
+
+  add_docker_compose_yml "docker-wilma.yml"
+
+  if ! ${MULTI_SERVER}; then
+    add_to_docker_compose_yml "__WILMA_DEPENDS_ON__" "   depends_on:\n      - keyrock"
+  fi 
+
+  add_nginx_depends_on "wilma"
+
+  add_rsyslog_conf "pep-proxy"
+
+  if  ${MULTI_SERVER}; then
+    AID=${MULTI_SERVER_CLIENT_ID}
+    SECRET=${MULTI_SERVER_CLIENT_SECRET}
+  else
+    # Create Applicaton for Orion
+    AID=$(${NGSI_GO} applications --host "${IDM}" create --name "Wilma" --description "Wilma application (${HOST_NAME})" --url "http://localhost/" --redirectUri "http://localhost/")
+    SECRET=$(${NGSI_GO} applications --host "${IDM}" get --aid "${AID}" | jq -r .application.secret )
+  fi
+
+  ORION_CLIENT_ID=${AID}
+  ORION_CLIENT_SECRET=${SECRET}
+
+  if  ${MULTI_SERVER}; then
+    PEP_PASSWORD=${MULTI_SERVER_PEP_PASSWORD}
+    PEP_ID=${MULTI_SERVER_PEP_PROXY_USERNAME}
+  else
+    # Create PEP Proxy for FIWARE Orion
+    PEP_PASSWORD=$(${NGSI_GO} applications --host "${IDM}" pep --aid "${AID}" create --run | jq -r .pep_proxy.password)
+    PEP_ID=$(${NGSI_GO} applications --host "${IDM}" pep --aid "${AID}" list | jq -r .pep_proxy.id)
+  fi
+
+  if  ${MULTI_SERVER}; then
+    PEP_PROXY_IDM_HOST=${KEYROCK}
+    PEP_PROXY_IDM_PORT=443
+    PEP_PROXY_IDM_SSL_ENABLED=true
+  else
+    PEP_PROXY_IDM_HOST=keyrock
+    PEP_PROXY_IDM_PORT=3000
+    PEP_PROXY_IDM_SSL_ENABLED=false
+  fi
+  cat <<EOF >> .env
+
+# PEP Proxy
+
+PEP_PROXY_IDM_HOST=${PEP_PROXY_IDM_HOST}
+PEP_PROXY_IDM_PORT=${PEP_PROXY_IDM_PORT}
+PEP_PROXY_IDM_SSL_ENABLED=${PEP_PROXY_IDM_SSL_ENABLED}
+PEP_PROXY_APP_ID=${AID}
+PEP_PROXY_USERNAME=${PEP_ID}
+PEP_PASSWORD=${PEP_PASSWORD}
+EOF
+}
+
+#
+# Tokenproxy
+#
+setup_tokenproxy() {
+  if ${TOKENPROXY}; then
+    if ${TOKENPROXY_INSTALLED}; then
+      return
+    fi
+    TOKENPROXY_INSTALLED=true
+
+    logging_info "${FUNCNAME[0]}"
+
+    add_docker_compose_yml "docker-tokenproxy.yml"
+
+    if ! ${MULTI_SERVER}; then
+      add_to_docker_compose_yml "__TOKENPROXY_DEPENDS_ON__" "   depends_on:\n      - keyrock"
+    fi 
+
+    add_nginx_depends_on "tokenproxy"
+
+    add_rsyslog_conf "tokenproxy"
+
+    cp -r "${SETUP_DIR}"/docker/tokenproxy "${CONFIG_DIR}"/
+    cp "${WORK_DIR}"/ngsi "${CONFIG_DIR}"/tokenproxy/
+
+    cd "${CONFIG_DIR}"/tokenproxy > /dev/null
+    ${DOCKER} build -t "${IMAGE_TOKENPROXY}" .
+    rm -f ngsi
+    cd - > /dev/null
+
+    if  ${MULTI_SERVER}; then
+      TOKENPROXY_KEYROCK=${MULTI_SERVER_KEYROCK}
+    else
+      TOKENPROXY_KEYROCK=http://keyrock:3000
+    fi
+
+    cat <<EOF >> .env
+
+# Tokenproxy
+
+TOKENPROXY_KEYROCK=${MULTI_SERVER_KEYROCK}
+TOKENPROXY_CLIENT_ID=${ORION_CLIENT_ID}
+TOKENPROXY_CLIENT_SECRET=${ORION_CLIENT_SECRET}
+EOF
+  fi
+}
+
+#
+# Keyrock
 #
 setup_keyrock() {
   logging_info "${FUNCNAME[0]}"
+
+  if ${MULTI_SERVER}; then
+    return
+  fi
 
   add_docker_compose_yml "docker-keyrock.yml"
 
@@ -1336,102 +1698,84 @@ setup_keyrock() {
     setup_mysql
   fi
 
+  setup_wilma
+
+  setup_tokenproxy
+
   if ${TOKENPROXY}; then
     sed -i -e "/# __NGINX_KEYROCK__/i \  location /token {\n    proxy_pass http://tokenproxy:1029/token;\n    proxy_redirect     default;\n  }" "${NGINX_SITES}/${KEYROCK}"
   fi
 }
 
 #
-# Wilma
+# Mongo
 #
-setup_wilma() {
+setup_mongo() {
+  if ${MONGO_INSTALLED}; then
+    return
+  fi
+  MONGO_INSTALLED=true
+
   logging_info "${FUNCNAME[0]}"
 
-  add_docker_compose_yml "docker-wilma.yml"
+  add_docker_compose_yml "docker-mongo.yml"
 
-  add_nginx_depends_on "wilma"
+  add_exposed_ports "${MONGO_EXPOSE_PORT}" "__MONGO_PORTS__" "27017"
+  add_rsyslog_conf "mongo"
 
-  add_rsyslog_conf "pep-proxy"
-
-  # Create Applicaton for Orion
-  AID=$(${NGSI_GO} applications --host "${IDM}" create --name "Wilma" --description "Wilma application" --url "http://localhost/" --redirectUri "http://localhost/")
-  SECRET=$(${NGSI_GO} applications --host "${IDM}" get --aid "${AID}" | jq -r .application.secret )
-
-  ORION_CLIENT_ID=${AID}
-  ORION_CLIENT_SECRET=${SECRET}
-
-  # Create PEP Proxy for FIWARE Orion
-  PEP_PASSWORD=$(${NGSI_GO} applications --host "${IDM}" pep --aid "${AID}" create --run | jq -r .pep_proxy.password)
-  PEP_ID=$(${NGSI_GO} applications --host "${IDM}" pep --aid "${AID}" list | jq -r .pep_proxy.id)
-
-  cat <<EOF >> .env
-
-# PEP Proxy
-PEP_PROXY_APP_ID=${AID}
-PEP_PROXY_USERNAME=${PEP_ID}
-PEP_PASSWORD=${PEP_PASSWORD}
-EOF
-}
-
-#
-# Tokenproxy
-#
-setup_tokenproxy() {
-  if ${TOKENPROXY}; then
-    logging_info "${FUNCNAME[0]}"
-
-    add_docker_compose_yml "docker-tokenproxy.yml"
-
-    add_nginx_depends_on "tokenproxy"
-
-    add_rsyslog_conf "tokenproxy"
-
-    cp -r "${SETUP_DIR}"/docker/tokenproxy "${CONFIG_DIR}"/
-    cp "${WORK_DIR}"/ngsi "${CONFIG_DIR}"/tokenproxy/
-
-    cd "${CONFIG_DIR}"/tokenproxy > /dev/null
-    ${DOCKER} build -t "${IMAGE_TOKENPROXY}" .
-    rm -f ngsi
-    cd - > /dev/null
-
-    cat <<EOF >> .env
-
-# Tokenproxy
-TOKENPROXY_CLIENT_ID=${ORION_CLIENT_ID}
-TOKENPROXY_CLIENT_SECRET=${ORION_CLIENT_SECRET}
-EOF
-  fi
+  mkdir -p "${CONFIG_DIR}/mongo"
 }
 
 #
 # Orion
 #
 setup_orion() {
+  if [ -z "${ORION}" ]; then
+    if [ -n "${MULTI_SERVER_ORION_HOST}" ]; then
+      if [ -n "${PERSEO}" ] || [ -n "${IOTAGENT_UL}" ] || [ -n "${IOTAGENT_JSON}" ] || [ -n "${WIRECLOUD}" ]; then
+        cat <<EOF >> .env
+
+# Orion Context Broker host
+
+ORION=${MULTI_SERVER_ORION_HOST}
+CB_URL=${MULTI_SERVER_ORION_URL}
+EOF
+      fi
+    fi
+    return
+  fi
+  echo "${ORION}"
+
   logging_info "${FUNCNAME[0]}"
 
   add_docker_compose_yml "docker-orion.yml"
-  add_docker_compose_yml "docker-mongo.yml"
+
+  add_exposed_ports "${ORION_EXPOSE_PORT}" "__ORION_PORTS__" "1026"
 
   create_nginx_conf "${ORION}" "nginx-orion"
 
   add_nginx_depends_on "orion"
 
-  add_rsyslog_conf "orion" "mongo"
+  add_rsyslog_conf "orion"
 
-  mkdir -p "${CONFIG_DIR}/mongo"
+  setup_mongo
   cp "${TEMPLEATE}/mongo/orion.js" "${CONFIG_DIR}/mongo/mongo-init.js"
+
+  setup_wilma
+
+  setup_tokenproxy
 
   if ${TOKENPROXY}; then
     sed -i -e "/# __NGINX_ORION__/i \  location /token {\n    proxy_pass http://tokenproxy:1029/token;\n    proxy_redirect     default;\n  }\n" "${NGINX_SITES}/${ORION}"
   fi
 
-  CB_HOST=https://${ORION}
+  CB_URL=https://${ORION}
 
   cat <<EOF >> .env
 
 # Orion Context Broker host
 
-CB_HOST=${CB_HOST}
+CB_URL=${CB_URL}
 EOF
 }
 
@@ -1441,7 +1785,7 @@ EOF
 setup_queryproxy() {
   if ! ${QUERYPROXY}; then
     return
-  fi 
+  fi
 
   logging_info "${FUNCNAME[0]}"
 
@@ -1546,31 +1890,36 @@ setup_cygnus() {
 
   add_docker_compose_yml "docker-cygnus.yml"
 
+  local sink
   sink=0
+
+  local expose_ports
+  expose_ports=
 
   if ${CYGNUS_MONGO}; then
     sink=$((sink+1))
+    setup_mongo
     sed -i -e "/__CYGNUS_DEPENDS_ON__/i \      - mongo" "${DOCKER_COMPOSE_YML}"
     sed -i -e "/__CYGNUS_ENVIRONMENT__/i \      - CYGNUS_MONGO_SERVICE_PORT=5051" "${DOCKER_COMPOSE_YML}"
     sed -i -e "/__CYGNUS_ENVIRONMENT__/i \      - CYGNUS_MONGO_HOSTS=mongo:27017" "${DOCKER_COMPOSE_YML}"
+    expose_ports="${expose_ports} 5051"
   fi
 
   if ${CYGNUS_MYSQL}; then
     sink=$((sink+1))
     setup_mysql
-
     sed -i -e "/__CYGNUS_DEPENDS_ON__/i \      - mysql" "${DOCKER_COMPOSE_YML}"
     sed -i -e "/__CYGNUS_ENVIRONMENT__/i \      - CYGNUS_MYSQL_SERVICE_PORT=5050" "${DOCKER_COMPOSE_YML}"
     sed -i -e "/__CYGNUS_ENVIRONMENT__/i \      - CYGNUS_MYSQL_HOST=mysql" "${DOCKER_COMPOSE_YML}"
     sed -i -e "/__CYGNUS_ENVIRONMENT__/i \      - CYGNUS_MYSQL_PORT=3306" "${DOCKER_COMPOSE_YML}"
     sed -i -e "/__CYGNUS_ENVIRONMENT__/i \      - CYGNUS_MYSQL_USER=root" "${DOCKER_COMPOSE_YML}"
     sed -i -e "/__CYGNUS_ENVIRONMENT__/i \      - CYGNUS_MYSQL_PASS=\${MYSQL_ROOT_PASSWORD}" "${DOCKER_COMPOSE_YML}"
+    expose_ports="${expose_ports} 5050"
   fi
 
   if ${CYGNUS_POSTGRES}; then
     sink=$((sink+1))
     setup_postgres
-
     sed -i -e "/__CYGNUS_DEPENDS_ON__/i \      - postgres" "${DOCKER_COMPOSE_YML}"
     sed -i -e "/__CYGNUS_ENVIRONMENT__/i \      - CYGNUS_POSTGRESQL_SERVICE_PORT=5055" "${DOCKER_COMPOSE_YML}"
     sed -i -e "/__CYGNUS_ENVIRONMENT__/i \      - CYGNUS_POSTGRESQL_HOST=postgres" "${DOCKER_COMPOSE_YML}"
@@ -1578,31 +1927,37 @@ setup_cygnus() {
     sed -i -e "/__CYGNUS_ENVIRONMENT__/i \      - CYGNUS_POSTGRESQL_USER=postgres" "${DOCKER_COMPOSE_YML}"
     sed -i -e "/__CYGNUS_ENVIRONMENT__/i \      - CYGNUS_POSTGRESQL_PASS=\${POSTGRES_PASSWORD}" "${DOCKER_COMPOSE_YML}"
     sed -i -e "/__CYGNUS_ENVIRONMENT__/i \      - CYGNUS_POSTGRESQL_ENABLE_CACHE=true" "${DOCKER_COMPOSE_YML}"
+    expose_ports="${expose_ports} 5055"
   fi
 
   if ${CYGNUS_ELASTICSEARCH}; then
     sink=$((sink+1))
     setup_elasticsearch
-
     sed -i -e "/__CYGNUS_DEPENDS_ON__/i \      - elasticsearch-db" "${DOCKER_COMPOSE_YML}"
     sed -i -e "/__CYGNUS_ENVIRONMENT__/i \      - CYGNUS_ELASTICSEARCH_HOST=elasticsearch-db:9200" "${DOCKER_COMPOSE_YML}"
     sed -i -e "/__CYGNUS_ENVIRONMENT__/i \      - CYGNUS_ELASTICSEARCH_PORT=5058" "${DOCKER_COMPOSE_YML}"
     sed -i -e "/__CYGNUS_ENVIRONMENT__/i \      - CYGNUS_ELASTICSEARCH_SSL=false" "${DOCKER_COMPOSE_YML}"
+    expose_ports="${expose_ports} 5058"
   fi
 
   if [ $sink -ge 2 ]; then
     sed -i -e "/__CYGNUS_ENVIRONMENT__/i \      - CYGNUS_MULTIAGENT=true" "${DOCKER_COMPOSE_YML}"
   fi
 
+  # shellcheck disable=SC2086
+  add_exposed_ports "${CYGNUS_EXPOSE_PORT}" "__CYGNUS_PORTS__" ${expose_ports}
+
   create_nginx_conf "${CYGNUS}" "nginx-cygnus"
 
   add_nginx_depends_on "cygnus"
 
   add_rsyslog_conf "cygnus"
+
+  setup_wilma
 }
 
 #
-# Cygnus and Comet
+# Comet
 #
 setup_comet() {
   if [ -z "${COMET}" ]; then
@@ -1613,6 +1968,8 @@ setup_comet() {
 
   add_docker_compose_yml "docker-comet.yml"
 
+  add_exposed_ports "${COMET_EXPOSE_PORT}" "__COMET_PORTS__" "8666"
+
   create_nginx_conf "${COMET}" "nginx-comet"
 
   add_nginx_depends_on "comet"
@@ -1622,6 +1979,8 @@ setup_comet() {
   fi
 
   add_rsyslog_conf "comet"
+
+  setup_wilma
 }
 
 #
@@ -1636,6 +1995,8 @@ setup_quantumleap() {
 
   add_docker_compose_yml "docker-quantumleap.yml"
 
+  add_exposed_ports "${QUANTUMLEAP_EXPOSE_PORT}" "__QUANTUMLEAP_PORTS__" "8668"
+
   create_nginx_conf "${QUANTUMLEAP}" "nginx-quantumleap"
 
   add_nginx_depends_on  "quantumleap"
@@ -1644,6 +2005,8 @@ setup_quantumleap() {
 
   # Workaround for CrateDB. See https://crate.io/docs/crate/howtos/en/latest/deployment/containers/docker.html#troubleshooting
   ${SUDO} sysctl -w vm.max_map_count=262144
+
+  setup_wilma
 }
 
 #
@@ -1664,8 +2027,6 @@ setup_perseo() {
 
   add_rsyslog_conf "perseo-fe" "perseo-core"
 
-  PERSEO_ORION_URL="http://orion:1026/"
-
   if [ -z "${PERSEO_MAX_AGE}" ]; then
     PERSEO_MAX_AGE=6000
   fi
@@ -1679,7 +2040,6 @@ setup_perseo() {
 # Perseo
 PERSEO_MAX_AGE=${PERSEO_MAX_AGE}
 PERSEO_LOG_LEVEL=${PERSEO_LOG_LEVEL}
-PERSEO_ORION_URL=${PERSEO_ORION_URL}
 EOF
 
   if [ -n "${PERSEO_SMTP_HOST}" ]; then
@@ -1696,49 +2056,10 @@ EOF
     sed -i -e "/__PERSEO_FE_ENVIRONMENT__/i \      - PERSEO_SMTP_SECURE=\${PERSEO_SMTP_SECURE}" "${DOCKER_COMPOSE_YML}"
     echo "PERSEO_SMTP_SECURE=${PERSEO_SMTP_SECURE}" >> .env
   fi
-}
 
-#
-# Login and logoff for WireCloud
-#
-login_and_logoff_wirecloud() {
-  logging_info "${FUNCNAME[0]}"
+  setup_mongo
 
-  wait "https://${WIRECLOUD}/" "200"
-
-  sleep 1
-
-  ${CURL} -sL "https://${WIRECLOUD}/login" -c "${WORK_DIR}/cookie01.txt"  -o "${WORK_DIR}/out1.txt"
-
-  CSRF_TOKEN=$(sed -n "/name='_csrf/s/.*value='\(.*\)'.*/\1/p" "${WORK_DIR}/out1.txt")
-  OAUTH2_URL=$(sed -n "/\/oauth2\/authorize/s/.*action=\"\([^\"]*\)\".*/\1/p" "${WORK_DIR}/out1.txt" | sed -e "s/amp;//g")
-
-  sleep 1
-
-  ${CURL} -sL -b "${WORK_DIR}/cookie01.txt" -c "${WORK_DIR}/cookie02.txt" \
-    -o "${WORK_DIR}/out2.txt" \
-    --data "email=${IDM_ADMIN_EMAIL}" \
-    --data "password=${IDM_ADMIN_PASS}" \
-    --data "_csrf=${CSRF_TOKEN}" \
-    -X POST "https://${KEYROCK}${OAUTH2_URL}"
-
-  CSRF_TOKEN=$(sed -n "/name='_csrf/s/.*value='\(.*\)'.*/\1/p" "${WORK_DIR}/out2.txt")
-  OAUTH2_URL=$(sed -n "/enable_app/s/.*action=\"\([^\"]*\)\".*/\1/p" "${WORK_DIR}/out2.txt" | sed -e "s/amp;//g")
-
-  sleep 1
-
-  ${CURL} -sL -b "${WORK_DIR}/cookie02.txt" -c "${WORK_DIR}/cookie03.txt" -o "${WORK_DIR}/out3.txt" --data "_csrf=${CSRF_TOKEN}" \
-    --data "user_authorized_application[shared_attributes]=username" \
-    --data "user_authorized_application[shared_attributes]=email" \
-    --data "user_authorized_application[shared_attributes]=identity_attributes" \
-    --data "user_authorized_application[shared_attributes]=image" \
-    --data "user_authorized_application[shared_attributes]=gravatar" \
-    --data "user_authorized_application[shared_attributes]=eidas_profile" \
-    -X POST "https://${KEYROCK}${OAUTH2_URL}"
-
-  sleep 1
-
-  ${CURL} -sL -b "${WORK_DIR}/cookie03.txt" -o "${WORK_DIR}/out4.txt" "https://${WIRECLOUD}/logout"
+  setup_wilma
 }
 
 #
@@ -1752,6 +2073,19 @@ patch_widget() {
   patch_dir="${WORK_DIR}/widget_patch"
   ql_patch="\"URL of the QuantumLeap server to use for retrieving entity information\"\\n                default="
 
+  local orion_url
+  local quantumleap_url
+
+  orion_url=${MULTI_SERVER_ORION_URL}
+  if [ -z "${orion_url}" ]; then
+    orion_url=https://${ORION}
+  fi
+
+  quantumleap_url=${MULTI_SERVER_QUANTUMLEAP_URL}
+  if [ -z "${quantumleap_url}" ]; then
+    quantumleap_url=https://${QUANTUMLEAP}
+  fi
+
   for name in ngsi-browser ngsi-source ngsi-type-browser quantumleap-source
   do
     # shellcheck disable=SC2143
@@ -1760,9 +2094,9 @@ patch_widget() {
       mkdir "${patch_dir}"
       cd "${patch_dir}"
       unzip "${widget_path}" > /dev/null
-      sed -i "s%http://orion.lab.fiware.org:1026%https://${ORION}%" config.xml
+      sed -i "s%http://orion.lab.fiware.org:1026%${orion_url}%" config.xml
       sed -i "s%ngsiproxy.lab.fiware.org%${NGSIPROXY}%" config.xml
-      sed -i ":l; N; s/${ql_patch}\"\"/${ql_patch}\"https:\/\/${QUANTUMLEAP}\"/; b l;" config.xml
+      sed -i ":l; N; s%${ql_patch}\"\"%${ql_patch}\"${quantumleap_url}\"%; b l;" config.xml
       rm "${widget_path}"
       # shellcheck disable=SC2035
       zip -r "${widget_path}" -b /tmp * > /dev/null
@@ -1787,29 +2121,33 @@ install_widgets_for_wirecloud() {
 
   logging_info "${FUNCNAME[0]}"
 
-  login_and_logoff_wirecloud
+  wait "https://${WIRECLOUD}/" "200"
 
-  mkdir -p "${WORK_DIR}/widgets/"
+  sleep 1
+
+  local found
+  local ql_installed
+  ql_installed=false
+  if [ -n "${QUANTUMLEAP}" ] || [ -n "${MULTI_SERVER_QUANTUMLEAP_URL}" ]; then
+    ql_installed=true
+  fi
 
   # shellcheck disable=SC2002
   cat "${SETUP_DIR}/widgets_list.txt" | while read -r line
   do
-    name="$(basename "${line}")"
-    logging_info "Installing ${name}"
-    fullpath="${WORK_DIR}/widgets/${name}"
-
-    curl -sL "${line}" -o "${fullpath}"
-    patch_widget "${name}" "${fullpath}"
     set +e
-    ${NGSI_GO} macs --host "${WIRECLOUD}" install --file "${fullpath}" --overwrite
+    found=$(echo "${line}" | grep -ic QUANTUMLEAP)
     set -e
-  done
+    if "${ql_installed}" || [ "${found}" -eq 0 ]; then
+      name="$(basename "${line}")"
+      logging_info "Installing ${name}"
+      fullpath="${WIDGET_DIR}/${name}"
 
-  cat <<EOF > "${WORK_DIR}/patch.sql"
-UPDATE catalogue_catalogueresource SET public = true;
-\q
-EOF
-  ${SUDO} sh -c "${DOCKER_COMPOSE_CMD} exec -T postgres psql -U postgres postgres < ${WORK_DIR}/patch.sql"
+      curl -sL "${line}" -o "${fullpath}"
+      patch_widget "${name}" "${fullpath}"
+      ${DOCKER_COMPOSE} exec --tty wirecloud python manage.py addtocatalogue --public "/widgets/${name}"
+    fi
+  done
 }
 
 #
@@ -1829,7 +2167,7 @@ setup_wirecloud() {
   local rid
 
   # Create Applicaton for WireCloud
-  aid=$(${NGSI_GO} applications --host "${IDM}" create --name "WireCloud" --description "WireCloud application" --url "https://${WIRECLOUD}/" --redirectUri "https://${WIRECLOUD}/complete/fiware/")
+  aid=$(${NGSI_GO} applications --host "${IDM}" create --name "WireCloud" --description "WireCloud application (${HOST_NAME})" --url "https://${WIRECLOUD}/" --redirectUri "https://${WIRECLOUD}/complete/fiware/")
   secret=$(${NGSI_GO} applications --host "${IDM}" get --aid "${aid}" | jq -r .application.secret)
   rid=$(${NGSI_GO} applications --host "${IDM}" roles --aid "${aid}" create --name Admin)
   ${NGSI_GO} applications --host "${IDM}" users --aid "${aid}" assign --rid "${rid}" --uid "${IDM_ADMIN_UID}" > /dev/null
@@ -1846,8 +2184,11 @@ setup_wirecloud() {
 
   add_rsyslog_conf "wirecloud" "elasticsearch" "memcached" "ngsiproxy"
 
-WIRECLOUD_CLIENT_ID=${aid}
-WIRECLOUD_CLIENT_SECRET=${secret}
+  WIDGET_DIR="${DATA_DIR}/wirecloud/widgets"
+  mkdir -p "${WIDGET_DIR}"
+
+  WIRECLOUD_CLIENT_ID=${aid}
+  WIRECLOUD_CLIENT_SECRET=${secret}
 
   cat <<EOF >> .env
 
@@ -2043,6 +2384,7 @@ setup_iotagent_ul() {
 
   add_rsyslog_conf "iotagent-ul"
 
+  setup_mongo
   create_openiot_mongo_index
   cat "${TEMPLEATE}/mongo/iotagentul.js" >> "${CONFIG_DIR}/mongo/mongo-init.js"
 
@@ -2070,6 +2412,8 @@ EOF
     add_to_docker_compose_yml "__IOTA_UL_ENVIRONMENT__" "     - IOTA_MQTT_USERNAME=\${MQTT_USERNAME}"
     add_to_docker_compose_yml "__IOTA_UL_ENVIRONMENT__" "     - IOTA_MQTT_PASSWORD=\${MQTT_PASSWORD}"
   fi
+
+  setup_wilma
 }
 
 #
@@ -2090,6 +2434,7 @@ setup_iotagent_json() {
 
   add_rsyslog_conf "iotagent-json"
 
+  setup_mongo
   create_openiot_mongo_index
   cat "${TEMPLEATE}/mongo/iotagentjson.js" >> "${CONFIG_DIR}/mongo/mongo-init.js"
 
@@ -2116,6 +2461,29 @@ EOF
     add_to_docker_compose_yml "__IOTA_JSON_ENVIRONMENT__" "     - IOTA_MQTT_PORT=1883"
     add_to_docker_compose_yml "__IOTA_JSON_ENVIRONMENT__" "     - IOTA_MQTT_USERNAME=\${MQTT_USERNAME}"
     add_to_docker_compose_yml "__IOTA_JSON_ENVIRONMENT__" "     - IOTA_MQTT_PASSWORD=\${MQTT_PASSWORD}"
+  fi
+
+  setup_wilma
+}
+
+#
+# Create API role for Node-RED
+#
+create_node_red_api_role() {
+  logging_info "${FUNCNAME[0]}"
+
+  local idm
+  local orion_client_id
+  idm=$1
+  orion_client_id=$2
+
+  set +e
+  HAS_API_ROLE=$(${NGSI_GO} applications --host "${idm}" roles --aid "${orion_client_id}" list --pretty | grep -c /node-red/api)
+  set -e
+  if [ "${HAS_API_ROLE}" -eq 0 ]; then
+    ORION_RID_API=$(${NGSI_GO} applications --host "${idm}" roles --aid "${orion_client_id}" create --name "/node-red/api")
+  else
+    ORION_RID_API=$(${NGSI_GO} applications --host "${idm}" roles --aid "${orion_client_id}" list --pretty | jq -r '.roles[] | select(.name == "/node-red/api").id' | head -1)
   fi
 }
 
@@ -2147,7 +2515,7 @@ setup_node_red_multi_instance() {
 
 EOF
 
-  ORION_RID_API=$(${NGSI_GO} applications --host "${IDM}" roles --aid "${ORION_CLIENT_ID}" create --name "/node-red/api")
+  create_node_red_api_role "${IDM}" "${ORION_CLIENT_ID}"
 
   for i in $(seq "${NODE_RED_INSTANCE_NUMBER}")
   do
@@ -2178,7 +2546,7 @@ EOF
     NODE_RED_CALLBACK_URL=https://${NODE_RED}${http_admin_root}/auth/strategy/callback
 
     # Create application for Node-RED
-    NODE_RED_CLIENT_ID=$(${NGSI_GO} applications --host "${IDM}" create --name "Node-RED ${number}" --description "Node-RED ${number} application" --url "${NODE_RED_URL}" --redirectUri "${NODE_RED_CALLBACK_URL}")
+    NODE_RED_CLIENT_ID=$(${NGSI_GO} applications --host "${IDM}" create --name "Node-RED ${number}" --description "Node-RED ${number} application (${HOST_NAME})" --url "${NODE_RED_URL}" --redirectUri "${NODE_RED_CALLBACK_URL}")
     NODE_RED_CLIENT_SECRET=$(${NGSI_GO} applications --host "${IDM}" get --aid "${NODE_RED_CLIENT_ID}" | jq -r .application.secret )
 
     # Create roles and add them to Admin
@@ -2239,6 +2607,10 @@ setup_node_red() {
 
   add_docker_compose_yml "docker-node-red.yml"
 
+  if ! ${MULTI_SERVER}; then
+    add_to_docker_compose_yml "__NODE_RED_DEPENDS_ON__" "   depends_on:\n      - keyrock"
+  fi 
+
   create_nginx_conf "${NODE_RED}" "nginx-node-red"
 
   add_nginx_depends_on  "node-red"
@@ -2249,7 +2621,7 @@ setup_node_red() {
   NODE_RED_CALLBACK_URL=https://${NODE_RED}/auth/strategy/callback
   
   # Create application for Node-RED
-  NODE_RED_CLIENT_ID=$(${NGSI_GO} applications --host "${IDM}" create --name "Node-RED" --description "Node-RED application" --url "${NODE_RED_URL}" --redirectUri "${NODE_RED_CALLBACK_URL}")
+  NODE_RED_CLIENT_ID=$(${NGSI_GO} applications --host "${IDM}" create --name "Node-RED" --description "Node-RED application (${HOST_NAME})" --url "${NODE_RED_URL}" --redirectUri "${NODE_RED_CALLBACK_URL}")
   NODE_RED_CLIENT_SECRET=$(${NGSI_GO} applications --host "${IDM}" get --aid "${NODE_RED_CLIENT_ID}" | jq -r .application.secret )
 
   # Create roles and add them to Admin
@@ -2261,7 +2633,8 @@ setup_node_red() {
 
   # Add Wilma application as a trusted application to Node-RED application
   ${NGSI_GO} applications --host "${IDM}" trusted --aid "${NODE_RED_CLIENT_ID}" add --tid "${ORION_CLIENT_ID}"  > /dev/null
-  RID=$(${NGSI_GO} applications --host "${IDM}" roles --aid "${ORION_CLIENT_ID}" create --name "/node-red/api")
+  create_node_red_api_role "${IDM}" "${ORION_CLIENT_ID}"
+  RID=${ORION_RID_API}
   ${NGSI_GO} applications --host "${IDM}" users --aid "${ORION_CLIENT_ID}" assign --rid "${RID}" --uid "${IDM_ADMIN_UID}" > /dev/null
 
   mkdir "${DATA_DIR}"/node-red
@@ -2298,7 +2671,7 @@ setup_grafana() {
   # Create application for Grafana
   GF_SERVER_ROOT_URL=https://${GRAFANA}/
   GF_SERVER_REDIRECT_URL=https://${GRAFANA}/login/generic_oauth
-  GRAFANA_CLIENT_ID=$(${NGSI_GO} applications --host "${IDM}" create --name "Grafana" --description "Grafana application" --url "${GF_SERVER_ROOT_URL}" --redirectUri "${GF_SERVER_REDIRECT_URL}" --responseType "code,token,id_token")
+  GRAFANA_CLIENT_ID=$(${NGSI_GO} applications --host "${IDM}" create --name "Grafana" --description "Grafana application (${HOST_NAME})" --url "${GF_SERVER_ROOT_URL}" --redirectUri "${GF_SERVER_REDIRECT_URL}" --responseType "code,token,id_token")
   GRAFANA_CLIENT_SECRET=$(${NGSI_GO} applications --host "${IDM}" get --aid "${GRAFANA_CLIENT_ID}" | jq -r .application.secret )
 
   mkdir -p "${DATA_DIR}"/grafana
@@ -2379,10 +2752,22 @@ setup_ngsi_go() {
 
   SERVERS=("$(${NGSI_GO} server list --all -1)")
 
+  local save_orion
+  save_orion=${ORION}
+  local save_keyrock
+  save_keyrock=${KEYROCK}
+
   for NAME in "${APPS[@]}"
   do
+    if [ "${NAME}" = "ORION" ] && [ -n "${MULTI_SERVER_ORION_HOST}" ]; then
+      ORION=${MULTI_SERVER_ORION_HOST}
+    fi
     eval VAL=\"\$"$NAME"\"
     if [ -n "$VAL" ]; then
+      if [ "${NAME}" = "KEYROCK" ] && [ "${VAL}" = "localhost:3000" ]; then
+          KEYROCK=localhost
+          VAL=${KEYROCK}
+      fi
       # shellcheck disable=SC2068
       for name in ${SERVERS[@]}
       do
@@ -2410,6 +2795,9 @@ setup_ngsi_go() {
       esac
     fi
   done
+
+  ORION=${save_orion}
+  KEYROCK=${save_keyrock}
 }
 
 #
@@ -2420,6 +2808,9 @@ update_nginx_file() {
 
   for name in "${APPS[@]}"
   do
+    if ${MULTI_SERVER} && [ "${name}" = "KEYROCK" ]; then
+      continue
+    fi 
     if [ "${name}" = "MOSQUITTO" ]; then
       continue
     fi
@@ -2453,7 +2844,9 @@ boot_up_containers() {
   logging_info "docker-compose up -d --build"
   ${DOCKER_COMPOSE} up -d --build
 
-  wait "https://${KEYROCK}/" "200"
+  if ! ${MULTI_SERVER}; then
+    wait "https://${KEYROCK}/" "200"
+  fi
 }
 
 #
@@ -2462,19 +2855,9 @@ boot_up_containers() {
 setup_end() {
   logging_info "${FUNCNAME[0]}"
 
-  delete_from_docker_compose_yml "__NGINX_"
-  delete_from_docker_compose_yml "__KEYROCK_"
-  delete_from_docker_compose_yml "__WIRECLOUD_"
-  delete_from_docker_compose_yml "__IOTA_"
-  delete_from_docker_compose_yml "__MOSQUITTO_"
-  delete_from_docker_compose_yml "__NODE_RED_"
-  delete_from_docker_compose_yml "__ORION_"
-  delete_from_docker_compose_yml "__CYGNUS_"
-  delete_from_docker_compose_yml "__COMET_"
-  delete_from_docker_compose_yml "__PERSEO_"
-  delete_from_docker_compose_yml "__POSTFIX_"
+  delete_from_docker_compose_yml "# __"
 
-  if [ -n "${KEYROCK}" ]; then
+  if ! ${MULTI_SERVER} && [ -n "${KEYROCK}" ]; then
     sed -i -e "/# __NGINX_KEYROCK__/d" "${NGINX_SITES}/${KEYROCK}"
   fi
   if [ -n "${ORION}" ]; then
@@ -2533,8 +2916,6 @@ setup_main() {
 
   setup_nginx
   setup_keyrock
-  setup_wilma
-  setup_tokenproxy
   setup_orion
   setup_queryproxy
   setup_regproxy
@@ -2570,6 +2951,7 @@ setup_main() {
 init_cmd() {
   SUDO=sudo
   IS_ROOT=false 
+  MULTI_SERVER=false
 
   MOCK_PATH=""
   if $FIBB_TEST; then
@@ -2591,6 +2973,8 @@ init_cmd() {
   HOST_CMD="${FIBB_TEST_HOST_CMD:-host}"
   WAIT_TIME=${FIBB_WAIT_TIME:-300}
   SKIP_INSTALL_WIDGET="${FIBB_TEST_SKIP_INSTALL_WIDGET:-false}"
+
+  HOST_NAME=$(hostname)
 
   INSTALL=".install"
 

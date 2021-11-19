@@ -44,6 +44,9 @@ IMAGE_WILMA=fiware/pep-proxy:8.1.0
 # Set a sub-domain name of Orion
 ORION=orion
 
+# Expose port 1026 (none, local, all) Default: none
+ORION_EXPOSE_PORT=
+
 # Docker image for Orion
 IMAGE_ORION=telefonicaiot/fiware-orion:3.3.1
 
@@ -59,6 +62,9 @@ CYGNUS_MYSQL=
 CYGNUS_POSTGRES=
 CYGNUS_ELASTICSEARCH=
 
+# Expose port (none, local, all) Default: none
+CYGNUS_EXPOSE_PORT=
+
 # Logging level for Cygnus
 #   https://github.com/telefonicaid/fiware-cygnus/blob/master/doc/cygnus-common/installation_and_administration_guide/install_with_docker.md
 #   INFO, DEBUG
@@ -73,6 +79,9 @@ ELASTICSEARCH=
 # Elasticsearch Java options
 ELASTICSEARCH_JAVA_OPTS="-Xmx256m -Xms256m"
 
+# Expose port (none, local, all) Default: none
+ELASTICSEARCH_EXPOSE_PORT=
+
 # Docker image for Elasticsearch
 IMAGE_ELASTICSEARCH_DB=elasticsearch:7.6.2
 
@@ -82,10 +91,13 @@ IMAGE_ELASTICSEARCH_DB=elasticsearch:7.6.2
 # Set a sub-domain name of Comet
 COMET=
 
+# Expose port (none, local, all) Default: none
+COMET_EXPOSE_PORT=
+
 # Comet
 #   https://github.com/telefonicaid/fiware-sth-comet/blob/master/doc/manuals/running.md
 #   Possible values are: "DEBUG", "INFO", "WARN", "ERROR" and "FATAL"
-LOGOPS_LEVEL=INFO
+COMET_LOGOPS_LEVEL=INFO
 
 # Docker image for Comet
 IMAGE_COMET=fiware/sth-comet:2.8.0
@@ -119,6 +131,9 @@ IMAGE_PERSEO_FE=telefonicaiot/perseo-fe:1.20.0
 #
 # Set a sub-domain name of Quantumleap
 QUANTUMLEAP=
+
+# Expose port (none, local, all) Default: none
+QUANTUMLEAP_EXPOSE_PORT=
 
 # Quantumleap
 #   INFO, DEBUG
@@ -336,6 +351,45 @@ REGPROXY_VERBOSE=false
 IMAGE_REGPROXY=letsfiware/regproxy:0.7.0-next
 
 #
+# MongoDB
+#
+# Expose port (none, local, all) Default: none
+MONGO_EXPOSE_PORT=
+
+# Docker images for MongoDB
+IMAGE_MONGO=mongo:4.4
+
+#
+# MySQL
+#
+# Expose port (none, local, all) Default: none
+MYSQL_EXPOSE_PORT=
+
+# Docker images for MySQL
+IMAGE_MYSQL=mysql:5.7
+
+#
+# PostgreSQL
+#
+# Expose port (none, local, all) Default: none
+POSTGRES_EXPOSE_PORT=
+
+# Docker images for PostgreSQL
+IMAGE_POSTGRES=postgres:11
+
+#
+# Nginx
+#
+# Docker images for Nginx
+IMAGE_NGINX=nginx:1.21
+
+#
+# Firewall (firewalld)
+#
+# Enable firewall. (true or false) Default: false
+FIREWALL=
+
+#
 # Certbot options
 #
 # Set a e-mail address for certbot. Defaul: a e-mail address of an admin user for Keyrock.
@@ -355,14 +409,19 @@ CERT_FORCE_RENEWAL=
 IMAGE_CERTBOT=certbot/certbot:v1.18.0
 
 #
-# Firewall (firewalld)
+# Multi-server mode
 #
-# Enable firewall. (true or false) Default: false
-FIREWALL=
+MULTI_SERVER_KEYROCK=
+MULTI_SERVER_ADMIN_EMAIL=
+MULTI_SERVER_ADMIN_PASS=
 
-# Docker images
-IMAGE_MONGO=mongo:4.4
-IMAGE_MYSQL=mysql:5.7
-IMAGE_POSTGRES=postgres:11
+MULTI_SERVER_PEP_PROXY_USERNAME=
+MULTI_SERVER_PEP_PASSWORD=
 
-IMAGE_NGINX=nginx:1.21
+MULTI_SERVER_CLIENT_ID=
+MULTI_SERVER_CLIENT_SECRET=
+
+MULTI_SERVER_ORION_HOST=
+MULTI_SERVER_QUANTUMLEAP_HOST=
+
+MULTI_SERVER_ORION_INTERNAL_IP=

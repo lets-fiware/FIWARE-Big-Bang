@@ -2,6 +2,7 @@ version: "3"
 services:
   postgres:
     image: ${IMAGE_POSTGRES}
+    # __POSTGRES_PORTS__
     environment:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     volumes:

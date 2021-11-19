@@ -28,23 +28,9 @@
 
 set -ue
 
-: "${CLIENT_ID:?CLIENT_ID not found}"
-: "${CLIENT_SECRET:?CLIENT_SECRET not found}"
-
-LOG_LEVEL="${LOG_LEVEL:-info}"
-HOST="${HOST:-http://keyrock:3000}"
-VERBOSE="${VERBOSE:-false}"
-
-if ${VERBOSE}; then
-  VERBOSE=--verbose
-else
-  VERBOSE=""
-fi
-
-echo "HOST=${HOST}"
-echo "LOG_LEVEL=${LOG_LEVEL}"
-echo "VERBOSE=${VERBOSE}"
-
-NGSI_GO="/usr/local/bin/ngsi --stderr ${LOG_LEVEL} --config ./ngsi-go-config.json --cache ./ngsi-go-token-cache.json"
-
-${NGSI_GO} tokenproxy server --idmHost "${HOST}" --clientId "${CLIENT_ID}" --clientSecret "${CLIENT_SECRET}" "${VERBOSE}"
+for file in docker-compose.yml docker-cert.yml docker-idm.yml
+do
+  if [ -e ${file} ]; then
+    sudo /usr/local/bin/docker-compose -f ${file} down --remove-orphan
+  fi
+done

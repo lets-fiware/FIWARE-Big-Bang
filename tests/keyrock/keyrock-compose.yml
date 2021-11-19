@@ -1,0 +1,19 @@
+version: "3"
+services:
+  keyrock:
+    image: fiware/idm:8.1.0
+    depends_on:
+      - mysql
+    ports:
+      - "3000:3000"
+    environment:
+      - IDM_DB_HOST=mysql
+      - IDM_ADMIN_USER=admin
+      - IDM_ADMIN_EMAIL=admin@example.com
+      - IDM_ADMIN_PASS=1234
+  mysql:
+    image: mysql:5.7
+    environment:
+      - MYSQL_ROOT_PASSWORD=1234
+    volumes:
+      - ./mysql:/docker-entrypoint-initdb.d/:ro

@@ -36,12 +36,12 @@ FI-BB stands for FIWARE Big Bang.
 -   Orion
 -   Cygnus
 -   Comet
+-   Perseo
 -   QuantumLeap
 -   WireCloud
 -   Ngsiproxy
 -   IoT Agent for UltraLight (over HTTP and MQTT)
 -   IoT Agent for JSON (over HTTP and MQTT)
--   Perseo
 
 ### Supported third-party open source software
 

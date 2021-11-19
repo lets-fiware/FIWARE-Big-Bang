@@ -44,7 +44,7 @@
       proxy_set_header Content-Length "";
       proxy_pass_request_body off;
       rewrite (.*) $req_uri break;
-      proxy_pass http://wilma:1026;
+      proxy_pass http://wilma:1027;
     }
 
     access_log /var/log/nginx/HOST-access.log;
