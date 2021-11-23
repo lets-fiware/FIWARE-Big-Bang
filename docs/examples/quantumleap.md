@@ -1,29 +1,10 @@
 # QuantumLeap
 
--   [Configuration parameters](#configuration-parameters)
--   [How to setup](#how-to-setup)
 -   [Get version](#get-version)
 -   [Sanity check for QuantumLeap](#sanity-check-for-quantumLeap)
 -   [Persisting Context Data into QuantumLeap](#persisting-context-data-into-quantumLeap)
 -   [Examples](#examples)
 -   [Related information](#related-information)
-
-## Configuration parameters
-
-You can specify configurations by editing the `config.sh` file.
-
-| Variable name | Description                      | Default value |
-| ------------- | -------------------------------- | ------------- |
-| QUANTUMLEAP   | A sub-domain name of QuantumLeap | (empty)       |
-
-## How to setup
-
-To set up QuantumLeap, configure an environment variable in config.sh.
-Set a sub-domain name for QuantumLeap to `QUANTUMLEAP=` as shown:
-
-```bash
-QUANTUMLEAP=quantumleap
-```
 
 ## Get version
 

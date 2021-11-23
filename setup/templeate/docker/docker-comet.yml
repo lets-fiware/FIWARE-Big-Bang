@@ -2,6 +2,7 @@ version: "3"
 services:
   comet:
     image: ${IMAGE_COMET}
+    # __COMET_PORTS__
     depends_on:
       # __COMET_DEPENDS_ON__
       - mongo
@@ -12,7 +13,7 @@ services:
       - STH_PORT=8666
       - DB_PREFIX=sth_
       - DB_URI=mongo:27017
-      - LOGOPS_LEVEL=${LOGOPS_LEVEL}
+      - LOGOPS_LEVEL=${COMET_LOGOPS_LEVEL}
     healthcheck:
       test: curl --fail -s http://comet:8666/version || exit 1
     restart: always

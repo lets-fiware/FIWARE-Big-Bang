@@ -2,6 +2,7 @@ version: "3"
 services:
   cygnus:
     image: ${IMAGE_CYGNUS}
+    # __CYGNUS_PORTS__
     depends_on:
     # __CYGNUS_DEPENDS_ON__
     environment:

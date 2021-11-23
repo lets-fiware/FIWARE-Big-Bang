@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.7.0-next
 
+-   Add feature to support multi-server mode (#113)
 -   Refactor config.sh (#112)
 -   Update documentaion (#111)
 -   Add feature to support perseo (#110)

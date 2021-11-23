@@ -1,57 +1,11 @@
 # Node-RED
 
--   [Configuration parameters](#configuration-parameters)
--   [How to setup](#how-to-setup)
 -   [Sanity check for Node-RED](#sanity-check-node-red)
 -   [Access Node-RED API](#access-node-red-api)
 -   [How to use NGSI node](#how-to-use-ngsi-node)
 -   [Configration for Context-Broker node](#configration-for-context-broker-node)
 -   [Examples](#examples)
 -   [Related information](#related-information)
-
-## Configuration parameters
-
-You can specify configurations by editing the `config.sh` file.
-
-| Variable name                   | Description                      | Default value |
-| ------------------------------- | -------------------------------- | ------------- |
-| NODE\_RED                       | A sub-domain name of Node-RED    | (empty)       |
-| NODE\_RED\_INSTANCE\_NUMBER     | Number of Node-RED instance.     | 1             |
-| NODE\_RED\_INSTANCE\_USERNAME   | Username for Node-RED instance.  | node-red      |
-| NODE\_RED\_INSTANCE\_HTTP\_ROOT | HTTP root for Node-RED instance. | /node-red     |
-
-## How to setup
-
-### Single-instance
-
-To set up Node-RED, configure an environment variable in config.sh. Set a sub-domain name
-for Node-RED to `NODE_RED` as shown:
-
-```bash
-NODE_RED=node-red
-```
-
-### Multi-instance
-
-To set up multiple Node-RED instances, configure an environment variable in config.sh.
-Set a sub-domain name for Node-RED to `NODE_RED` and set number of instances to
-`NODE_RED_INSTANCE_NUMBER` as shown:
-
-```bash
-NODE_RED=node-red
-NODE_RED_INSTANCE_NUMBER=5
-```
-
-After installation, the `node-red_users.txt` file has been created in a directory you ran the
-`lets-fiware.sh` script. It has URL, username and password to access each Node-Red instance.
-
-```text
-https://node-red.example.com/node-red001        node-red001@example.com oS7O0tqhLPPFSflF
-https://node-red.example.com/node-red002        node-red002@example.com hs7Nrt8PZLTsJlnS
-https://node-red.example.com/node-red003        node-red003@example.com W1XEgeJjsXr0q5UI
-https://node-red.example.com/node-red004        node-red004@example.com jdZV5SGXEZbtGjTP
-https://node-red.example.com/node-red005        node-red005@example.com XgnFHj63gqxfqyE1
-```
 
 ## Sanity check for Node-RED
 
@@ -181,7 +135,7 @@ ngsi get \
 
 ### Create flow
 
-![](./images/node-red-001.png)
+![](../images/node-red-001.png)
 
 ```
 [{"id":"22c1abd2f3953dc4","type":"tab","label":"flow1","disabled":false,"info":""},{"id":"ca443434c8b99c5a","type":"inject","z":"22c1abd2f3953dc4","name":"","props":[{"p":"payload"}],"repeat":"","crontab":"","once":false,"onceDelay":0.1,"topic":"","payload":"device001","payloadType":"str","x":300,"y":180,"wires":[["354b5c13a6eda39a"]]},{"id":"43be416d8e939507","type":"debug","z":"22c1abd2f3953dc4","name":"","active":true,"tosidebar":true,"console":false,"tostatus":false,"complete":"false","statusVal":"","statusType":"auto","x":690,"y":180,"wires":[]},{"id":"354b5c13a6eda39a","type":"NGSI-Entity","z":"22c1abd2f3953dc4","name":"","endpoint":"802c3058092a74ab","protocol":"v2","ldContext":"https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld","mode":"normalized","mimeType":"application/ld+json","attrs":"","x":490,"y":180,"wires":[["43be416d8e939507"]]},{"id":"802c3058092a74ab","type":"Context-Broker","name":"orion","endpoint":"https://orion.example.com","service":"","servicepath":"","idmEndpoint":"https://orion.example.com"}]
@@ -193,7 +147,7 @@ ngsi get \
 
 -   Endpoint: `https://orion.example.com`
 
-![](./images/node-red-002.png)
+![](../images/node-red-002.png)
 
 ### Security
 
@@ -201,11 +155,11 @@ ngsi get \
 -   Username: `admin@example.com`
 -   Password: `Your password`
 
-![](./images/node-red-003.png)
+![](../images/node-red-003.png)
 
 ### Inject payload
 
-![](./images/node-red-004.png)
+![](../images/node-red-004.png)
 
 ## Examples
 

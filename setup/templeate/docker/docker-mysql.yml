@@ -2,6 +2,7 @@ version: "3"
 services:
   mysql:
     image: ${IMAGE_MYSQL}
+    # __MYSQL_PORTS__
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
     volumes:

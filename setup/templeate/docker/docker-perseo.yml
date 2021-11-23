@@ -21,7 +21,7 @@ services:
       - PERSEO_MONGO_ENDPOINT=mongo
       - PERSEO_CORE_URL=http://perseo-core:8080
       - PERSEO_LOG_LEVEL=${PERSEO_LOG_LEVEL}
-      - PERSEO_ORION_URL=${PERSEO_ORION_URL}
+      - PERSEO_ORION_URL=${ORION_INTERNAL_URL}
       # __PERSEO_FE_ENVIRONMENT__
     restart: always
     logging:

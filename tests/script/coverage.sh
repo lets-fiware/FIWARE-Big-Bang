@@ -2,12 +2,17 @@
 
 set -ue
 
+#
+# Logging
+#
 logging() {
   echo "$2"
   /usr/bin/logger -is -p "$1" -t "FI-BB" "$2"
 }
 
-
+#
+# Install kcov
+#
 install_kcov() {
   logging "user.info" "${FUNCNAME[0]}"
 
@@ -26,6 +31,9 @@ install_kcov() {
   popd
 }
 
+#
+# Build certmock
+#
 build_certmock() {
   logging "user.info" "${FUNCNAME[0]}"
 
@@ -34,17 +42,99 @@ build_certmock() {
   popd
 }
 
+#
+# Reset env
+#
 reset_env() {
   sudo rm -fr config/ data/
   git checkout config.sh
 }
 
+#
+# Remove example com from hosts
+#
 remove_example_com_from_hosts() {
   sudo sed -i -e "/example.com/d" /etc/hosts
 }
 
+#
+# Wait for serive
+#
+wait() {
+  logging "user.info" "${FUNCNAME[0]}"
+
+  WAIT_TIME=300
+
+  local host
+  local ret
+
+  host=$1
+  ret=$2
+
+  echo "Wait for ${host} to be ready (${WAIT_TIME} sec)" 1>&2
+
+  for i in $(seq "${WAIT_TIME}")
+  do
+    # shellcheck disable=SC2086
+    if [ "${ret}" == "$(curl ${host} -o /dev/null -w '%{http_code}\n' -s)" ]; then
+      return
+    fi
+    sleep 1
+  done
+
+  logging "user.err" "${host}: Timeout was reached."
+  exit 1
+}
+
+#
+# Up keyrock for multi server
+#
+up_keyrock_for_multi_server() {
+  cd ./tests/keyrock
+
+  FIBB_KEYROCK_URL=http://localhost:3000/
+
+  sudo /usr/local/bin/docker-compose -f keyrock-compose.yml up -d
+
+  wait "${FIBB_KEYROCK_URL}" "200"
+
+  sleep 3
+
+  rm -f ngsi-go-config.json ngsi-go-token-cache.json
+  FIBB_NGSI_GO="/usr/local/bin/ngsi --batch --config ./ngsi-go-config.json --cache ./ngsi-go-token-cache.json"
+
+  ${FIBB_NGSI_GO} server add --host keyrock --serverType keyrock --serverHost "http://localhost:3000" --username "admin@example.com" --password "1234"
+
+  FIBB_AID=$(${FIBB_NGSI_GO} applications --host keyrock create --name "Wilma" --description "Wilma application" --url "http://localhost/" --redirectUri "http://localhost/")
+  FIBB_SECRET=$(${FIBB_NGSI_GO} applications --host keyrock get --aid "${FIBB_AID}" | jq -r .application.secret )
+  ${FIBB_NGSI_GO} applications --host keyrock roles --aid "${FIBB_AID}" create --name "/node-red/api" > /dev/null
+
+  FIBB_PEP_PASSWORD=$(${FIBB_NGSI_GO} applications --host keyrock  pep --aid "${FIBB_AID}" create --run | jq -r .pep_proxy.password)
+  FIBB_PEP_ID=$(${FIBB_NGSI_GO} applications --host keyrock  pep --aid "${FIBB_AID}" list | jq -r .pep_proxy.id)
+
+  cd - > /dev/null
+}
+
+#
+# Down keyrock for multi server
+#
+down_keyrock_for_multi_server() {
+  cd ./tests/keyrock
+
+  sudo /usr/local/bin/docker-compose -f keyrock-compose.yml down
+
+  rm -f ngsi-go-config.json ngsi-go-token-cache.json
+
+  cd - > /dev/null
+}
+
+#
+# setup
+#
 setup() {
   logging "user.info" "${FUNCNAME[0]}"
+
+  LANG=C
 
   install_kcov
   build_certmock
@@ -60,6 +150,10 @@ setup() {
   fi
 
   mkdir coverage
+
+  if [ -e ~/.bashrc ]; then
+    sed -i -e "/ngsi_bash_autocomplete/d" ~/.bashrc
+  fi
 
   sudo rm -f /usr/local/bin/docker-compose
   sudo rm -f /etc/redhat-release
@@ -135,6 +229,7 @@ fibb_down() {
 install_test1() {
   logging "user.info" "${FUNCNAME[0]}"
 
+  sed -i -e "s/^\(ORION_EXPOSE_PORT=\).*/\1local/" config.sh
   sed -i -e "s/^\(CYGNUS=\).*/\1cygnus/" config.sh
   sed -i -e "s/^\(COMET=\).*/\1comet/" config.sh
   sed -i -e "s/^\(QUANTUMLEAP=\).*/\1quantumleap/" config.sh
@@ -156,6 +251,7 @@ install_test1() {
   sed -i -e "s/^\(CYGNUS_MYSQL=\).*/\1true/" config.sh
   sed -i -e "s/^\(CYGNUS_POSTGRES=\).*/\1true/" config.sh
   sed -i -e "s/^\(CYGNUS_ELASTICSEARCH=\).*/\1true/" config.sh
+  sed -i -e "s/^\(CYGNUS_EXPOSE_PORT=\).*/\1all/" config.sh
 
   sed -i -e "s/^\(REGPROXY=\).*/\1true/" config.sh
   sed -i -e "s/^\(REGPROXY_NGSITYPE=\).*/\1v2/" config.sh
@@ -214,39 +310,16 @@ install_test4() {
   sed -i -e "s/^\(IOTAGENT_HTTP=\).*/\1iotagent-http/" config.sh
   sed -i -e "s/^\(IOTA_HTTP_AUTH=\).*/\1basic/" config.sh
   sed -i -e "s/^\(MOSQUITTO=\).*/\1mosquitto/" config.sh
+
   export FIBB_TEST_DOCKER_CMD=rekcod
   export FIBB_TEST_SKIP_INSTALL_WIDGET=true
+
+  sudo apt -y remove zip
+  sudo apt -y autoremove
 
   ${KCOV} ./coverage ./lets-fiware.sh example.com "${IPS[0]}"
 
   export FIBB_TEST_DOCKER_CMD=
-}
-
-install_on_centos() {
-  logging "user.info" "${FUNCNAME[0]}"
-
-  sleep 5
-
-  sudo touch /etc/redhat-release
-
-  sudo apt remove -y jq
-
-  reset_env
-
-  sed -i -e "s/^\(FIREWALL=\).*/\1true/" config.sh
-  sed -i -e "s/^\(IOTAGENT_UL=\).*/\1iotagent-ul/" config.sh
-  sed -i -e "s/^\(IOTAGENT_HTTP=\).*/\1iotagent-http/" config.sh
-  sed -i -e "s/^\(IOTA_HTTP_AUTH=\).*/\1none/" config.sh
-  export FIBB_TEST_DOCKER_CMD=rekcod
-
-  ${KCOV} ./coverage ./lets-fiware.sh example.com
-
-  sudo rm -f /etc/redhat-release
-  export FIBB_TEST_DOCKER_CMD=
-
-  sleep 5
-
-  fibb_down
 }
 
 install_test5() {
@@ -266,6 +339,110 @@ install_test5() {
   reset_env
 
   unset FIBB_WAIT_TIME
+}
+
+install_on_centos() {
+  logging "user.info" "${FUNCNAME[0]}"
+
+  sleep 5
+
+  sudo touch /etc/redhat-release
+
+  sudo apt remove -y jq
+
+  reset_env
+
+  sed -i -e "s/^\(FIREWALL=\).*/\1true/" config.sh
+  sed -i -e "s/^\(IOTAGENT_UL=\).*/\1iotagent-ul/" config.sh
+  sed -i -e "s/^\(IOTAGENT_HTTP=\).*/\1iotagent-http/" config.sh
+  sed -i -e "s/^\(IOTA_HTTP_AUTH=\).*/\1none/" config.sh
+
+  export FIBB_TEST_DOCKER_CMD=rekcod
+
+  ${KCOV} ./coverage ./lets-fiware.sh example.com
+
+  sudo rm -f /etc/redhat-release
+  export FIBB_TEST_DOCKER_CMD=
+
+  sleep 5
+
+  fibb_down
+}
+
+#
+# Test multi server installation
+#
+multi_server_test1() {
+  logging "user.info" "${FUNCNAME[0]}"
+
+  reset_env
+
+  up_keyrock_for_multi_server
+
+  sleep 2
+
+  sed -i -e "s/^\(KEYROCK=\).*/\1/" config.sh
+  sed -i -e "s/^\(MULTI_SERVER_KEYROCK=\).*/\1http:\/\/localhost:3000/" config.sh
+  sed -i -e "s/^\(MULTI_SERVER_ADMIN_EMAIL=\).*/\1admin@example.com/" config.sh
+  sed -i -e "s/^\(MULTI_SERVER_ADMIN_PASS=\).*/\11234/" config.sh
+  sed -i -e "s/^\(MULTI_SERVER_PEP_PROXY_USERNAME=\).*/\1${FIBB_PEP_ID}/" config.sh
+  sed -i -e "s/^\(MULTI_SERVER_PEP_PASSWORD=\).*/\1${FIBB_PEP_PASSWORD}/" config.sh
+  sed -i -e "s/^\(MULTI_SERVER_CLIENT_ID=\).*/\1${FIBB_AID}/" config.sh
+  sed -i -e "s/^\(MULTI_SERVER_CLIENT_SECRET=\).*/\1${FIBB_SECRET}/" config.sh
+
+  ${KCOV} ./coverage ./lets-fiware.sh example.com
+
+  down_keyrock_for_multi_server
+
+  fibb_down
+
+  reset_env
+
+  sleep 5
+}
+
+#
+# Test multi server installation
+#
+multi_server_test2() {
+  logging "user.info" "${FUNCNAME[0]}"
+
+  reset_env
+
+  up_keyrock_for_multi_server
+
+  sleep 2
+
+  sed -i -e "s/^\(KEYROCK=\).*/\1/" config.sh
+  sed -i -e "s/^\(ORION=\).*/\1/" config.sh
+  sed -i -e "s/^\(NODE_RED=\).*/\1node-red/" config.sh
+  sed -i -e "s/^\(PERSEO=\).*/\1perseo/" config.sh
+  sed -i -e "s/^\(WIRECLOUD=\).*/\1wirecloud/" config.sh
+  sed -i -e "s/^\(NGSIPROXY=\).*/\1ngsiproxy/" config.sh
+  sed -i -e "s/^\(MULTI_SERVER_KEYROCK=\).*/\1http:\/\/localhost:3000/" config.sh
+  sed -i -e "s/^\(MULTI_SERVER_ADMIN_EMAIL=\).*/\1admin@example.com/" config.sh
+  sed -i -e "s/^\(MULTI_SERVER_ADMIN_PASS=\).*/\11234/" config.sh
+  sed -i -e "s/^\(MULTI_SERVER_PEP_PROXY_USERNAME=\).*/\1${FIBB_PEP_ID}/" config.sh
+  sed -i -e "s/^\(MULTI_SERVER_PEP_PASSWORD=\).*/\1${FIBB_PEP_PASSWORD}/" config.sh
+  sed -i -e "s/^\(MULTI_SERVER_CLIENT_ID=\).*/\1${FIBB_AID}/" config.sh
+  sed -i -e "s/^\(MULTI_SERVER_CLIENT_SECRET=\).*/\1${FIBB_SECRET}/" config.sh
+  sed -i -e "s/^\(MULTI_SERVER_ORION_HOST=\).*/\1orion.exmaple.com/" config.sh
+  sed -i -e "s/^\(MULTI_SERVER_QUANTUMLEAP_HOST=\).*/\1quantumleap.exmaple.com/" config.sh
+  sed -i -e "s/^\(MULTI_SERVER_ORION_INTERNAL_IP=\).*/\1192.168.0.1/" config.sh
+
+  export FIBB_TEST_SKIP_INSTALL_WIDGET=true
+
+  ${KCOV} ./coverage ./lets-fiware.sh example.com
+
+  down_keyrock_for_multi_server
+
+  fibb_down
+
+  export FIBB_TEST_SKIP_INSTALL_WIDGET=
+
+  reset_env
+
+  sleep 5
 }
 
 error_test() {
@@ -341,7 +518,7 @@ error_test() {
   ${KCOV} ./coverage ./lets-fiware.sh example.com
   reset_env
 
-  echo "*** Keyrock is empty ***" 1>&2
+  echo "*** Keyrock is empty (Set either KEYROCK or MULTI_SERVER_KEYROCK) ***" 1>&2
   sed -i -e "s/^\(KEYROCK=\).*/\1/" config.sh
   ${KCOV} ./coverage ./lets-fiware.sh example.com
   reset_env
@@ -400,28 +577,110 @@ EOF
   sed -i -e "s/^\(IOTA_HTTP_AUTH=\).*/\1error/" config.sh
   ${KCOV} ./coverage ./lets-fiware.sh example.com
   reset_env
+
+  echo "*** Set either KEYROCK or MULTI_SERVER_KEYROCK ***" 1>&2
+  sed -i -e "s/^\(KEYROCK=\).*/\1keyrock/" config.sh
+  sed -i -e "s/^\(MULTI_SERVER_KEYROCK=\).*/\1https::\/\/keyrock.example.com/" config.sh
+  ${KCOV} ./coverage ./lets-fiware.sh example.com
+  reset_env
+
+  echo "*** Queryroxy is enabled but Orion not found***" 1>&2
+  sed -i -e "s/^\(ORION=\).*/\1/" config.sh
+  sed -i -e "s/^\(QUERYPROXY=\).*/\1true/" config.sh
+  ${KCOV} ./coverage ./lets-fiware.sh example.com
+  reset_env
+
+  echo "*** MULTI_SERVER_KEYROCK not http or https ***" 1>&2
+  sed -i -e "s/^\(KEYROCK=\).*/\1/" config.sh
+  sed -i -e "s/^\(MULTI_SERVER_KEYROCK=\).*/\1keyrock.example.com/" config.sh
+  ${KCOV} ./coverage ./lets-fiware.sh example.com
+  reset_env
+
+  echo "*** MULTI_SERVER_ADMIN_EMAIL or MULTI_SERVER_ADMIN_PASS is empty ***" 1>&2
+  sed -i -e "s/^\(KEYROCK=\).*/\1/" config.sh
+  sed -i -e "s/^\(MULTI_SERVER_KEYROCK=\).*/\1https:\/\/keyrock.example.com/" config.sh
+  ${KCOV} ./coverage ./lets-fiware.sh example.com
+  reset_env
+
+  echo "*** MULTI_SERVER_PEP_PROXY_USERNAME or MULTI_SERVER_PEP_PASSWORD is empty ***" 1>&2
+  sed -i -e "s/^\(KEYROCK=\).*/\1/" config.sh
+  sed -i -e "s/^\(MULTI_SERVER_KEYROCK=\).*/\1https:\/\/keyrock.example.com/" config.sh
+  sed -i -e "s/^\(MULTI_SERVER_ADMIN_EMAIL=\).*/\1admin@example.com/" config.sh
+  sed -i -e "s/^\(MULTI_SERVER_ADMIN_PASS=\).*/\11234/" config.sh
+  ${KCOV} ./coverage ./lets-fiware.sh example.com
+  reset_env
+
+  echo "*** MULTI_SERVER_CLIENT_ID or MULTI_SERVER_CLIENT_SECRET is empty ***" 1>&2
+  sed -i -e "s/^\(KEYROCK=\).*/\1/" config.sh
+  sed -i -e "s/^\(MULTI_SERVER_KEYROCK=\).*/\1https:\/\/keyrock.example.com/" config.sh
+  sed -i -e "s/^\(MULTI_SERVER_ADMIN_EMAIL=\).*/\1admin@example.com/" config.sh
+  sed -i -e "s/^\(MULTI_SERVER_ADMIN_PASS=\).*/\11234/" config.sh
+  sed -i -e "s/^\(MULTI_SERVER_PEP_PROXY_USERNAME=\).*/\1FIBB_PEP_ID/" config.sh
+  sed -i -e "s/^\(MULTI_SERVER_PEP_PASSWORD=\).*/\1FIBB_PEP_PASSWORD/" config.sh
+  ${KCOV} ./coverage ./lets-fiware.sh example.com
+  reset_env
+
+  echo "*** MULTI_SERVER_ORION_INTERNAL_IP not found ***" 1>&2
+  sed -i -e "s/^\(KEYROCK=\).*/\1/" config.sh
+  sed -i -e "s/^\(ORION=\).*/\1/" config.sh
+  sed -i -e "s/^\(PERSEO=\).*/\1perseo/" config.sh
+  sed -i -e "s/^\(MULTI_SERVER_KEYROCK=\).*/\1https:\/\/keyrock.example.com/" config.sh
+  sed -i -e "s/^\(MULTI_SERVER_ADMIN_EMAIL=\).*/\1admin@example.com/" config.sh
+  sed -i -e "s/^\(MULTI_SERVER_ADMIN_PASS=\).*/\11234/" config.sh
+  sed -i -e "s/^\(MULTI_SERVER_PEP_PROXY_USERNAME=\).*/\1FIBB_PEP_ID/" config.sh
+  sed -i -e "s/^\(MULTI_SERVER_PEP_PASSWORD=\).*/\1FIBB_PEP_PASSWORD/" config.sh
+  sed -i -e "s/^\(MULTI_SERVER_CLIENT_ID=\).*/\1FIBB_AID/" config.sh
+  sed -i -e "s/^\(MULTI_SERVER_CLIENT_SECRET=\).*/\1FIBB_SECRET/" config.sh
+  ${KCOV} ./coverage ./lets-fiware.sh example.com
+  reset_env
+
+  echo "*** MULTI_SERVER_ORION_HOST not found ***" 1>&2
+  sed -i -e "s/^\(KEYROCK=\).*/\1/" config.sh
+  sed -i -e "s/^\(ORION=\).*/\1/" config.sh
+  sed -i -e "s/^\(WIRECLOUD=\).*/\1wirecloud/" config.sh
+  sed -i -e "s/^\(NGSIPROXY=\).*/\1ngsiproxy/" config.sh
+  sed -i -e "s/^\(MULTI_SERVER_KEYROCK=\).*/\1https:\/\/keyrock.example.com/" config.sh
+  sed -i -e "s/^\(MULTI_SERVER_ADMIN_EMAIL=\).*/\1admin@example.com/" config.sh
+  sed -i -e "s/^\(MULTI_SERVER_ADMIN_PASS=\).*/\11234/" config.sh
+  sed -i -e "s/^\(MULTI_SERVER_PEP_PROXY_USERNAME=\).*/\1FIBB_PEP_ID/" config.sh
+  sed -i -e "s/^\(MULTI_SERVER_PEP_PASSWORD=\).*/\1FIBB_PEP_PASSWORD/" config.sh
+  sed -i -e "s/^\(MULTI_SERVER_CLIENT_ID=\).*/\1FIBB_AID/" config.sh
+  sed -i -e "s/^\(MULTI_SERVER_CLIENT_SECRET=\).*/\1FIBB_SECRET/" config.sh
+  ${KCOV} ./coverage ./lets-fiware.sh example.com
+  reset_env
 }
 
-setup
+#
+# main
+#
+main() {
+  setup
 
-error_test
+  error_test
 
-install_test1
+  install_test1
 
-install_test2
+  install_test2
 
-fibb_down
+  fibb_down
 
-install_test3
+  install_test3
 
-fibb_down
+  fibb_down
 
-install_test4
+  install_test4
 
-fibb_down
+  fibb_down
 
-install_on_centos
+  install_on_centos
 
-install_test5
+  install_test5
 
-remove_example_com_from_hosts
+  multi_server_test1
+
+  multi_server_test2
+
+  remove_example_com_from_hosts
+}
+
+main "$@"

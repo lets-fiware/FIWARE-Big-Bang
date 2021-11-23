@@ -2,6 +2,7 @@ version: "3"
 services:
   mongo:
     image: ${IMAGE_MONGO}
+    # __MONGO_PORTS__
     command: --nojournal
     volumes:
       - ./config/mongo/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro

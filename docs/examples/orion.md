@@ -1,28 +1,8 @@
 # Orion
 
--   [Configuration parameters](#configuration-parameters)
--   [How to setup](#how-to-setup)
--   [Get version](#get-version)
 -   [Sanity check for Orion](#sanity-check-for-orion)
 -   [Examples](#examples)
 -   [Related information](#related-information)
-
-## Configuration parameters
-
-You can specify configurations by editing the `config.sh` file.
-
-| Variable name | Description                           | Default value |
-| ------------- | ------------------------------------- | ------------- |
-| ORION         | A sub-domain name of Orion (Required) | orion         | 
-
-## How to setup
-
-To set up Orion, configure an environment variable in config.sh.
-Set a sub-domain name for Orion to `ORION` as shown:
-
-```bash
-ORION=orion
-```
 
 ## Sanity check for Orion
 

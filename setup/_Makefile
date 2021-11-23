@@ -3,7 +3,7 @@ build:
 up:
 	sudo /usr/local/bin/docker-compose up -d
 down:
-	sudo /usr/local/bin/docker-compose down
+	./setup/down.sh
 ps:
 	sudo /usr/local/bin/docker-compose ps
 clean:
@@ -30,3 +30,5 @@ get-token:
 	./config/script/get_token.sh
 collect:
 	./config/script/collect.sh
+multi-server:
+	./config/script/multi_server.sh

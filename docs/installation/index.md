@@ -1,14 +1,5 @@
 # Installation
 
-### Supported Linux distribution
-
-The FIWARE Big Bang supports CentOS and Ubuntu as Linux distribution.
-The recommended Linux distribution is Ubuntu 20.04.
-
--   Ubuntu 20.04
--   Ubuntu 18.04
--   CentOS 7, 8
-
 ## Supported FIWARE GEs and third-party open source software
 
 ### Supported FIWARE GEs
@@ -18,12 +9,12 @@ The recommended Linux distribution is Ubuntu 20.04.
 -   Orion
 -   Cygnus
 -   Comet
+-   Perseo
 -   QuantumLeap
 -   WireCloud
 -   Ngsiproxy
 -   IoT Agent for UltraLight (over HTTP and MQTT)
 -   IoT Agent for JSON (over HTTP and MQTT)
--   Perseo
 
 ### Supported third-party open source software
 
@@ -38,6 +29,15 @@ The recommended Linux distribution is Ubuntu 20.04.
 
 A virtual machine with a public IP address (global IP address) or a virtual machine that can be accessed
 from the Internet via a network equipment
+
+### Supported Linux distribution
+
+The FIWARE Big Bang supports CentOS and Ubuntu as Linux distribution.
+The recommended Linux distribution is Ubuntu 20.04.
+
+-   Ubuntu 20.04
+-   Ubuntu 18.04
+-   CentOS 7, 8
 
 ### Domain name
 

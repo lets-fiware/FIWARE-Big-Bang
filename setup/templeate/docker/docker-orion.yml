@@ -2,6 +2,7 @@ version: "3"
 services:
   orion:
     image: ${IMAGE_ORION}
+    # __ORION_PORTS__
     depends_on:
       - mongo
     # __ORION_DEPENDS_ON__

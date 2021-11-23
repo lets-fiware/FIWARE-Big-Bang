@@ -2,7 +2,6 @@
 
 -   [Configuration parameters](#configuration-parameters)
 -   [How to setup](#how-to-setup)
--   [Sanity check for WireCloud](#~anity-check-for-wirecloud)
 -   [Related information](#related-information)
 
 ## Configuration parameters
@@ -23,11 +22,6 @@ Set a sub-domain name for WireCloud and Ngsiproxy to `WIRECLOUD` as `NGSIPROXY` 
 WIRECLOUD=wirecloud
 NGSIPROXY=ngsiproxy
 ```
-
-## Sanity check for WireCloud 
-
-Once Orion is running, you can access the WireCloud web application.
-Open at `https://wirecloud.example.com` to access the WireCloud GUI.
 
 ## Related information
 
