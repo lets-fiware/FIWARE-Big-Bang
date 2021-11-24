@@ -1,5 +1,17 @@
 # System administration
 
+## Contents
+
+<details>
+<summary><strong>Details</strong></summary>
+
+-   [Files and directories layout](#files-and-directories-layout)
+-   [Make command for system administration](#make-command-for-system-administration)
+-   [Log files](#log-files)
+-   [Server certificates](#server-certificates)
+
+</details>
+
 ## Files and directories layout
 
 The following files and directories will be created.

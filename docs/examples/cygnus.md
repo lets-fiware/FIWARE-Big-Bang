@@ -1,4 +1,8 @@
 # Cygnus
+## Contents
+
+<details>
+<summary><strong>Details</strong></summary>
 
 -   [Configuration parameters](#configuration-parameters)
 -   [How to setup](#how-to-setup)
@@ -9,6 +13,8 @@
 -   [Persisting Context Data into Elasticsearch](#persisting-context-data-into-elasticsearch)
 -   [Examples](#examples)
 -   [Related information](#related-information)
+
+</details>
 
 ## Configuration parameters
 

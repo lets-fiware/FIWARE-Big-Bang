@@ -1,11 +1,18 @@
 # How to get an access token
 
+## Contents
+
+<details>
+<summary><strong>Details</strong></summary>
+
 -   [Prerequisite](#prerequisite)
 -   [Get an access token from Tokenproxy](#get-an-access-token-from-tokenproxy)
 -   [Get an access token from Keyrock](#get-an-access-token-from-keyrock)
 -   [Get an access token with NGSI Go](#get-an-access-token-with-ngsi-go)
 -   [Examples](#examples)
 -   [Related information](#related-information)
+
+</details>
 
 ## Prerequisite
 

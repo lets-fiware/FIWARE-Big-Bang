@@ -1,5 +1,10 @@
 # Node-RED
 
+## Contents
+
+<details>
+<summary><strong>Details</strong></summary>
+
 -   [Sanity check for Node-RED](#sanity-check-node-red)
 -   [Access Node-RED API](#access-node-red-api)
 -   [How to use NGSI node](#how-to-use-ngsi-node)
@@ -7,9 +12,13 @@
 -   [Examples](#examples)
 -   [Related information](#related-information)
 
+</details>
+
 ## Sanity check for Node-RED
 
 Open at `https://node-red.example.com` to access the Node-RED GUI.
+
+![](https://raw.githubusercontent.com/lets-fiware/FIWARE-Big-Bang/gh-pages/images/node-red/node-red-sign-in.png)
 
 ## Access Node-RED API
 
@@ -135,7 +144,7 @@ ngsi get \
 
 ### Create flow
 
-![](../images/node-red-001.png)
+![](https://raw.githubusercontent.com/lets-fiware/FIWARE-Big-Bang/gh-pages/images/node-red/node-red-001.png)
 
 ```
 [{"id":"22c1abd2f3953dc4","type":"tab","label":"flow1","disabled":false,"info":""},{"id":"ca443434c8b99c5a","type":"inject","z":"22c1abd2f3953dc4","name":"","props":[{"p":"payload"}],"repeat":"","crontab":"","once":false,"onceDelay":0.1,"topic":"","payload":"device001","payloadType":"str","x":300,"y":180,"wires":[["354b5c13a6eda39a"]]},{"id":"43be416d8e939507","type":"debug","z":"22c1abd2f3953dc4","name":"","active":true,"tosidebar":true,"console":false,"tostatus":false,"complete":"false","statusVal":"","statusType":"auto","x":690,"y":180,"wires":[]},{"id":"354b5c13a6eda39a","type":"NGSI-Entity","z":"22c1abd2f3953dc4","name":"","endpoint":"802c3058092a74ab","protocol":"v2","ldContext":"https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context.jsonld","mode":"normalized","mimeType":"application/ld+json","attrs":"","x":490,"y":180,"wires":[["43be416d8e939507"]]},{"id":"802c3058092a74ab","type":"Context-Broker","name":"orion","endpoint":"https://orion.example.com","service":"","servicepath":"","idmEndpoint":"https://orion.example.com"}]
@@ -147,7 +156,7 @@ ngsi get \
 
 -   Endpoint: `https://orion.example.com`
 
-![](../images/node-red-002.png)
+![](https://raw.githubusercontent.com/lets-fiware/FIWARE-Big-Bang/gh-pages/images/node-red/node-red-002.png)
 
 ### Security
 
@@ -155,11 +164,11 @@ ngsi get \
 -   Username: `admin@example.com`
 -   Password: `Your password`
 
-![](../images/node-red-003.png)
+![](https://raw.githubusercontent.com/lets-fiware/FIWARE-Big-Bang/gh-pages/images/node-red/node-red-003.png)
 
 ### Inject payload
 
-![](../images/node-red-004.png)
+![](https://raw.githubusercontent.com/lets-fiware/FIWARE-Big-Bang/gh-pages/images/node-red/node-red-004.png)
 
 ## Examples
 

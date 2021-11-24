@@ -1,8 +1,15 @@
 # Orion
 
+## Contents
+
+<details>
+<summary><strong>Details</strong></summary>
+
 -   [Sanity check for Orion](#sanity-check-for-orion)
 -   [Examples](#examples)
 -   [Related information](#related-information)
+
+</details>
 
 ## Sanity check for Orion
 

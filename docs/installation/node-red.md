@@ -1,10 +1,17 @@
 # Node-RED
 
+## Contents
+
+<details>
+<summary><strong>Details</strong></summary>
+
 -   [Configuration parameters](#configuration-parameters)
 -   [How to setup](#how-to-setup)
     -   [Single-instance](#single-instance)
     -   [Multi-instance](#multi-instance)
 -   [Related information](#related-information)
+
+</details>
 
 ## Configuration parameters
 

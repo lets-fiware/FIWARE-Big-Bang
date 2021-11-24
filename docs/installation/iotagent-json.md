@@ -1,11 +1,17 @@
 # IoT Agent for JSON
 
+## Contents
+
+<details>
+<summary><strong>Details</strong></summary>
+
 -   [Configuration parameters](#configuration-parameters)
 -   [How to setup](#how-to-setup)
     -   [IoT Agent for JSON over MQTT](#iot-agent-for-json-over-mqtt)
     -   [IoT Agent for JSON over HTTP](#iot-agent-for-json-over-http)
 -   [Related information](#related-information)
 
+</details>
 
 ## Configuration parameters
 

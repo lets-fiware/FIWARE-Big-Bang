@@ -1,10 +1,17 @@
 # QuantumLeap
 
+## Contents
+
+<details>
+<summary><strong>Details</strong></summary>
+
 -   [Get version](#get-version)
 -   [Sanity check for QuantumLeap](#sanity-check-for-quantumLeap)
 -   [Persisting Context Data into QuantumLeap](#persisting-context-data-into-quantumLeap)
 -   [Examples](#examples)
 -   [Related information](#related-information)
+
+</details>
 
 ## Get version
 

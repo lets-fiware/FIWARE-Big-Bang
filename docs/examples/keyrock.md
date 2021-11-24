@@ -1,9 +1,16 @@
 # Keyrock
 
+## Contents
+
+<details>
+<summary><strong>Details</strong></summary>
+
 -   [Sanity check for Keyrock](#sanity-check-for-keyrock)
 -   [Access Keyrock GUI](#access-keyrock-gui)
 -   [Examples](#examples)
 -   [Related information](#related-information)
+
+</details>
 
 ## Sanity check for Keyrock
 
@@ -36,6 +43,8 @@ curl https://keyrock.example.com/version
 ## Access Keyrock GUI
 
 Open at `https://keyrock.example.com` to access the Keyrock GUI.
+
+![](https://raw.githubusercontent.com/lets-fiware/FIWARE-Big-Bang/gh-pages/images/keyrock/keyrock-sign-in.png)
 
 ## Examples
 

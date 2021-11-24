@@ -1,7 +1,12 @@
 # After installation
 
+## Contents
+
+<details>
+<summary><strong>Details</strong></summary>
+
 -   [Installation completion message](#installation-completion-message)
--   [Sanity check](#sanity-check)
+-   [Sanity check procedures](#sanity-check-procedures)
     -   [Get the status of docker containers](#get-the-status-of-docker-containers)
     -   [Get an access token](#get-an-access-token)
     -   [Get Orion version](#get-orion-version)
@@ -17,6 +22,9 @@
     -   [Sanity check for WireCloud](#sanity-check-for-wirecloud)
     -   [Sanity check for Node-RED](#sanity-check-for-node-red)
     -   [Access Node-RED API](#access-node-red-api)
+    -   [Sanity check for Grafana](#sanity-check-for-grafana)
+
+</details>
 
 ## Installation completion message
 
@@ -33,7 +41,7 @@ Please see the .env file for details.
 
 It has a URL, a username and a password for Keyrock.
 
-## Sanity check
+## Sanity check procedures
 
 You can check if the FIWARE instance is healthy by running some commands.
 
@@ -141,7 +149,9 @@ curl https://keyrock.example.com/version
 
 ### Keyrock GUI
 
-To access the Keyrock GUI,  Open at https://keyrock.example.com with Web browser.
+To access the Keyrock GUI,  Open at `https://keyrock.example.com` with Web browser.
+
+![](https://raw.githubusercontent.com/lets-fiware/FIWARE-Big-Bang/gh-pages/images/keyrock/keyrock-sign-in.png)
 
 ### Sanity check for Cygnus
 
@@ -281,12 +291,15 @@ ngsi version --host iotagent-json.example.com --pretty
 
 ### Sanity check for WireCloud 
 
-Once Orion is running, you can access the WireCloud web application.
 Open at `https://wirecloud.example.com` to access the WireCloud GUI.
+
+![](https://raw.githubusercontent.com/lets-fiware/FIWARE-Big-Bang/gh-pages/images/wirecloud/wirecloud-sign-in.png)
 
 ### Sanity check for Node-RED
 
 Open at `https://node-red.example.com` to access the Node-RED GUI.
+
+![](https://raw.githubusercontent.com/lets-fiware/FIWARE-Big-Bang/gh-pages/images/node-red/node-red-sign-in.png)
 
 ### Access Node-RED API
 
@@ -372,3 +385,9 @@ curl https://node-red.example.com/settings \
   }
 }
 ```
+
+### Sanity check for Grafana
+
+Open at `https://grafana.example.com` to access the Grafana GUI.
+
+![](https://raw.githubusercontent.com/lets-fiware/FIWARE-Big-Bang/gh-pages/images/grafana/grafana-sign-in.png)
