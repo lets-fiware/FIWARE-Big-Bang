@@ -1,10 +1,17 @@
 # IoT Agent for UltraLight 2.0
 
+## Contents
+
+<details>
+<summary><strong>Details</strong></summary>
+
 -   [Configuration parameters](#configuration-parameters)
 -   [How to setup](#how-to-setup)
     -   [IoT Agent for UL over MQTT](#iot-agent-for-ul-over-mqtt)
     -   [IoT Agent for UL over HTTP](#iot-agent-for-ul-over-http)
 -   [Related information](#related-information)
+
+</details>
 
 ## Configuration parameters
 

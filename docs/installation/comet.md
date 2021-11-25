@@ -1,10 +1,17 @@
 # Comet
 
+## Contents
+
+<details>
+<summary><strong>Details</strong></summary>
+
 -   [Configuration parameters](#configuration-parameters)
 -   [How to setup](#how-to-setup)
     -   [Minimal mode (STH-Comet ONLY)](#minimal-mode-sth-comet-only)
     -   [Formal mode (Cygnus + STH-Comet)](#formal-mode-cygnus--sth-comet)
 -   [Related information](#related-information)
+
+</details>
 
 ## Configuration parameters
 

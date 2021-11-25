@@ -1,5 +1,10 @@
 # Comet
 
+## Contents
+
+<details>
+<summary><strong>Details</strong></summary>
+
 -   [Minimal mode (STH-Comet ONLY)](#minimal-mode-sth-comet-only)
     -   [Sanity check for Comet](#sanity-check-for-comet)
     -   [Subscribing to Context Changes](subscribing-to-context-changes)
@@ -17,6 +22,8 @@
     -   [Aggregated data consumption by aggregation method and resolution](#aggregated-data-consumption-by-aggregation-method-and-resolution-1)
     -   [Examples](#examples-1)
 -   [Related information](#related-information)
+
+</details>
 
 ## Minimal mode (STH-Comet ONLY)
 

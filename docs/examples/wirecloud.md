@@ -1,12 +1,21 @@
 # WireCloud
 
+## Contents
+
+<details>
+<summary><strong>Details</strong></summary>
+
 -   [Sanity check for WireCloud](#~anity-check-for-wirecloud)
 -   [Related information](#related-information)
 
+</details>
+
 ## Sanity check for WireCloud 
 
-Once Orion is running, you can access the WireCloud web application.
+Once WireCloud is running, you can access the WireCloud web application.
 Open at `https://wirecloud.example.com` to access the WireCloud GUI.
+
+![](https://raw.githubusercontent.com/lets-fiware/FIWARE-Big-Bang/gh-pages/images/wirecloud/wirecloud-sign-in.png)
 
 ## Related information
 

@@ -1,8 +1,15 @@
 # WireCloud
 
+## Contents
+
+<details>
+<summary><strong>Details</strong></summary>
+
 -   [Configuration parameters](#configuration-parameters)
 -   [How to setup](#how-to-setup)
 -   [Related information](#related-information)
+
+</details>
 
 ## Configuration parameters
 

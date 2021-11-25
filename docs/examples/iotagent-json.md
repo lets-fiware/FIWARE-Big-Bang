@@ -1,5 +1,10 @@
 # IoT Agent for JSON
 
+## Contents
+
+<details>
+<summary><strong>Details</strong></summary>
+
 -   [Sanity check for IoT Agent for JSON](#sanity-check-for-iot-agent-for-json)
 -   [IoT Agent for JSON over MQTT](#iot-agent-for-json-over-mqtt-1)
     -   [Create service](#create-service)
@@ -19,6 +24,7 @@
     -   [Examples](#examples-1)
 -   [Related information](#related-information)
 
+</details>
 
 ## Sanity check for IoT Agent for JSON
 

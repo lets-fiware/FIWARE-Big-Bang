@@ -5,18 +5,23 @@ nav:
   - 'Home':
     - 'Index': index.md
     - 'Installation':
-      - 'Installation': index.md
-      - 'Multi server': installation/multi_server.md
+      - 'Installation': installation/index.md
       - 'Keyrock': installation/keyrock.md
       - 'Orion': installation/orion.md
       - 'Cygnus': installation/cygnus.md
       - 'Comet': installation/comet.md
       - 'Perseo': installation/perseo.md
-      - 'Quantumleap': installation/quantumleap.md
+      - 'QuantumLeap': installation/quantumleap.md
       - 'IoT Agent for UL': installation/iotagent-ul.md
       - 'IoT Agent for JSON': installation/iotagent-json.md
       - 'WireCloud': installation/wirecloud.md
       - 'Node-RED': installation/node-red.md
+      - 'Regproxy': installation/regproxy.md
+      - 'Queryproxy': installation/queryproxy.md
+      - 'Certbot': installation/certbot.md
+      - 'Firewall': installation/firewall.md
+      - 'Multi-server': installation/multi_server.md
+      - 'Expose ports': installation/expose-ports.md
     - 'After installation': after-installation.md
     - 'System Administration': system_administration.md
     - 'NGSI Go': ngsi-go.md
@@ -27,7 +32,7 @@ nav:
       - 'Cygnus': examples/cygnus.md
       - 'Comet': examples/comet.md
       - 'Perseo': examples/perseo.md
-      - 'Quantumleap': examples/quantumleap.md
+      - 'QuantumLeap': examples/quantumleap.md
       - 'IoT Agent for UL': examples/iotagent-ul.md
       - 'IoT Agent for JSON': examples/iotagent-json.md
       - 'WireCloud': examples/wirecloud.md

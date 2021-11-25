@@ -1,5 +1,22 @@
 # Installation
 
+## Contents
+
+<details>
+<summary><strong>Details</strong></summary>
+
+-   [Supported FIWARE GEs and third-party open source software](#supported-fiware-ges-and-third-party-open-source-software)
+-   [Requirements](#requirements)
+-   [Prerequisite](#prerequisite)
+-   [Getting Started](#getting-started)
+-   [Command syntax](#command-syntax)
+-   [Configuration](#configuration)
+-   [Multi-server installation](#multi-server-installation)
+-   [Expose ports](#expose-ports)
+-   [Examples](#examples)
+
+</details>
+
 ## Supported FIWARE GEs and third-party open source software
 
 ### Supported FIWARE GEs
@@ -65,19 +82,19 @@ or CNAME records.
 
 Download a tar.gz file for the FIWARE Big Bang.
 
-```
+```bash
 curl -sL https://github.com/lets-fiware/FIWARE-Big-Bang/archive/refs/tags/v0.7.0.tar.gz | tar zxf -
 ```
 
 Move to the `FIWARE-Big-Bang-0.7.0` directory.
 
-```
+```bash
 cd FIWARE-Big-Bang-0.7.0/
 ```
 
 Run the `lets-fiware.sh` script with your own domain name and a public IP address.
 
-```
+```bash
 ./lets-fiware.sh example.com XX.XX.XX.XX
 ```
 
@@ -86,7 +103,7 @@ Run the `lets-fiware.sh` script with your own domain name and a public IP addres
 The `lets-fiware.sh` command accepts two arguments. The first argument is a domain name. The second one is
 a public IP address. It can be omitted when your virtual machine has a public IP address.
 
-```
+```bash
 ./lets-fiware.sh DOMAIN_NAME [PUBLIC_IP_ADDRESS]
 ```
 
@@ -98,151 +115,109 @@ Examples:
 ## Configuration
 
 You can specify configurations by editing the `config.sh` file.
+Please see each documentation for details as below:
 
-### Keyrock
+-   [Keyrock](keyrock.md)
+-   [Orion](oron.md)
+-   [Cygnus](cygnus.md)
+-   [Comet](comet.md)
+-   [Perseo](perseo.md)
+-   [Quantumleap](quantumleap.md)
+-   [IoT Agent for UltraLight](iotagent-ul.md)
+-   [IoT Agent for JSON](iotagent-json.md)
+-   [WireCloud](wirecloud.md)
+-   [Node-RED](node-red.md)
+-   [Grafana](grafana.md) (Experimental support)
+-   [Regproxy](regproxy.md)
+-   [Queryproxy](queryproxy.md)
+-   [Certbot](certbot.md)
+-   [Firewall](firewall.md)
 
-| Variable name     | Description                                                      | Default value                   |
-| ----------------- | ---------------------------------------------------------------- | ------------------------------- |
-| KEYROCK           | A sub-domain name of Keyrock (Required)                          | keyrock                         |
-| IDM\_ADMIN\_NAME  | A name of an admin user for Keyrock                              | admin                           |
-| IDM\_ADMIN\_EMAIL | An email address of an admin user for Keyrock                    | IDM\_ADMIN\_NAME @ DOMAIN\_NAME |
-| IDM\_ADMIN\_PASS  | A password of an admin user for Keyrock                          | (Automatically generated)       |
-| KEYROCK\_POSTGRES | Use PostgreSQL as backend database for Keyrock. (true or false)  | false                           |
+## Multi-server installation
 
-### Orion
+The multi-server installation allows to install FIWARE GEs and other OSS to multiple servers.
+Please see [this documentation](multi_server.md) for details.
 
-| Variable name | Description                           | Default value |
-| ------------- | ------------------------------------- | ------------- |
-| ORION         | A sub-domain name of Orion (Required) | orion         |
+## Expose ports
 
-### Cygnus
+Some FIWARE GEs and other OSS running in a Docker container can expose a port for their service.
+Please see [this documentation](expose-ports.md) for details.
 
-| Variable name         | Description                                      | Default value |
-| --------------------- | ------------------------------------------------ | ------------- |
-| CYGNUS                | A sub-domain name of Cygnus                      | (empty)       |
-| ELASTICSEARCH         | A sub-domain name of Elasticsearch               | (empty)       |
-| CYGNUS\_MONGO         | Use MongoDB sink for Cygnus. true or false       | false         |
-| CYGNUS\_MYSQL         | Use MySQL sink for Cygnus. true or false         | false         |
-| CYGNUS\_POSTGRES      | Use PostgreSQL sink for Cygnus. true or false    | false         |
-| CYGNUS\_ELASTICSEARCH | Use Elasticsearch sink for Cygnus. true or false | false         |
+## Examples
 
-### Comet
+Configuration examples are as shown:
 
-| Variable name | Description                | Default value |
-| ------------- | -------------------------- | ------------- |
-| COMET         | A sub-domain name of Comet | (empty)       |
+### Examples 1
 
-### Quantumleap
+Configure Orion Context broker.
 
-| Variable name | Description                      | Default value |
-| ------------- | -------------------------------- | ------------- |
-| QUANTUMLEAP   | A sub-domain name of QuantumLeap | (empty)       |
+```bash
+KEYROCK=keyrock
+ORION=orion
+```
 
-### IoT Agent (Common to UltraLight and JSON)
+### Examples 2
 
-| Variable name           | Description                                                    | Default value             |
-| ----------------------- | -------------------------------------------------------------- | ------------------------- |
-| MOSQUITTO               | A sub-domain name of MOSQUITTO                                 | (empty)                   |
-| MQTT\_1883              | Use MQTT 1883 Port. true or false                              | false                     |
-| MQTT\_TLS               | Use MQTT TLS. true or false                                    | true                      |
-| IOTAGENT\_HTTP          | Set a sub-domain name to use IoT Agent over HTTP.              | (empty)                   |
-| IOTA\_HTTP\_AUTH        | Authorization for IoT Agent over HTTP. (none, basic or bearer) | bearer                    |
-| IOTA\_HTTP\_BASIC\_USER | User for Basic authorization for IoT Agent over HTTP.          | fiware                    |
-| IOTA\_HTTP\_BASIC\_PASS | Password for Basic authorization for IoT Agent over HTTP.      | (Automatically generated) |
+To store persistent context data to PostgreSQL, configure Cygnus and PostgreSQL.
 
-### IoT Agent for UltraLight
+```bash
+KEYROCK=keyrock
+ORION=orion
+CYGNUS=cygnus
+CYGNUS_POSTGRES=true
+```
 
-| Variable name               | Description                                                                                   | Default value |
-| --------------------------- | --------------------------------------------------------------------------------------------- | ------------- |
-| IOTAGENT\_UL                | A sub-domain name of IoT Agent for UltraLight 2.0                                             | (empty)       |
-| IOTA\_UL\_DEFAULT\_RESOURCE | The default path the IoT Agent uses listening for UltraLight measures.                        | /iot/ul       |
-| IOTA\_UL\_TIMESTAMP         | Whether to supply timestamp information with each measurement received from attached devices. | true          |
-| IOTA\_UL\_AUTOCAST          | Ensure JSON number values are read as numbers not strings                                     |               |
+### Examples 3
 
-### IoT Agent for JSON
+To persists Time Series Context Data, configure Comet and Cygnus.
 
-| Variable name                 | Description                                                                                   | Default value |
-| ----------------------------- | --------------------------------------------------------------------------------------------- | ------------- |
-| IOTAGENT\_JSON                | A sub-domain name of IoT Agent for JSON                                                       | (empty)       |
-| IOTA\_JSON\_DEFAULT\_RESOURCE | The default path the IoT Agent uses listening for JSON measures.                              | /iot/json     |
-| IOTA\_JSON\_TIMESTAMP         | Whether to supply timestamp information with each measurement received from attached devices. | true          |
-| IOTA\_JSON\_AUTOCAST          | Ensure JSON number values are read as numbers not strings                                     |               |
+```bash
+KEYROCK=keyrock
+ORION=orion
+COMET=comet
+CYGNUS=cygnus
+```
 
-### Perseo
+### Examples 4
 
-| Variable name        | Description                                                      | Default value |
-| -------------------- | ---------------------------------------------------------------- | ------------- |
-| PERSEO               | A sub-domain name of Perseo                                      | (empty)       |
-| PERSEO\_MAX\_AGE     | The expiration time for dangling rules in milliseconds.          | 6000          |
-| PERSEO\_SMTP\_HOST   | Host of the SMTP server for Perseo.                              | (empty)       |
-| PERSEO\_SMTP\_PORT   | Port of the SMTP server for Perseo.                              | (empty)       |
-| PERSEO\_SMTP\_SECURE | true if SSL should be used with the SMTP server. (true or false) | (empty)       |
-| PERSEO\_LOG\_LEVEL   | Log level for Perseo.                                            | info          |
+Configure IoT Agent for UltraLight 2.0 over HTTP with basic authentication.
 
-### WireCloud
+```bash
+KEYROCK=keyrock
+ORION=orion
+IOTAGENT_UL=iotagent-ul
+IOTAGENT_HTTP=iotagent-http
+IOTA_HTTP_AUTH=basic
+```
+### Examples 5
 
-| Variable name | Description                    | Default value |
-| ------------- | ------------------------------ | ------------- |
-| WIRECLOUD     | A sub-domain name of WireCloud | (empty)       |
-| NGSIPROXY     | A sub-domain name of Ngsiproxy | (empty)       |
+Configure IoT Agent for UltraLight 2.0 over MQTT TLS.
 
-### Node-RED
+```bash
+KEYROCK=keyrock
+ORION=orion
+IOTAGENT_JSON=iotagent-json
+MOSQUITTO=mosquitto
+MQTT_TLS=true
+```
 
-| Variable name                   | Description                      | Default value |
-| ------------------------------- | -------------------------------- | ------------- |
-| NODE\_RED                       | A sub-domain name of Node-RED    | (empty)       |
-| NODE\_RED\_INSTANCE\_NUMBER     | Number of Node-RED instance.     | 1             |
-| NODE\_RED\_INSTANCE\_USERNAME   | Username for Node-RED instance.  | node-red      |
-| NODE\_RED\_INSTANCE\_HTTP\_ROOT | HTTP root for Node-RED instance. | /node-red     |
+### Examples 6
 
-### Grafana (Experimental support)
+Configure WireCloud.
 
-| Variable name | Description                  | Default value |
-| ------------- | ---------------------------- | ------------- |
-| GRAFANA       | A sub-domain name of Grafana | (empty)       |
+```bash
+KEYROCK=keyrock
+ORION=orion
+WIRECLOUD=wirecloud
+NGSIPROXY=ngsiproxy
+```
 
-### Queryproxy
+### Examples 7
 
-| Variable name | Description                   | Default value |
-| ------------- | ----------------------------- | ------------- |
-| QUERYPROXY    | Use queryproxy. true or false | false         |
+Configure Node-RED..
 
-### Regproxy
-
-| Variable name            | Description                            | Default value |
-| ------------------------ | -------------------------------------- | ------------- |
-| REGPROXY                 | Use regproxy. true or false            | false         |
-| REGPROXY\_NGSITYPE       | NgsiType for remote broker. (v2 or ld) | v2            |
-| REGPROXY\_HOST           | Host for remote broker.                | (empty)       |
-| REGPROXY\_IDMTYPE        | IdM type for remote broker.            | (empty)       |
-| REGPROXY\_IDMHOST        | IdM host for remote broker.            | (empty)       |
-| REGPROXY\_USERNAME       | A username for remote broker.          | (empty)       |
-| REGPROXY\_PASSWORD       | A password for remote broker.          | (empty)       |
-| REGPROXY\_CLIENT\_ID     | A client id for remote broker.         | (empty)       |
-| REGPROXY\_CLIENT\_SECRET | A client secret for remote broker.     | (empty)       |
-
-### Postfix
-
-| Variable name | Description                                   | Default value |
-| ------------- | --------------------------------------------- | ------------- |
-| POSTFIX       | Use Postfix (local delivery). (true or false) | false         |
-
-### Firewall
-
-| Variable name | Description                    | Default value |
-| ------------- | ------------------------------ | ------------- |
-| FIREWALL      | Enable firewall. true or false | false         |
-
-### Certbot
-
-| Variable name        | Description                                         | Default value                                   |
-| -------------------- | --------------------------------------------------- | ----------------------------------------------- |
-| CERT\_EMAIL          | An email address for certbot                        | (An email address of an admin user for Keyrock) |
-| CERT\_REVOKE         | Revoke and reacquire the certificate. true or false | false                                           |
-| CERT\_TEST           | Use --test-cert option. true or false               | false                                           |
-| CERT\_FORCE\_RENEWAL | Use --force-renewal option. true or false           | false                                           |
-
-## Copyright and License
-
-Copyright (c) 2021 Kazuhito Suda<br>
-Licensed under the MIT License.
+```bash
+KEYROCK=keyrock
+ORION=orion
+NODE_RED=node-red
+```

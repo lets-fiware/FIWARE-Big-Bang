@@ -1,5 +1,10 @@
 # IoT Agent for UltraLight 2.0
 
+## Contents
+
+<details>
+<summary><strong>Details</strong></summary>
+
 -   [Sanity check for IoT Agent for UltraLight 2.0](#sanity-check-for-iot-agent-for-ul)
 -   [IoT Agent for UL over MQTT](#iot-agent-for-ul-over-mqtt-1)
     -   [Create service](#create-service)
@@ -19,6 +24,7 @@
     -   [Examples](#examples-1)
 -   [Related information](#related-information)
 
+</details>
 
 ## Sanity check for IoT Agent for UL
 
