@@ -118,7 +118,7 @@ You can specify configurations by editing the `config.sh` file.
 Please see each documentation for details as below:
 
 -   [Keyrock](keyrock.md)
--   [Orion](oron.md)
+-   [Orion](orion.md)
 -   [Cygnus](cygnus.md)
 -   [Comet](comet.md)
 -   [Perseo](perseo.md)
