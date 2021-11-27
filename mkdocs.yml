@@ -15,9 +15,10 @@ nav:
       - 'IoT Agent for UL': installation/iotagent-ul.md
       - 'IoT Agent for JSON': installation/iotagent-json.md
       - 'WireCloud': installation/wirecloud.md
-      - 'Node-RED': installation/node-red.md
       - 'Regproxy': installation/regproxy.md
       - 'Queryproxy': installation/queryproxy.md
+      - 'Node-RED': installation/node-red.md
+      - 'Grafana': installation/grafana.md
       - 'Certbot': installation/certbot.md
       - 'Firewall': installation/firewall.md
       - 'Multi-server': installation/multi_server.md
@@ -37,3 +38,4 @@ nav:
       - 'IoT Agent for JSON': examples/iotagent-json.md
       - 'WireCloud': examples/wirecloud.md
       - 'Node-RED': examples/node-red.md
+      - 'Grafana': examples/grafana.md
