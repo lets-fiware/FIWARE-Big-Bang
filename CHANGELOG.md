@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.8.0 - 25 Nov, 2021
 
+-   Update documentation (#116)
 -   Improve documentation (#115)
 -   Add feature to support multi-server mode (#113)
 -   Refactor config.sh (#112)
