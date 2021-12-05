@@ -1,5 +1,7 @@
 ## FIWARE Big Bang v0.8.0-next
 
+-   Add troubleshooting.md (#119)
+
 ## FIWARE Big Bang v0.8.0 - 25 Nov, 2021
 
 -   Update documentation (#116)

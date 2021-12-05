@@ -39,3 +39,4 @@ nav:
       - 'WireCloud': examples/wirecloud.md
       - 'Node-RED': examples/node-red.md
       - 'Grafana': examples/grafana.md
+    - 'Troubleshooting': troubleshooting.md
