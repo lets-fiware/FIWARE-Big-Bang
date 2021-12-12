@@ -780,20 +780,23 @@ check_docker_compose() {
 check_ngsi_go() {
   logging_info "${FUNCNAME[0]}"
 
+  local ngsi_go_version
+  ngsi_go_version=v0.10.0
+
   if [ -e /usr/local/bin/ngsi ]; then
     local ver
     ver=$(/usr/local/bin/ngsi --version)
     logging_info "${ver}"
     ver=$(/usr/local/bin/ngsi --version | sed -e "s/ngsi version \([^ ]*\) .*/\1/" | awk -F. '{printf "%2d%02d%02d", $1,$2,$3}')
-    if [ "${ver}" -ge 900 ]; then
+    if [ "${ver}" -ge 1000 ]; then
         cp /usr/local/bin/ngsi "${WORK_DIR}"
         return
     fi
   fi
 
-  curl -sOL https://github.com/lets-fiware/ngsi-go/releases/download/v0.9.0/ngsi-v0.9.0-linux-amd64.tar.gz
-  ${SUDO} tar zxf ngsi-v0.9.0-linux-amd64.tar.gz -C /usr/local/bin
-  rm -f ngsi-v0.9.0-linux-amd64.tar.gz
+  curl -sOL https://github.com/lets-fiware/ngsi-go/releases/download/${ngsi_go_version}/ngsi-${ngsi_go_version}-linux-amd64.tar.gz
+  ${SUDO} tar zxf ngsi-${ngsi_go_version}-linux-amd64.tar.gz -C /usr/local/bin
+  rm -f ngsi-${ngsi_go_version}-linux-amd64.tar.gz
 
   if [ -d /etc/bash_completion.d ]; then
     curl -OL https://raw.githubusercontent.com/lets-fiware/ngsi-go/main/autocomplete/ngsi_bash_autocomplete
@@ -827,7 +830,7 @@ setup_init() {
 
   CERTBOT_DIR=$(pwd)/data/cert
 
-  NGSI_GO="/usr/local/bin/ngsi --batch --config ${WORK_DIR}/ngsi-go-config.json --cache ${WORK_DIR}/ngsi-go-token-cache.json"
+  NGSI_GO="/usr/local/bin/ngsi --batch --configDir ${WORK_DIR}/ngsi-go"
   if $FIBB_TEST; then
     NGSI_GO="${NGSI_GO} --insecureSkipVerify"
   fi
@@ -2477,14 +2480,7 @@ create_node_red_api_role() {
   idm=$1
   orion_client_id=$2
 
-  set +e
-  HAS_API_ROLE=$(${NGSI_GO} applications --host "${idm}" roles --aid "${orion_client_id}" list --pretty | grep -c /node-red/api)
-  set -e
-  if [ "${HAS_API_ROLE}" -eq 0 ]; then
-    ORION_RID_API=$(${NGSI_GO} applications --host "${idm}" roles --aid "${orion_client_id}" create --name "/node-red/api")
-  else
-    ORION_RID_API=$(${NGSI_GO} applications --host "${idm}" roles --aid "${orion_client_id}" list --pretty | jq -r '.roles[] | select(.name == "/node-red/api").id' | head -1)
-  fi
+  ORION_RID_API=$(${NGSI_GO} applications --host "${idm}" roles --aid "${orion_client_id}" create --name "/node-red/api")
 }
 
 #
@@ -2764,34 +2760,16 @@ setup_ngsi_go() {
     fi
     eval VAL=\"\$"$NAME"\"
     if [ -n "$VAL" ]; then
-      if [ "${NAME}" = "KEYROCK" ] && [ "${VAL}" = "localhost:3000" ]; then
-          KEYROCK=localhost
-          VAL=${KEYROCK}
-      fi
-      # shellcheck disable=SC2068
-      for name in ${SERVERS[@]}
-      do
-        if [ "${VAL}" = "${name}" ]; then
-          ngsi server delete --host "${name}"
-        fi
-      done
-    fi
-  done
-
-  for NAME in "${APPS[@]}"
-  do
-    eval VAL=\"\$"$NAME"\"
-    if [ -n "$VAL" ]; then
       case "${NAME}" in
-          "KEYROCK" ) ${NGSI_GO} server add --host "${VAL}" --serverType keyrock --serverHost "https://${VAL}" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" ;;
-          "ORION" )  ${NGSI_GO} broker add --host "${VAL}" --ngsiType v2 --brokerHost "https://${VAL}" --idmType tokenproxy --idmHost "https://${KEYROCK}/token" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" ;;
-          "CYGNUS" ) ${NGSI_GO} server add --host "${VAL}" --serverType cygnus --serverHost "https://${VAL}" --idmType tokenproxy --idmHost "https://${KEYROCK}/token" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" ;;
-          "COMET" ) ${NGSI_GO} server add --host "${VAL}" --serverType comet --serverHost "https://${VAL}" --idmType tokenproxy --idmHost "https://${KEYROCK}/token" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" ;;
-          "IOTAGENT_UL" ) ${NGSI_GO} server add --host "${VAL}" --serverType iota --serverHost "https://${VAL}" --idmType tokenproxy --idmHost "https://${KEYROCK}/token" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" --service openiot --path /;;
-          "IOTAGENT_JSON" ) ${NGSI_GO} server add --host "${VAL}" --serverType iota --serverHost "https://${VAL}" --idmType tokenproxy --idmHost "https://${KEYROCK}/token" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" --service openiot --path /;;
-          "WIRECLOUD" ) ${NGSI_GO} server add --host "${VAL}" --serverType wirecloud --serverHost "https://${VAL}" --idmType keyrock --idmHost "https://${KEYROCK}/oauth2/token" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" --clientId "${WIRECLOUD_CLIENT_ID}" --clientSecret "${WIRECLOUD_CLIENT_SECRET}";;
-          "QUANTUMLEAP" ) ${NGSI_GO} server add --host "${VAL}" --serverType quantumleap --serverHost "https://${VAL}" --idmType tokenproxy --idmHost "https://${KEYROCK}/token" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" ;;
-          "PERSEO" ) ${NGSI_GO} server add --host "${VAL}" --serverType perseo --serverHost "https://${VAL}" --idmType tokenproxy --idmHost "https://${KEYROCK}/token" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" ;;
+          "KEYROCK" ) ${NGSI_GO} server add --host "${VAL}" --serverType keyrock --serverHost "https://${VAL}" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" --overWrite ;;
+          "ORION" )  ${NGSI_GO} broker add --host "${VAL}" --ngsiType v2 --brokerHost "https://${VAL}" --idmType tokenproxy --idmHost "https://${KEYROCK}/token" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" --overWrite ;;
+          "CYGNUS" ) ${NGSI_GO} server add --host "${VAL}" --serverType cygnus --serverHost "https://${VAL}" --idmType tokenproxy --idmHost "https://${KEYROCK}/token" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" --overWrite ;;
+          "COMET" ) ${NGSI_GO} server add --host "${VAL}" --serverType comet --serverHost "https://${VAL}" --idmType tokenproxy --idmHost "https://${KEYROCK}/token" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" --overWrite ;;
+          "IOTAGENT_UL" ) ${NGSI_GO} server add --host "${VAL}" --serverType iota --serverHost "https://${VAL}" --idmType tokenproxy --idmHost "https://${KEYROCK}/token" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" --service openiot --path / --overWrite ;;
+          "IOTAGENT_JSON" ) ${NGSI_GO} server add --host "${VAL}" --serverType iota --serverHost "https://${VAL}" --idmType tokenproxy --idmHost "https://${KEYROCK}/token" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" --service openiot --path / --overWrite ;;
+          "WIRECLOUD" ) ${NGSI_GO} server add --host "${VAL}" --serverType wirecloud --serverHost "https://${VAL}" --idmType keyrock --idmHost "https://${KEYROCK}/oauth2/token" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" --clientId "${WIRECLOUD_CLIENT_ID}" --clientSecret "${WIRECLOUD_CLIENT_SECRET}" --overWrite ;;
+          "QUANTUMLEAP" ) ${NGSI_GO} server add --host "${VAL}" --serverType quantumleap --serverHost "https://${VAL}" --idmType tokenproxy --idmHost "https://${KEYROCK}/token" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" --overWrite ;;
+          "PERSEO" ) ${NGSI_GO} server add --host "${VAL}" --serverType perseo --serverHost "https://${VAL}" --idmType tokenproxy --idmHost "https://${KEYROCK}/token" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" --overWrite ;;
       esac
     fi
   done
