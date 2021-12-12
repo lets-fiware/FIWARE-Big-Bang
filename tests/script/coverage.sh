@@ -158,9 +158,12 @@ setup() {
   sudo rm -f /usr/local/bin/docker-compose
   sudo rm -f /etc/redhat-release
 
-  curl -OL https://github.com/lets-fiware/ngsi-go/releases/download/v0.8.0/ngsi-v0.8.0-linux-amd64.tar.gz
-  sudo tar zxvf ngsi-v0.8.0-linux-amd64.tar.gz -C /usr/local/bin
-  rm -f ngsi-v0.8.0-linux-amd64.tar.gz
+  local ngsi_go_version
+  ngsi_go_version=v0.9.0
+
+  curl -OL https://github.com/lets-fiware/ngsi-go/releases/download/${ngsi_go_version}/ngsi-${ngsi_go_version}-linux-amd64.tar.gz
+  sudo tar zxvf ngsi-${ngsi_go_version}-linux-amd64.tar.gz -C /usr/local/bin
+  rm -f ngsi-${ngsi_go_version}-linux-amd64.tar.gz
 
   KCOV="/usr/local/bin/kcov --exclude-path=tests,.git,setup,coverage,.github,.vscode,examples"
 

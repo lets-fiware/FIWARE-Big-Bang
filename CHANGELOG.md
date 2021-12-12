@@ -1,10 +1,11 @@
 ## FIWARE Big Bang v0.8.0-next
 
+-   Update NGSI Go to 0.10.0 (#120)
 -   Add troubleshooting.md (#119)
+-   Update documentation (#118)
 
 ## FIWARE Big Bang v0.8.0 - 25 Nov, 2021
 
--   Update documentation (#116)
 -   Improve documentation (#115)
 -   Add feature to support multi-server mode (#113)
 -   Refactor config.sh (#112)
