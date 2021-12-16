@@ -20,8 +20,10 @@ services:
       - IDM_SESSION_SECRET=${IDM_SESSION_SECRET}
       - IDM_ENCRYPTION_KEY=${IDM_ENCRYPTION_KEY}
       - IDM_DEBUG=${IDM_DEBUG}
+      - IDM_OIDC_JWT_ALGORITHM=RS256
     # __KEYROCK_ENVIRONMENT__
     volumes:
+      - ./config/keyrock/certs/applications:/opt/fiware-idm/certs/applications
     # __KEYROCK_VOLUMES__
     restart: always
     logging:

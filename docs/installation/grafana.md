@@ -13,5 +13,3 @@ You can specify configurations by editing the `config.sh` file.
 ```bash
 GRAFANA=grafana
 ```
-
-Please see [this issue](https://github.com/lets-fiware/FIWARE-Big-Bang/issues/2).

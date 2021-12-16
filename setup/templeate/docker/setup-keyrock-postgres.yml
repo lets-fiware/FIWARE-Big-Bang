@@ -15,17 +15,17 @@ services:
       - IDM_DB_NAME=${IDM_DB_NAME}
       - IDM_DB_USER=${IDM_DB_USER}
       - IDM_DB_PASS=${IDM_DB_PASS}
-
       - IDM_ADMIN_UID=${IDM_ADMIN_UID}
       - IDM_ADMIN_USER=${IDM_ADMIN_USER}
       - IDM_ADMIN_EMAIL=${IDM_ADMIN_EMAIL}
       - IDM_ADMIN_PASS=${IDM_ADMIN_PASS}
       - IDM_SESSION_SECRET=${IDM_SESSION_SECRET}
       - IDM_ENCRYPTION_KEY=${IDM_ENCRYPTION_KEY}
-
       - IDM_DEBUG=true
+      - DEBUG=idm:*
+      - IDM_OIDC_JWT_ALGORITHM=RS256
     volumes:
-      - ./.work/keyrock/20210603073911-hashed-access-tokens.js:/opt/fiware-idm/migrations/20210603073911-hashed-access-tokens.js
+    # __KEYROCK_VOLUMES__
     logging:
       driver: syslog
       options:

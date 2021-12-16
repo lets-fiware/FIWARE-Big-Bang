@@ -1173,7 +1173,12 @@ EOF
 up_keyrock_mysql() {
   logging_info "${FUNCNAME[0]}"
 
+  mkdir -p "${CONFIG_DIR}"/keyrock/certs/applications
+
   cp -a "${TEMPLEATE}"/docker/setup-keyrock-mysql.yml ./docker-idm.yml
+  cp "${CONTRIB_DIR}/keyrock/applications.js" "${CONFIG_DIR}/keyrock"
+  add_to_docker_idm_yml "__KEYROCK_VOLUMES__" "     - ${CONFIG_DIR}/keyrock/certs/applications:/opt/fiware-idm/certs/applications"
+  add_to_docker_idm_yml "__KEYROCK_VOLUMES__" "     - ${CONFIG_DIR}/keyrock/applications.js:/opt/fiware-idm/controllers/api/applications.js"
 
   MYSQL_ROOT_PASSWORD=$(pwgen -s 16 1)
 
@@ -1219,9 +1224,15 @@ EOF
 up_keyrock_postgres() {
   logging_info "${FUNCNAME[0]}"
 
-  cp "${CONTRIB_DIR}/keyrock/20210603073911-hashed-access-tokens.js" "${KEYROCK_DIR}"
+  mkdir -p "${CONFIG_DIR}"/keyrock/certs/applications
 
+  cp "${CONTRIB_DIR}/keyrock/20210603073911-hashed-access-tokens.js" "${CONFIG_DIR}/keyrock"
+  cp "${CONTRIB_DIR}/keyrock/applications.js" "${CONFIG_DIR}/keyrock"
   cp -a "${TEMPLEATE}"/docker/setup-keyrock-postgres.yml ./docker-idm.yml
+
+  add_to_docker_idm_yml "__KEYROCK_VOLUMES__" "     - ${CONFIG_DIR}/keyrock/20210603073911-hashed-access-tokens.js:/opt/fiware-idm/migrations/20210603073911-hashed-access-tokens.js"
+  add_to_docker_idm_yml "__KEYROCK_VOLUMES__" "     - ${CONFIG_DIR}/keyrock/certs/applications:/opt/fiware-idm/certs/applications"
+  add_to_docker_idm_yml "__KEYROCK_VOLUMES__" "     - ${CONFIG_DIR}/keyrock/applications.js:/opt/fiware-idm/controllers/api/applications.js"
 
   POSTGRES_PASSWORD=$(pwgen -s 16 1)
 
@@ -1368,6 +1379,13 @@ add_nginx_volumes() {
 #
 add_to_docker_compose_yml() {
   sed -i -e "/$1/i \ $2" "${DOCKER_COMPOSE_YML}"
+}
+
+#
+# Add to docker_idm.yml
+#
+add_to_docker_idm_yml() {
+  sed -i -e "/$1/i \ $2" docker-idm.yml
 }
 
 #
@@ -1682,16 +1700,17 @@ setup_keyrock() {
 
   add_rsyslog_conf "keyrock"
 
-  mkdir "${CONFIG_DIR}"/keyrock
   echo "${DOMAIN_NAME}" > "${CONFIG_DIR}"/keyrock/whitelist.txt
 
   cp "${CONTRIB_DIR}/keyrock/list_users.js" "${CONFIG_DIR}/keyrock"
   cp "${CONTRIB_DIR}/keyrock/users.js" "${CONFIG_DIR}/keyrock"
+  cp "${CONTRIB_DIR}/keyrock/applications.js" "${CONFIG_DIR}/keyrock"
   cp "${CONTRIB_DIR}/keyrock/version.json" "${CONFIG_DIR}/keyrock"
 
   add_to_docker_compose_yml "__KEYROCK_VOLUMES__" "     - ${CONFIG_DIR}/keyrock/whitelist.txt:/opt/fiware-idm/etc/email_list/whitelist.txt"
   add_to_docker_compose_yml "__KEYROCK_VOLUMES__" "     - ${CONFIG_DIR}/keyrock/list_users.js:/opt/fiware-idm/controllers/web/list_users.js"
   add_to_docker_compose_yml "__KEYROCK_VOLUMES__" "     - ${CONFIG_DIR}/keyrock/users.js:/opt/fiware-idm/controllers/web/users.js"
+  add_to_docker_compose_yml "__KEYROCK_VOLUMES__" "     - ${CONFIG_DIR}/keyrock/applications.js:/opt/fiware-idm/controllers/api/applications.js"
   add_to_docker_compose_yml "__KEYROCK_VOLUMES__" "     - ${CONFIG_DIR}/keyrock/version.json:/opt/fiware-idm/version.json"
   add_to_docker_compose_yml "__KEYROCK_ENVIRONMENT__" "     - IDM_EMAIL_LIST=whitelist"
 
@@ -2656,7 +2675,7 @@ setup_grafana() {
 
   logging_info "${FUNCNAME[0]}"
 
-  add_docker_compose_yml "/docker-grafana.yml"
+  add_docker_compose_yml "docker-grafana.yml"
 
   create_nginx_conf "${GRAFANA}" "nginx-grafana"
 
@@ -2667,8 +2686,10 @@ setup_grafana() {
   # Create application for Grafana
   GF_SERVER_ROOT_URL=https://${GRAFANA}/
   GF_SERVER_REDIRECT_URL=https://${GRAFANA}/login/generic_oauth
-  GRAFANA_CLIENT_ID=$(${NGSI_GO} applications --host "${IDM}" create --name "Grafana" --description "Grafana application (${HOST_NAME})" --url "${GF_SERVER_ROOT_URL}" --redirectUri "${GF_SERVER_REDIRECT_URL}" --responseType "code,token,id_token")
+  set +e
+  GRAFANA_CLIENT_ID=$(${NGSI_GO} applications --host "${IDM}" create --name "Grafana" --description "Grafana application (${HOST_NAME})" --url "${GF_SERVER_ROOT_URL}" --redirectUri "${GF_SERVER_REDIRECT_URL}" --openid)
   GRAFANA_CLIENT_SECRET=$(${NGSI_GO} applications --host "${IDM}" get --aid "${GRAFANA_CLIENT_ID}" | jq -r .application.secret )
+  set -e
 
   mkdir -p "${DATA_DIR}"/grafana
   ${SUDO} chown 472:472 "${DATA_DIR}"/grafana

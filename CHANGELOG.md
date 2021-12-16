@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.8.0-next
 
+-   Fix issues #2 that login to Grafana with Keyrock fails (#122)
 -   Update Orion to 3.4.0 (#121)
 -   Update NGSI Go to 0.10.0 (#120)
 -   Add troubleshooting.md (#119)
