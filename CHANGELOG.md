@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.9.0-next
 
+-   Update feature for creating app cert (#127)
 -   Update Keyrock example (#126)
 
 ## FIWARE Big Bang v0.9.0 - 16 Dec, 2021
