@@ -23,6 +23,7 @@ SOFTWARE.
 */
 
 // Porting of https://raw.githubusercontent.com/ging/fiware-idm/FIWARE_8.1/controllers/api/applications.js
+// https://github.com/ging/fiware-idm/pull/263
 
 const debug = require('debug')('idm:api-applications');
 const models = require('../../models/models.js');
@@ -202,7 +203,6 @@ exports.create = function (req, res) {
         application.jwt_secret = req.body.application.token_types.includes('jwt')
           ? crypto.randomBytes(16).toString('hex').slice(0, 16)
           : null;
-        promises.push(generate_app_certificates(application));
       }
 
       const create_application = application.save({
@@ -231,8 +231,12 @@ exports.create = function (req, res) {
         });
       });
 
-      promises.unshift(create_assignment);
-      promises.unshift(create_application);
+      promises.push(create_application);
+      promises.push(create_assignment);
+
+      if (application.scope && application.scope.includes('openid')) {
+        promises.push(generate_app_certificates(application));
+      }
 
       return Promise.all(promises)
         .then(function (values) {
@@ -315,19 +319,40 @@ exports.update = function (req, res) {
         req.application.response_type = oauth_type.response_type;
       }
 
-      return req.application.save();
-    })
-    .then(function (application) {
-      const difference = diff_object(application_previous_values, application.dataValues);
-      const response =
-        Object.keys(difference).length > 0
-          ? { values_updated: difference }
-          : {
-              message: "Request don't change the application parameters",
-              code: 200,
-              title: 'OK'
-            };
-      res.status(200).json(response);
+      const diff_application = function (application) {
+        return new Promise(resolve => {
+          const difference = diff_object(application_previous_values, application.dataValues);
+          resolve(
+            Object.keys(difference).length > 0
+              ? { values_updated: difference }
+              : {
+                message: "Request don't change the application parameters",
+                code: 200,
+                title: 'OK'
+              }
+          );
+        });
+      }
+
+      req.application.save();
+
+      const promises = [];
+
+      promises.push(diff_application(req.application))
+
+      if (req.application.scope.includes("openid")) {
+        promises.push(generate_app_certificates(req.application));
+      } else {
+        promises.push(delete_app_certificates(req.application));
+      }
+
+      return Promise.all(promises)
+        .then(function (values) {
+          res.status(200).json(values[0]);
+        })
+        .catch(function (error) {
+          return Promise.reject(error);
+        });
     })
     .catch(function (error) {
       debug('Error: ' + error);
@@ -347,6 +372,9 @@ exports.update = function (req, res) {
 // DELETE /v1/applications/:application_id -- Delete application
 exports.delete = function (req, res) {
   debug('--> delete');
+
+  // Delete certificates if exists
+  delete_app_certificates(req.application);
 
   req.application
     .destroy()
@@ -646,4 +674,26 @@ function generate_app_certificates(application) {
       }
     });
   });
+}
+
+// Delete certificates
+function delete_app_certificates(application) {
+  debug('--> delete_app_certificates');
+
+  try {
+    if (fs.existsSync('./certs/applications')) {
+      if (fs.existsSync('./certs/applications/' + application.id + '-oidc-key.pem')) {
+        fs.unlinkSync('./certs/applications/' + application.id + '-oidc-key.pem');
+        fs.unlinkSync('./certs/applications/' + application.id + '-oidc-cert.pem');
+        fs.unlinkSync('./certs/applications/' + application.id + '-oidc-csr.pem');
+      }
+      if (fs.existsSync('./certs/applications/' + application.id + '-key.pem')) {
+        fs.unlinkSync('./certs/applications/' + application.id + '-key.pem');
+        fs.unlinkSync('./certs/applications/' + application.id + '-cert.pem');
+        fs.unlinkSync('./certs/applications/' + application.id + '-csr.pem');
+      }
+    }
+  } catch (err) {
+    console.error(err);
+  }
 }
