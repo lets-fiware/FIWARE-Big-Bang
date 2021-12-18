@@ -19,7 +19,7 @@ Once Keyrock is running, you can check the status by the following command:
 #### Request:
 
 ```bash
-curl https://keyrock.example.com/version
+ngsi version --host keyrock.example.com --pretty
 ```
 
 #### Response:
@@ -45,6 +45,99 @@ curl https://keyrock.example.com/version
 Open at `https://keyrock.example.com` to access the Keyrock GUI.
 
 ![](https://raw.githubusercontent.com/lets-fiware/FIWARE-Big-Bang/gh-pages/images/keyrock/keyrock-sign-in.png)
+
+## Create user
+
+### Create a user
+
+Request:
+
+```
+ngsi users create --host keyrock.example.com --username user001 --email user001@example.com --password 1234
+```
+
+Response:
+
+```
+36d8086c-4fc4-4954-9ee2-592e7debe5a0
+```
+
+Request:
+
+```
+ngsi users get --uid 36d8086c-4fc4-4954-9ee2-592e7debe5a0 --pretty
+```
+
+Response:
+
+```
+{
+  "user": {
+    "scope": [],
+    "id": "36d8086c-4fc4-4954-9ee2-592e7debe5a0",
+    "username": "user001",
+    "email": "user001@example.com",
+    "enabled": true,
+    "admin": false,
+    "image": "default",
+    "gravatar": false,
+    "date_password": "2021-12-18T21:26:30.000Z",
+    "description": null,
+    "website": null
+  }
+}
+```
+
+### Create users
+
+Request:
+
+```
+#!/bin/sh
+set -ue
+
+HOST=keyrock
+DOMAIN=example.com
+
+for id in $(seq 10)
+do
+ USER=$(printf "user%03d" $id)
+ PASS=$(pwgen -s 16 1)
+ ngsi users create --host "${HOST}.${DOMAIN}" --username "${USER}" --email "${USER}@${DOMAIN}" --password "${PASS}" > /dev/null
+ echo "${USER}@${DOMAIN} ${PASS}"
+done
+```
+
+Response:
+
+```
+user001@e-suda.info Uu2HADXh5ITIlIVt
+user002@e-suda.info Gbf4njxTp3tZApje
+user003@e-suda.info J6aNl3phuOurh8x8
+user004@e-suda.info 2Jm5bP7RJJmMD6D9
+user005@e-suda.info midj714vE8pD9ULs
+user006@e-suda.info jbrk2SC3SdVNsW8W
+user007@e-suda.info wlxTAGdRHU6ESmRa
+user008@e-suda.info sBfWNhVaye0zLHWh
+user009@e-suda.info R6ES3ezcdTXst2TI
+user010@e-suda.info A2djP94QYrH2LgVw
+```
+
+The `pwgen` program generates passwords. You can install it by following the steps below:
+
+-   Ubuntu
+
+```
+apt update
+apt install -y pwgen
+```
+
+-   CentOS
+
+```
+yum install -y epel-release
+yum install -y pwge
+```
 
 ## Examples
 
