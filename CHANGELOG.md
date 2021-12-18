@@ -1,5 +1,7 @@
 ## FIWARE Big Bang v0.9.0-next
 
+-   Update Keyrock example (#126)
+
 ## FIWARE Big Bang v0.9.0 - 16 Dec, 2021
 
 -   Update QuantumLeap to 0.8.3 and Crate DB to 4.6.6 (#123)
