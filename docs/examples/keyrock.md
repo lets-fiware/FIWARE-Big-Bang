@@ -52,25 +52,25 @@ Open at `https://keyrock.example.com` to access the Keyrock GUI.
 
 Request:
 
-```
+```bash
 ngsi users create --host keyrock.example.com --username user001 --email user001@example.com --password 1234
 ```
 
 Response:
 
-```
+```text
 36d8086c-4fc4-4954-9ee2-592e7debe5a0
 ```
 
 Request:
 
-```
+```bash
 ngsi users get --uid 36d8086c-4fc4-4954-9ee2-592e7debe5a0 --pretty
 ```
 
 Response:
 
-```
+```json
 {
   "user": {
     "scope": [],
@@ -92,7 +92,7 @@ Response:
 
 Request:
 
-```
+```bash
 #!/bin/sh
 set -ue
 
@@ -110,7 +110,7 @@ done
 
 Response:
 
-```
+```text
 user001@e-suda.info Uu2HADXh5ITIlIVt
 user002@e-suda.info Gbf4njxTp3tZApje
 user003@e-suda.info J6aNl3phuOurh8x8
@@ -127,16 +127,16 @@ The `pwgen` program generates passwords. You can install it by following the ste
 
 -   Ubuntu
 
-```
+```bash
 apt update
 apt install -y pwgen
 ```
 
 -   CentOS
 
-```
+```bash
 yum install -y epel-release
-yum install -y pwge
+yum install -y pwgen
 ```
 
 ## Examples
