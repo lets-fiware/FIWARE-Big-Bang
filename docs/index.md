@@ -36,5 +36,5 @@ various FIWARE GEs run. It's your own universe.
 
 ## Copyright and License
 
-Copyright (c) 2021 Kazuhito Suda<br>
+Copyright (c) 2021-2022 Kazuhito Suda<br>
 Licensed under the MIT License.
