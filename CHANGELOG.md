@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.9.0-next
 
+-   Update GitHub Actions (#129)
 -   Update copyright (#128)
 -   Update feature for creating app cert (#127)
 -   Update Keyrock example (#126)
