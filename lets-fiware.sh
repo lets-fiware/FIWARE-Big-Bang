@@ -952,7 +952,7 @@ validate_domain() {
     if [ -n "${val}" ]; then
         logging_info "Sub-domain: ${val}"
         # shellcheck disable=SC2086
-        IP=$(${HOST_CMD} -4 ${val} | awk 'match($0,/[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/) { print substr($0, RSTART, RLENGTH) }' || true)
+        IP=$(${HOST_CMD} -4 ${val} | sed -n -r "/ has address /s/^.* has address ([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+).*$/\1/p" || true)
         if [ "$IP" = "" ]; then
           IP=$(sed -n -e "/${val}/s/\([^ ].*\) .*/\1/p" /etc/hosts)
         fi
