@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.9.0-next
 
+-   Fix issue #130 that domain validation fails when subdomain name contains IP address (#131)
 -   Update GitHub Actions (#129)
 -   Update copyright (#128)
 -   Update feature for creating app cert (#127)
