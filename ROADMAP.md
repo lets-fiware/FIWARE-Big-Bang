@@ -18,12 +18,10 @@ any time.
 ## Short term
 
 The following list of features are planned to be addressed in the short term,
-and incorporated in the next release of the product planned for December 2021:
+and incorporated in the next release of the product planned for March 2022:
 
 -   Orion-LD, Mintaka
--   IoT Agent
--   Knowage
--   Ckan
+-   Draco
 
 ## Medium term
 
@@ -31,7 +29,7 @@ The following list of features are planned to be addressed in the medium term,
 typically within the subsequent release(s) generated in the next 9 months after
 next planned release:
 
--   k8s
+-   K8s
 
 ## Long term
 
