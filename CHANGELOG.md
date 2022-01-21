@@ -1,5 +1,7 @@
 ## FIWARE Big Bang v0.10.0-next
 
+-   Update roadmap (#134)
+
 ## FIWARE Big Bang v0.10.0 - 20 Jan, 2022
 
 -   Fix issue #130 that domain validation fails when subdomain name contains IP address (#131)
