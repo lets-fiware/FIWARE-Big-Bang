@@ -11,8 +11,6 @@ fi
 
 . ./.env
 
-#!/bin/bash
-set -eu
 for i in {0..9}
 do
   echo $i
