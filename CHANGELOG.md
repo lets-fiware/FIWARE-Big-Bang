@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.10.0-next
 
+-   Remove unnecessary documentation and commands for Cygnus (#135)
 -   Update roadmap (#134)
 
 ## FIWARE Big Bang v0.10.0 - 20 Jan, 2022
