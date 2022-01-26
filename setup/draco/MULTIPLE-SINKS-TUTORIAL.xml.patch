@@ -1,0 +1,24 @@
+221c221
+<                     <value>jdbc:mysql://db-mysql:3306</value>
+---
+>                     <value>jdbc:mysql://MYSQL_HOST</value>
+233c233
+<                     <value>root</value>
+---
+>                     <value>MYSQL_USER</value>
+236a237
+>                     <value>MYSQL_PASSWORD</value>
+317c318
+<                     <value>jdbc:postgresql://db-postgres:5432/</value>
+---
+>                     <value>jdbc:postgresql://POSTGRES_HOST/</value>
+329c330
+<                     <value>postgres</value>
+---
+>                     <value>POSTGRES_USER</value>
+332a334
+>                     <value>POSTGRES_PASSWORD</value>
+996c998
+<                         <value>mongodb://mongo-db:27017</value>
+---
+>                         <value>mongodb://MONGO_HOST</value>

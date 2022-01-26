@@ -127,6 +127,25 @@ IMAGE_PERSEO_CORE=telefonicaiot/perseo-core:1.8.0
 IMAGE_PERSEO_FE=telefonicaiot/perseo-fe:1.20.0
 
 #
+# Draco
+#
+DRACO=
+
+# Use Draco sink (true or false) Default: false
+DRACO_MONGO=
+DRACO_MYSQL=
+DRACO_POSTGRES=
+
+# Expose port (none, local, all) Default: none
+DRACO_EXPOSE_PORT=
+
+# Disable /nifi-docs/ url
+DRACO_DISABLE_NIFI_DOCS=
+
+# Docker image for Draco
+IMAGE_DRACO=ging/fiware-draco:2.0.0
+
+#
 # Quantumleap
 #
 # Set a sub-domain name of Quantumleap

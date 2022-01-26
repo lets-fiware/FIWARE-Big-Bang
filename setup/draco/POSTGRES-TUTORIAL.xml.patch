@@ -1,0 +1,10 @@
+119c119
+<                     <value>jdbc:postgresql://db-postgres:5432/</value>
+---
+>                     <value>jdbc:postgresql://POSTGRES_HOST/</value>
+131c131
+<                     <value>postgres</value>
+---
+>                     <value>POSTGRES_USER</value>
+134a135
+>                     <value>POSTGRES_PASSWORD</value>

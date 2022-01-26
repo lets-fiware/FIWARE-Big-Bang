@@ -1,0 +1,35 @@
+version: "3"
+services:
+  draco:
+    image: ${IMAGE_DRACO}
+    # __DRACO_PORTS__
+    depends_on:
+    # __DRACO_DEPENDS_ON__
+    environment:
+      - AUTH=tls
+      - KEYSTORE_PATH=/opt/nifi/nifi-current/conf/keystore.jks
+      - KEYSTORE_TYPE=jks
+      - KEYSTORE_PASSWORD=${DRACO_KEYSTORE_PASSWORD}
+      - TRUSTSTORE_PATH=/opt/nifi/nifi-current/conf/truststore.jks
+      - TRUSTSTORE_TYPE=jks
+      - TRUSTSTORE_PASSWORD=${DRACO_TRUSTSTORE_PASSWORD}
+      - NIFI_WEB_HTTPS_HOST=draco
+      - NIFI_WEB_HTTPS_PORT=8443
+      - INITIAL_ADMIN_IDENTITY=${IDM_ADMIN_EMAIL}
+      - OIDC_DISCOVERY_URL=${DRACO_OIDC_DISCOVERY_URL}
+      - OIDC_CLIENT_ID=${DRACO_OIDC_CLIENT_ID}
+      - OIDC_CLIENT_SECRET=${DRACO_OIDC_CLIENT_SECRET}
+      - OIDC_PREFERRED_JWSALGORITHM=RS256
+    volumes:
+      - ${CONFIG_DIR}/draco/cert/keystore.jks:/opt/nifi/nifi-current/conf/keystore.jks
+      - ${CONFIG_DIR}/draco/cert/truststore.jks:/opt/nifi/nifi-current/conf/truststore.jks
+      - ${CONFIG_DIR}/draco/secure.sh:/opt/nifi/scripts/secure.sh
+      - ${DATA_DIR}/draco/conf:/opt/nifi/nifi-current/conf
+    healthcheck:
+      test: curl --fail -s http://draco:9090/nifi-api/system-diagnostics || exit 1
+      start_period: 1m
+    restart: always
+    logging:
+      driver: syslog
+      options:
+        tag: "[draco]"
