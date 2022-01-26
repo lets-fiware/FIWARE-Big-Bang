@@ -2596,32 +2596,34 @@ setup_draco() {
   local draco_containter
   draco_container=draco_"$$"
 
-  docker run --rm -d --name "${draco_container}" --entrypoint=/usr/bin/tail "${IMAGE_DRACO}" -f /opt/nifi/nifi-current/conf/bootstrap.conf
+  ${DOCKER} run -d --rm --tty --name "${draco_container}" --entrypoint=/usr/bin/tail "${IMAGE_DRACO}" -f /opt/nifi/nifi-current/conf/bootstrap.conf |
   sleep 3
   docker cp "${draco_container}":/opt/nifi/scripts/secure.sh "${CONFIG_DIR}"/draco/secure.sh
   sed -e 1d "${SETUP_DIR}"/draco/nifi-patch.sh >> "${CONFIG_DIR}"/draco/secure.sh
 
   local file
 
-  for file in $(docker exec "${draco_container}" ls -1F conf | grep -v /)
+  for file in $(${DOCKER} exec "${draco_container}" ls -1F conf | grep -v /)
   do
-    docker cp "${draco_container}":/opt/nifi/nifi-current/conf/"${file}" "${DATA_DIR}"/draco/conf
+    ${DOCKER} cp "${draco_container}":/opt/nifi/nifi-current/conf/"${file}" "${DATA_DIR}"/draco/conf
   done
 
   for file in MONGO-TUTORIAL.xml MULTIPLE-SINKS-TUTORIAL.xml MYSQL-TUTORIAL.xml ORION-TO-CASSANDRA.xml ORION-TO-MONGO.xml ORION-TO-MYSQL.xml ORION-TO-POSTGRESQL.xml POSTGRES-TUTORIAL.xml
   do
-    docker cp "${draco_container}":/opt/nifi/nifi-current/conf/templates/"${file}" "${DATA_DIR}"/draco/conf/templates
+    ${DOCKER} cp "${draco_container}":/opt/nifi/nifi-current/conf/templates/"${file}" "${DATA_DIR}"/draco/conf/templates
     patch "${DATA_DIR}/draco/conf/templates/${file}" "${SETUP_DIR}/draco/${file}.patch"
   done
 
-  docker stop "${draco_container}"
+  ${DOCKER} stop "${draco_container}"
 
-  docker run --rm -it --entrypoint /bin/sh \
+  set +e
+  ${DOCKER} run --rm --tty --entrypoint /bin/sh \
     -v "${draco_cert}":/opt/nifi/nifi-current/localhost \
     "${IMAGE_DRACO}" /opt/nifi/nifi-toolkit-current/bin/tls-toolkit.sh \
     standalone \
     --hostnames localhost \
     --isOverwrite
+  set -e
 
   # Update host information
   DRACO_MONGO_HOST=${DRACO_MONGO_HOST:-mongo}
@@ -2677,11 +2679,11 @@ setup_draco() {
   set +e
   DRACO_OIDC_CLIENT_ID=$(${NGSI_GO} applications --host "${IDM}" create --name "Draco" --description "Draco application (${HOST_NAME})" --url "${DRACO_ROOT_URL}" --redirectUri "${DRACO_REDIRECT_URL}" --openid)
   DRACO_OIDC_CLIENT_SECRET=$(${NGSI_GO} applications --host "${IDM}" get --aid "${DRACO_OIDC_CLIENT_ID}" | jq -r .application.secret )
-  set -e
 
   DRACO_OIDC_DISCOVERY_URL="https://${KEYROCK}/idm/applications/${DRACO_OIDC_CLIENT_ID}/.well-known/openid-configuration"
   DRACO_KEYSTORE_PASSWORD=$(sed -n "/^nifi.security.keystorePasswd=/s/\(.*\)=\(.*\)/\2/p" "${draco_cert}/nifi.properties")
   DRACO_TRUSTSTORE_PASSWORD=$(sed -n "/^nifi.security.truststorePasswd=/s%\(.*\)=\(.*\)%\2%p" "${draco_cert}/nifi.properties")
+  set -e
 
   cat <<EOF >> .env
 
