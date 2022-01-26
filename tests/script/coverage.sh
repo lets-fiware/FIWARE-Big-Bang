@@ -165,7 +165,7 @@ setup() {
   sudo tar zxvf ngsi-${ngsi_go_version}-linux-amd64.tar.gz -C /usr/local/bin
   rm -f ngsi-${ngsi_go_version}-linux-amd64.tar.gz
 
-  KCOV="/usr/local/bin/kcov --exclude-path=tests,.git,setup,coverage,.github,.vscode,examples"
+  KCOV="/usr/local/bin/kcov --exclude-path=tests,.git,setup,coverage,.github,.vscode,examples,docs,.mock"
 
   SAVE_PATH=${PATH}
 
@@ -288,6 +288,13 @@ install_test3() {
   sed -i -e "s/^\(PERSEO_SMTP_HOST=\).*/\1www.hostname.com/" config.sh
   sed -i -e "s/^\(PERSEO_SMTP_PORT=\).*/\125/" config.sh
   sed -i -e "s/^\(PERSEO_SMTP_SECURE=\).*/\1false/" config.sh
+
+  sed -i -e "s/^\(DRACO=\).*/\1draco/" config.sh
+  sed -i -e "s/^\(DRACO_MONGO=\).*/\1true/" config.sh
+  sed -i -e "s/^\(DRACO_MYSQL=\).*/\1true/" config.sh
+  sed -i -e "s/^\(DRACO_POSTGRES=\).*/\1true/" config.sh
+  sed -i -e "s/^\(DRACO_EXPOSE_PORT=\).*/\1all/" config.sh
+  sed -i -e "s/^\(DRACO_DISABLE_NIFI_DOCS=\).*/\1true/" config.sh
 
   ${KCOV} ./coverage ./lets-fiware.sh example.com
 }
@@ -571,6 +578,17 @@ EOF
  
   echo "*** Specify one or more Cygnus sinks ***" 1>&2
   sed -i -e "s/^\(CYGNUS=\).*/\1cygnus/" config.sh
+  ${KCOV} ./coverage ./lets-fiware.sh example.com
+  reset_env
+
+  echo "*** Specify one or more sinks ***" 1>&2
+  sed -i -e "s/^\(DRACO=\).*/\1draco/" config.sh
+  ${KCOV} ./coverage ./lets-fiware.sh example.com
+  reset_env
+
+  echo "Set either Cygnus or Draco" 1>&2
+  sed -i -e "s/^\(CYGNUS=\).*/\1cygnus/" config.sh
+  sed -i -e "s/^\(DRACO=\).*/\1draco/" config.sh
   ${KCOV} ./coverage ./lets-fiware.sh example.com
   reset_env
 

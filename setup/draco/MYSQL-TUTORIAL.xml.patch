@@ -1,0 +1,10 @@
+121c121
+<                     <value>jdbc:mysql://db-mysql:3306</value>
+---
+>                     <value>jdbc:mysql://MYSQL_HOST</value>
+133c133
+<                     <value>root</value>
+---
+>                     <value>MYSQL_USER</value>
+136a137
+>                     <value>MYSQL_PASSWORD</value>
