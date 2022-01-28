@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.10.0-next
 
+-   Update Orion to 3.5.0 (#139)
 -   Support Draco (#138)
 -   Update GitHub Actions (#136)
 -   Remove unnecessary documentation and commands for Cygnus (#135)
