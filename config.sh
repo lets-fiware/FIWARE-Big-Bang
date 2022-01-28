@@ -48,7 +48,7 @@ ORION=orion
 ORION_EXPOSE_PORT=
 
 # Docker image for Orion
-IMAGE_ORION=telefonicaiot/fiware-orion:3.4.0
+IMAGE_ORION=telefonicaiot/fiware-orion:3.5.0
 
 #
 # Cygnus
