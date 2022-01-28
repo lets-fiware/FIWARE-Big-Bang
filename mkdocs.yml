@@ -8,6 +8,7 @@ nav:
       - 'Installation': installation/index.md
       - 'Keyrock': installation/keyrock.md
       - 'Orion': installation/orion.md
+      - 'Orion-LD': installation/orion-ld.md
       - 'Cygnus': installation/cygnus.md
       - 'Comet': installation/comet.md
       - 'Perseo': installation/perseo.md

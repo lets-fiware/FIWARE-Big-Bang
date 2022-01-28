@@ -69,6 +69,20 @@ ngsi broker \
   --password "password"
 ```
 
+### Orion-LD
+
+```bash
+ngsi broker \
+  add \
+  --host orion-ld.example.com \
+  --ngsiType ld \
+  --brokerHost "https://orion-ld.example.com" \
+  --idmType tokenproxy \
+  --idmHost "https://keyrock.example.com/token" \
+  --username "admin@example.com" \
+  --password "password"
+```
+
 ### Cygnus
 
 ```bash

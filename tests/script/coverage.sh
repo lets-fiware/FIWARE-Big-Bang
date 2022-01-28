@@ -296,6 +296,9 @@ install_test3() {
   sed -i -e "s/^\(DRACO_EXPOSE_PORT=\).*/\1all/" config.sh
   sed -i -e "s/^\(DRACO_DISABLE_NIFI_DOCS=\).*/\1true/" config.sh
 
+  sed -i -e "s/^\(ORION=\).*/\1/" config.sh
+  sed -i -e "s/^\(ORION_LD=\).*/\1orion-ld/" config.sh
+
   ${KCOV} ./coverage ./lets-fiware.sh example.com
 }
 
@@ -589,6 +592,12 @@ EOF
   echo "Set either Cygnus or Draco" 1>&2
   sed -i -e "s/^\(CYGNUS=\).*/\1cygnus/" config.sh
   sed -i -e "s/^\(DRACO=\).*/\1draco/" config.sh
+  ${KCOV} ./coverage ./lets-fiware.sh example.com
+  reset_env
+
+  echo "Set either Orion or Orion-LD" 1>&2
+  sed -i -e "s/^\(ORION=\).*/\1orion/" config.sh
+  sed -i -e "s/^\(ORION_LD=\).*/\1orion-ld/" config.sh
   ${KCOV} ./coverage ./lets-fiware.sh example.com
   reset_env
 
