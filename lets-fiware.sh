@@ -274,6 +274,47 @@ check_cygnus_values() {
 }
 
 #
+# Check Draco values
+#
+check_draco_values() {
+  logging_info "${FUNCNAME[0]}"
+
+  if [ "${DRACO}" != "" ]; then
+    if [ -z "${DRACO_MONGO}" ]; then
+      DRACO_MONGO=false
+    fi
+    if [ -z "${DRACO_MYSQL}" ]; then
+      DRACO_MYSQL=false
+    fi
+    if [ -z "${DRACO_POSTGRES}" ]; then
+      DRACO_POSTGRES=false
+    fi
+    if ! ${DRACO_MONGO} && ! ${DRACO_MYSQL} && ! ${DRACO_POSTGRES} ; then
+      logging_err "error: Specify one or more Draco sinks"
+      exit "${ERR_CODE}"
+    fi
+  fi
+
+  DRACO_MONGO_HOST=
+  DRACO_MONGO_PORT=
+  DRACO_MONGO_USER=
+  DRACO_MONGO_PASS=
+  
+  DRACO_MYSQL_HOST=
+  DRACO_MYSQL_PORT=
+  DRACO_MYSQL_USER=
+  DRACO_MYSQL_PASS=
+
+  DRACO_POSTGRES_HOST=
+  DRACO_POSTGRES_PORT=
+  DRACO_POSTGRES_USER=
+  DRACO_POSTGRES_PASS=
+
+  DRACO_CASSANDRA_HOST=
+  DRACO_CASSANDRA_PORT=
+}
+
+#
 # Check IoT Agent values
 #
 check_iot_agent_values() {
@@ -401,7 +442,14 @@ set_and_check_values() {
     exit "${ERR_CODE}"
   fi
 
+  if [ -n "${CYGNUS}" ] && [ -n "${DRACO}" ]; then
+    logging_err "Set either Cygnus or Draco"
+    exit "${ERR_CODE}"
+  fi
+
   check_cygnus_values
+
+  check_draco_values
 
   check_iot_agent_values
 
@@ -467,6 +515,7 @@ IMAGE_CYGNUS=${IMAGE_CYGNUS}
 IMAGE_COMET=${IMAGE_COMET}
 IMAGE_WIRECLOUD=${IMAGE_WIRECLOUD}
 IMAGE_NGSIPROXY=${IMAGE_NGSIPROXY}
+IMAGE_DRACO=${IMAGE_DRACO}
 IMAGE_QUANTUMLEAP=${IMAGE_QUANTUMLEAP}
 IMAGE_IOTAGENT_UL=${IMAGE_IOTAGENT_UL}
 IMAGE_IOTAGENT_JSON=${IMAGE_IOTAGENT_JSON}
@@ -839,7 +888,7 @@ setup_init() {
 
   DOCKER_COMPOSE_YML=./docker-compose.yml
 
-  readonly APPS=(KEYROCK ORION CYGNUS COMET WIRECLOUD NGSIPROXY NODE_RED GRAFANA QUANTUMLEAP PERSEO IOTAGENT_UL IOTAGENT_JSON IOTAGENT_HTTP MOSQUITTO ELASTICSEARCH)
+  readonly APPS=(KEYROCK ORION CYGNUS COMET WIRECLOUD NGSIPROXY NODE_RED GRAFANA QUANTUMLEAP PERSEO IOTAGENT_UL IOTAGENT_JSON IOTAGENT_HTTP MOSQUITTO ELASTICSEARCH DRACO)
 
   val=
 
@@ -2489,6 +2538,164 @@ EOF
 }
 
 #
+# Setup draco
+#
+setup_draco() {
+  if [ -z "${DRACO}" ]; then
+    return
+  fi
+
+  logging_info "${FUNCNAME[0]}"
+
+  add_docker_compose_yml "docker-draco.yml"
+
+  if ${DRACO_MONGO}; then
+    setup_mongo
+    sed -i -e "/__DRACO_DEPENDS_ON__/i \      - mongo" "${DOCKER_COMPOSE_YML}"
+  fi
+
+  if ${DRACO_MYSQL}; then
+    setup_mysql
+
+    DRACO_MYSQL_USER=root
+    DRACO_MYSQL_PASS="${MYSQL_ROOT_PASSWORD}"
+
+    sed -i -e "/__DRACO_DEPENDS_ON__/i \      - mysql" "${DOCKER_COMPOSE_YML}"
+  fi
+
+  if ${DRACO_POSTGRES}; then
+    setup_postgres
+
+    DRACO_POSTGRES_USER=postgres
+    DRACO_POSTGRES_PASS="${POSTGRES_PASSWORD}"
+
+    sed -i -e "/__DRACO_DEPENDS_ON__/i \      - postgres" "${DOCKER_COMPOSE_YML}"
+  fi
+
+  # shellcheck disable=SC2086
+  add_exposed_ports "${DRACO_EXPOSE_PORT}" "__DRACO_PORTS__" "5050"
+
+  create_nginx_conf "${DRACO}" "nginx-draco"
+
+  add_nginx_depends_on "draco"
+
+  add_rsyslog_conf "draco"
+
+  DRACO_DISABLE_NIFI_DOCS=${DRACO_DISABLE_NIFI_DOCS:-false}
+
+  if "${DRACO_DISABLE_NIFI_DOCS}"; then
+    sed -i -e "/# __NGINX_DRACO__/i \  location /nifi-docs/ {\n    return 404;\n  }\n" "${NGINX_SITES}/${DRACO}"
+  fi
+
+  local draco_cert
+  draco_cert="${CONFIG_DIR}/draco/cert"
+
+  mkdir -p "${draco_cert}"
+  mkdir -p "${DATA_DIR}"/draco/conf/templates
+
+  local draco_containter
+  draco_container=draco_"$$"
+
+  ${DOCKER} run -d --rm --tty --name "${draco_container}" --entrypoint=/usr/bin/tail "${IMAGE_DRACO}" -f /opt/nifi/nifi-current/conf/bootstrap.conf |
+  sleep 3
+  docker cp "${draco_container}":/opt/nifi/scripts/secure.sh "${CONFIG_DIR}"/draco/secure.sh
+  sed -e 1d "${SETUP_DIR}"/draco/nifi-patch.sh >> "${CONFIG_DIR}"/draco/secure.sh
+
+  local file
+
+  for file in $(${DOCKER} exec "${draco_container}" ls -1F conf | grep -v /)
+  do
+    ${DOCKER} cp "${draco_container}":/opt/nifi/nifi-current/conf/"${file}" "${DATA_DIR}"/draco/conf
+  done
+
+  for file in MONGO-TUTORIAL.xml MULTIPLE-SINKS-TUTORIAL.xml MYSQL-TUTORIAL.xml ORION-TO-CASSANDRA.xml ORION-TO-MONGO.xml ORION-TO-MYSQL.xml ORION-TO-POSTGRESQL.xml POSTGRES-TUTORIAL.xml
+  do
+    ${DOCKER} cp "${draco_container}":/opt/nifi/nifi-current/conf/templates/"${file}" "${DATA_DIR}"/draco/conf/templates
+    patch "${DATA_DIR}/draco/conf/templates/${file}" "${SETUP_DIR}/draco/${file}.patch"
+  done
+
+  ${DOCKER} stop "${draco_container}"
+
+  set +e
+  ${DOCKER} run --rm --tty --entrypoint /bin/sh \
+    -v "${draco_cert}":/opt/nifi/nifi-current/localhost \
+    "${IMAGE_DRACO}" /opt/nifi/nifi-toolkit-current/bin/tls-toolkit.sh \
+    standalone \
+    --hostnames localhost \
+    --isOverwrite
+  set -e
+
+  # Update host information
+  DRACO_MONGO_HOST=${DRACO_MONGO_HOST:-mongo}
+  DRACO_MONGO_PORT=${DRACO_MONGO_PORT:-27017}
+  DRACO_MONGO="${DRACO_MONGO_USER}:${DRACO_MONGO_PASS}@${DRACO_MONGO_HOST}:${DRACO_MONGO_PORT}"
+
+  if [ -z "${DRACO_MONGO_USER}" ] || [ -z "${DRACO_MONGO_PASS}" ]; then
+    DRACO_MONGO="${DRACO_MONGO_HOST}:${DRACO_MONGO_PORT}"
+  fi
+
+  DRACO_MYSQL_HOST=${DRACO_MYSQL_HOST:-mysql}
+  DRACO_MYSQL_PORT=${DRACO_MYSQL_PORT:-3306}
+  DRACO_MYSQL="${DRACO_MYSQL_HOST}:${DRACO_MYSQL_PORT}"
+  DRACO_MYSQL_USER=${DRACO_MYSQL_USER:-root}
+  DRACO_MYSQL_PASS=${DRACO_MYSQL_PASS:-mysql}
+
+  DRACO_POSTGRES_HOST=${DRACO_POSTGRES_HOST:-postgres}
+  DRACO_POSTGRES_PORT=${DRACO_POSTGRES_PORT:-5432}
+  DRACO_POSTGRES="${DRACO_POSTGRES_HOST}:${DRACO_POSTGRES_PORT}"
+  DRACO_POSTGRES_USER=${DRACO_POSTGRES_USER:-postgres}
+  DRACO_POSTGRES_PASS=${DRACO_POSTGRES_PASS:-postgres}
+ 
+  DRACO_CASSANDRA_HOST=${DRACO_CASSANDRA_HOST:-cassandra}
+  DRACO_CASSANDRA_PORT=${DRACO_CASSANDRA_PORT:-9042}
+  DRACO_CASSANDRA="${DRACO_CASSANDRA_HOST}:${DRACO_CASSANDRA_PORT}"
+
+  TEMPLATES="${DATA_DIR}/draco/conf/templates"
+
+  for file in MULTIPLE-SINKS-TUTORIAL.xml MONGO-TUTORIAL.xml ORION-TO-MONGO.xml
+  do
+    sed -i -e "s/MONGO_HOST/${DRACO_MONGO}/" "${TEMPLATES}/${file}"
+  done
+
+  for file in MULTIPLE-SINKS-TUTORIAL.xml MYSQL-TUTORIAL.xml ORION-TO-MYSQL.xml
+  do
+    sed -i -e "s/MYSQL_HOST/${DRACO_MYSQL}/" \
+           -e "s/MYSQL_USER/${DRACO_MYSQL_USER}/" \
+           -e "s/MYSQL_PASSWORD/${DRACO_MYSQL_PASS}/" "${TEMPLATES}/${file}"
+  done
+
+  for file in MULTIPLE-SINKS-TUTORIAL.xml POSTGRES-TUTORIAL.xml ORION-TO-POSTGRESQL.xml
+  do
+    sed -i -e "s/POSTGRES_HOST/${DRACO_POSTGRES}/" \
+           -e "s/POSTGRES_USER/${DRACO_POSTGRES_USER}/" \
+           -e "s/POSTGRES_PASSWORD/${DRACO_POSTGRES_PASS}/" "${TEMPLATES}/${file}"
+  done
+
+  sed -i -e "s/CASSANDRA_HOST/${DRACO_CASSANDRA}/" "${TEMPLATES}/ORION-TO-CASSANDRA.xml"
+
+  # Create application for Draco
+  DRACO_ROOT_URL=https://${DRACO}/
+  DRACO_REDIRECT_URL=https://${DRACO}:443/nifi-api/access/oidc/callback
+  set +e
+  DRACO_OIDC_CLIENT_ID=$(${NGSI_GO} applications --host "${IDM}" create --name "Draco" --description "Draco application (${HOST_NAME})" --url "${DRACO_ROOT_URL}" --redirectUri "${DRACO_REDIRECT_URL}" --openid)
+  DRACO_OIDC_CLIENT_SECRET=$(${NGSI_GO} applications --host "${IDM}" get --aid "${DRACO_OIDC_CLIENT_ID}" | jq -r .application.secret )
+
+  DRACO_OIDC_DISCOVERY_URL="https://${KEYROCK}/idm/applications/${DRACO_OIDC_CLIENT_ID}/.well-known/openid-configuration"
+  DRACO_KEYSTORE_PASSWORD=$(sed -n "/^nifi.security.keystorePasswd=/s/\(.*\)=\(.*\)/\2/p" "${draco_cert}/nifi.properties")
+  DRACO_TRUSTSTORE_PASSWORD=$(sed -n "/^nifi.security.truststorePasswd=/s%\(.*\)=\(.*\)%\2%p" "${draco_cert}/nifi.properties")
+  set -e
+
+  cat <<EOF >> .env
+
+DRACO_KEYSTORE_PASSWORD=${DRACO_KEYSTORE_PASSWORD}
+DRACO_TRUSTSTORE_PASSWORD=${DRACO_TRUSTSTORE_PASSWORD}
+DRACO_OIDC_DISCOVERY_URL=${DRACO_OIDC_DISCOVERY_URL}
+DRACO_OIDC_CLIENT_ID=${DRACO_OIDC_CLIENT_ID}
+DRACO_OIDC_CLIENT_SECRET=${DRACO_OIDC_CLIENT_SECRET}
+EOF
+}
+
+#
 # Create API role for Node-RED
 #
 create_node_red_api_role() {
@@ -2797,6 +3004,8 @@ setup_ngsi_go() {
 
   ORION=${save_orion}
   KEYROCK=${save_keyrock}
+
+  ${NGSI_GO} settings clear
 }
 
 #
@@ -2843,6 +3052,10 @@ boot_up_containers() {
   logging_info "docker-compose up -d --build"
   ${DOCKER_COMPOSE} up -d --build
 
+  if [ -n "${DRACO}" ]; then
+    "${FIBB_TEST}" || wait "https://${DRACO}/" "200"
+  fi
+
   if ! ${MULTI_SERVER}; then
     wait "https://${KEYROCK}/" "200"
   fi
@@ -2861,6 +3074,9 @@ setup_end() {
   fi
   if [ -n "${ORION}" ]; then
     sed -i -e "/# __NGINX_ORION__/d" "${NGINX_SITES}/${ORION}"
+  fi
+  if [ -n "${DRACO}" ]; then
+    sed -i -e "/# __NGINX_DRACO__/d" "${NGINX_SITES}/${DRACO}"
   fi
   if [ -n "${IOTAGENT_HTTP}" ]; then
     sed -i -e "/# __NGINX_IOTAGENT_HTTP__/d" "${NGINX_SITES}/${IOTAGENT_HTTP}"
@@ -2920,6 +3136,7 @@ setup_main() {
   setup_regproxy
   setup_cygnus
   setup_comet
+  setup_draco
   setup_quantumleap
   setup_wirecloud
   setup_iotagent_ul
@@ -2977,9 +3194,9 @@ init_cmd() {
 
   INSTALL=".install"
 
-  DATA_DIR=./data
-  WORK_DIR=./.work
-  CONFIG_DIR=./config
+  DATA_DIR=${SELF_DIR}/data
+  WORK_DIR=${SELF_DIR}/.work
+  CONFIG_DIR=${SELF_DIR}/config
   ENV_FILE=.env
   NODE_RED_USERS_TEXT=node-red_users.txt
 }
@@ -3018,6 +3235,8 @@ remove_files() {
 #
 main() {
   LANG=C
+
+  SELF_DIR=$(cd "$(dirname "$0")"; pwd)
 
   parse_args "$@"
 

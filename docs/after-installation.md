@@ -17,6 +17,7 @@
     -   [Sanity check for Perseo](#sanity-check-for-perseo)
     -   [Get QuantumLeap version](#get-quantumleap-version)
     -   [Sanity check for QuantumLeap](#sanity-check-for-quantumleap)
+    -   [Sanity check for Draco](#sanity-check-for-draco)
     -   [Sanity check for IoT Agent for UL](#sanity-check-for-iot-agent-for-ul)
     -   [Sanity check for IoT Agent for JSON](#sanity-check-for-iot-agent-for-json)
     -   [Sanity check for WireCloud](#sanity-check-for-wirecloud)
@@ -246,6 +247,12 @@ ngsi health --host quantumleap.example.com
   "status": "pass"
 }
 ```
+
+### Sanity check for Draco
+
+Open at `https://draco.example.com` to access the Draco GUI.
+
+![](https://raw.githubusercontent.com/lets-fiware/FIWARE-Big-Bang/gh-pages/images/draco/draco-01.png)
 
 ### Sanity check for IoT Agent for UL
 

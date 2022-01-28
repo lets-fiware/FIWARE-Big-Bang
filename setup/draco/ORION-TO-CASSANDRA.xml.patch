@@ -1,0 +1,4 @@
+116c116
+<                     <value>localhost:9042</value>
+---
+>                     <value>CASSANDRA_HOST</value>
