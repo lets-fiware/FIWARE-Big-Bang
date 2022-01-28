@@ -119,6 +119,10 @@ set_default_values() {
     ORION_EXPOSE_PORT=none
   fi
 
+  if [ -z "${ORION_LD_EXPOSE_PORT}" ]; then
+    ORION_LD_EXPOSE_PORT=none
+  fi
+
   if [ -z "${CYGNUS_EXPOSE_PORT}" ]; then
     CYGNUS_EXPOSE_PORT=none
   fi
@@ -442,6 +446,11 @@ set_and_check_values() {
     exit "${ERR_CODE}"
   fi
 
+  if [ -n "${ORION}" ] && [ -n "${ORION_LD}" ]; then
+    logging_err "Set either Orion or Orion-LD"
+    exit "${ERR_CODE}"
+  fi
+
   if [ -n "${CYGNUS}" ] && [ -n "${DRACO}" ]; then
     logging_err "Set either Cygnus or Draco"
     exit "${ERR_CODE}"
@@ -511,6 +520,7 @@ ORION_INTERNAL_URL=${ORION_INTERNAL_URL}
 IMAGE_KEYROCK=${IMAGE_KEYROCK}
 IMAGE_WILMA=${IMAGE_WILMA}
 IMAGE_ORION=${IMAGE_ORION}
+IMAGE_ORION_LD=${IMAGE_ORION_LD}
 IMAGE_CYGNUS=${IMAGE_CYGNUS}
 IMAGE_COMET=${IMAGE_COMET}
 IMAGE_WIRECLOUD=${IMAGE_WIRECLOUD}
@@ -888,7 +898,7 @@ setup_init() {
 
   DOCKER_COMPOSE_YML=./docker-compose.yml
 
-  readonly APPS=(KEYROCK ORION CYGNUS COMET WIRECLOUD NGSIPROXY NODE_RED GRAFANA QUANTUMLEAP PERSEO IOTAGENT_UL IOTAGENT_JSON IOTAGENT_HTTP MOSQUITTO ELASTICSEARCH DRACO)
+  readonly APPS=(KEYROCK ORION ORION_LD CYGNUS COMET WIRECLOUD NGSIPROXY NODE_RED GRAFANA QUANTUMLEAP PERSEO IOTAGENT_UL IOTAGENT_JSON IOTAGENT_HTTP MOSQUITTO ELASTICSEARCH DRACO)
 
   val=
 
@@ -1815,7 +1825,6 @@ EOF
     fi
     return
   fi
-  echo "${ORION}"
 
   logging_info "${FUNCNAME[0]}"
 
@@ -1847,6 +1856,47 @@ EOF
 # Orion Context Broker host
 
 CB_URL=${CB_URL}
+EOF
+}
+
+#
+# Orion-LD
+#
+setup_orion_ld() {
+  if [ -z "${ORION_LD}" ]; then
+    return
+  fi
+
+  logging_info "${FUNCNAME[0]}"
+
+  add_docker_compose_yml "docker-orion-ld.yml"
+
+  add_exposed_ports "${ORION_LD_EXPOSE_PORT}" "__ORION_LD_PORTS__" "1026"
+
+  create_nginx_conf "${ORION_LD}" "nginx-orion-ld"
+
+  add_nginx_depends_on "orion-ld"
+
+  add_rsyslog_conf "orion-ld"
+
+  setup_mongo
+  cp "${TEMPLEATE}/mongo/orion-ld.js" "${CONFIG_DIR}/mongo/mongo-init.js"
+
+  setup_wilma
+
+  setup_tokenproxy
+
+  if ${TOKENPROXY}; then
+    sed -i -e "/# __NGINX_ORION_LD__/i \  location /token {\n    proxy_pass http://tokenproxy:1029/token;\n    proxy_redirect     default;\n  }\n" "${NGINX_SITES}/${ORION_LD}"
+  fi
+
+  CB_LD_URL=https://${ORION_LD}
+
+  cat <<EOF >> .env
+
+# Orion-LD Context Broker host
+
+CB_LD_URL=${CB_LD_URL}
 EOF
 }
 
@@ -2596,7 +2646,7 @@ setup_draco() {
   local draco_containter
   draco_container=draco_"$$"
 
-  ${DOCKER} run -d --rm --tty --name "${draco_container}" --entrypoint=/usr/bin/tail "${IMAGE_DRACO}" -f /opt/nifi/nifi-current/conf/bootstrap.conf |
+  ${DOCKER} run -d --rm --tty --name "${draco_container}" --entrypoint=/usr/bin/tail "${IMAGE_DRACO}" -f /opt/nifi/nifi-current/conf/bootstrap.conf
   sleep 3
   docker cp "${draco_container}":/opt/nifi/scripts/secure.sh "${CONFIG_DIR}"/draco/secure.sh
   sed -e 1d "${SETUP_DIR}"/draco/nifi-patch.sh >> "${CONFIG_DIR}"/draco/secure.sh
@@ -2991,6 +3041,7 @@ setup_ngsi_go() {
       case "${NAME}" in
           "KEYROCK" ) ${NGSI_GO} server add --host "${VAL}" --serverType keyrock --serverHost "https://${VAL}" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" --overWrite ;;
           "ORION" )  ${NGSI_GO} broker add --host "${VAL}" --ngsiType v2 --brokerHost "https://${VAL}" --idmType tokenproxy --idmHost "https://${KEYROCK}/token" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" --overWrite ;;
+          "ORION_LD" )  ${NGSI_GO} broker add --host "${VAL}" --ngsiType ld --brokerHost "https://${VAL}" --idmType tokenproxy --idmHost "https://${KEYROCK}/token" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" --overWrite ;;
           "CYGNUS" ) ${NGSI_GO} server add --host "${VAL}" --serverType cygnus --serverHost "https://${VAL}" --idmType tokenproxy --idmHost "https://${KEYROCK}/token" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" --overWrite ;;
           "COMET" ) ${NGSI_GO} server add --host "${VAL}" --serverType comet --serverHost "https://${VAL}" --idmType tokenproxy --idmHost "https://${KEYROCK}/token" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" --overWrite ;;
           "IOTAGENT_UL" ) ${NGSI_GO} server add --host "${VAL}" --serverType iota --serverHost "https://${VAL}" --idmType tokenproxy --idmHost "https://${KEYROCK}/token" --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}" --service openiot --path / --overWrite ;;
@@ -3075,6 +3126,9 @@ setup_end() {
   if [ -n "${ORION}" ]; then
     sed -i -e "/# __NGINX_ORION__/d" "${NGINX_SITES}/${ORION}"
   fi
+  if [ -n "${ORION_LD}" ]; then
+    sed -i -e "/# __NGINX_ORION_LD__/d" "${NGINX_SITES}/${ORION_LD}"
+  fi
   if [ -n "${DRACO}" ]; then
     sed -i -e "/# __NGINX_DRACO__/d" "${NGINX_SITES}/${DRACO}"
   fi
@@ -3132,6 +3186,7 @@ setup_main() {
   setup_nginx
   setup_keyrock
   setup_orion
+  setup_orion_ld
   setup_queryproxy
   setup_regproxy
   setup_cygnus

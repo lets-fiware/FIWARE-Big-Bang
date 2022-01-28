@@ -6,6 +6,7 @@ Port Exposing is driven by environment variables as shown:
 | Variable name               | Description                                                                                                          | Default value |
 | --------------------------- | -------------------------------------------------------------------------------------------------------------------- | ------------- |
 | ORION\_EXPOSE\_PORT         | Expose port 1026. (none, local or all)                                                                               | none          |
+| ORION\_LD\_EXPOSE\_PORT     | Expose port 1026. (none, local or all)                                                                               | none          |
 | CYGNUS\_EXPOSE\_PORT        | Expose port for Cygnus. (none, local or all) 5051 for Mongo, 5050 for MySQL, 5055 for Postgres, 5058 for PostgreSQL. | none          |
 | COMET\_EXPOSE\_PORT         | Expose port for Comet. (none, local or all)                                                                          | none          |
 | QUANTUMLEAP\_EXPOSE\_PORT   | Expose port for Quantumleap. (none, local or all)                                                                    | none          |
