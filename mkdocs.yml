@@ -12,6 +12,7 @@ nav:
       - 'Comet': installation/comet.md
       - 'Perseo': installation/perseo.md
       - 'QuantumLeap': installation/quantumleap.md
+      - 'Draco': installation/draco.md
       - 'IoT Agent for UL': installation/iotagent-ul.md
       - 'IoT Agent for JSON': installation/iotagent-json.md
       - 'WireCloud': installation/wirecloud.md
@@ -34,6 +35,7 @@ nav:
       - 'Comet': examples/comet.md
       - 'Perseo': examples/perseo.md
       - 'QuantumLeap': examples/quantumleap.md
+      - 'Draco': examples/draco.md
       - 'IoT Agent for UL': examples/iotagent-ul.md
       - 'IoT Agent for JSON': examples/iotagent-json.md
       - 'WireCloud': examples/wirecloud.md

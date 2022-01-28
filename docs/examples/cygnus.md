@@ -630,7 +630,7 @@ curl -sXGET "https://elasticsearch.example.com/_sql?format=json" \
 
 ## Examples
 
-Look at examples [here](https://github.com/fisuda/FIWARE-Big-Bang/tree/update/documentaion/examples/cygnus).
+Look at examples [here](https://github.com/lets-fiware/FIWARE-Big-Bang/tree/main/examples/cygnus).
 
 ## Related information
 

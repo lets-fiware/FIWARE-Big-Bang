@@ -1,0 +1,4 @@
+410c410
+<                         <value>mongodb://root:example@mongo:27017</value>
+---
+>                         <value>mongodb://MONGO_HOST</value>

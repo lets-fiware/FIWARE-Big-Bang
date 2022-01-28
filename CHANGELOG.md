@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.10.0-next
 
+-   Support Draco (#138)
 -   Update GitHub Actions (#136)
 -   Remove unnecessary documentation and commands for Cygnus (#135)
 -   Update roadmap (#134)
