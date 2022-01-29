@@ -830,14 +830,14 @@ check_ngsi_go() {
   logging_info "${FUNCNAME[0]}"
 
   local ngsi_go_version
-  ngsi_go_version=v0.10.0
+  ngsi_go_version=v0.11.0
 
   if [ -e /usr/local/bin/ngsi ]; then
     local ver
     ver=$(/usr/local/bin/ngsi --version)
     logging_info "${ver}"
     ver=$(/usr/local/bin/ngsi --version | sed -e "s/ngsi version \([^ ]*\) .*/\1/" | awk -F. '{printf "%2d%02d%02d", $1,$2,$3}')
-    if [ "${ver}" -ge 1000 ]; then
+    if [ "${ver}" -ge 1100 ]; then
         cp /usr/local/bin/ngsi "${WORK_DIR}"
         return
     fi

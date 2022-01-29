@@ -159,7 +159,7 @@ setup() {
   sudo rm -f /etc/redhat-release
 
   local ngsi_go_version
-  ngsi_go_version=v0.9.0
+  ngsi_go_version=v0.10.0
 
   curl -OL https://github.com/lets-fiware/ngsi-go/releases/download/${ngsi_go_version}/ngsi-${ngsi_go_version}-linux-amd64.tar.gz
   sudo tar zxvf ngsi-${ngsi_go_version}-linux-amd64.tar.gz -C /usr/local/bin
