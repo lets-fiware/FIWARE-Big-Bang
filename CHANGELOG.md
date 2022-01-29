@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.10.0-next
 
+-   Update NGSI Go to 0.11.0 (#140)
 -   Update Orion to 3.5.0 (#139)
 -   Support Draco (#138)
 -   Update GitHub Actions (#136)
