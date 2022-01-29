@@ -49,6 +49,7 @@ server {
   }
 
   # __NGINX_ORION_LD__
+
   access_log /var/log/nginx/HOST-access.log;
   error_log /var/log/nginx/HOST-error.log;
 }

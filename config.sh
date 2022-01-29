@@ -63,6 +63,27 @@ ORION_LD_EXPOSE_PORT=
 IMAGE_ORION_LD=fiware/orion-ld:1.0.1
 
 #
+# Mintaka
+#
+# Enable Mintaka (false, true) Default: true
+MINTAKA=
+
+# Expose port 8080 (none, local, all) Default: none
+MINTAKA_EXPOSE_PORT=
+
+# Docker image for Mintaka
+IMAGE_MINTAKA=fiware/mintaka:0.4.1
+
+# Set a password for Timescale DB. Default: automatically generated
+TIMESCALE_PASS=
+
+# Expose port 5432 (none, local, all) Default: none
+TIMESCALE_EXPOSE_PORT=
+
+# Docker image for Timescale DB
+IMAGE_TIMESCALE=timescale/timescaledb-postgis:1.7.5-pg12
+
+#
 # Cygnus
 #
 # Set a sub-domain name of Cygnus
