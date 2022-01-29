@@ -1,0 +1,13 @@
+version: "3"
+services:
+  orion-ld:
+    image: ${IMAGE_ORION_LD}
+    # __ORION_LD_PORTS__
+    depends_on:
+      - mongo
+    command: -dbhost mongo
+    restart: always
+    logging:
+      driver: syslog
+      options:
+        tag: "[orion-ld]"
