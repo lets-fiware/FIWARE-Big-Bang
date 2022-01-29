@@ -34,6 +34,7 @@ FI-BB stands for FIWARE Big Bang.
 -   Keyrock
 -   Wilma
 -   Orion
+-   Orion-LD
 -   Cygnus
 -   Comet
 -   Perseo

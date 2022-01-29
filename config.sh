@@ -51,6 +51,18 @@ ORION_EXPOSE_PORT=
 IMAGE_ORION=telefonicaiot/fiware-orion:3.5.0
 
 #
+# Orion-LD
+#
+# Set a sub-domain name of Orion-LD
+ORION_LD=
+
+# Expose port 1026 (none, local, all) Default: none
+ORION_LD_EXPOSE_PORT=
+
+# Docker image for Orion
+IMAGE_ORION_LD=fiware/orion-ld:1.0.1
+
+#
 # Cygnus
 #
 # Set a sub-domain name of Cygnus
