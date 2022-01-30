@@ -1,0 +1,15 @@
+  location /ngsi-ld/v1/temporal/entities/ {
+    set $req_uri "$uri";
+    auth_request /_check_oauth2_token;
+
+    proxy_pass http://mintaka:8080/temporal/entities/;
+    proxy_redirect     default;
+  }
+
+  location  /ngsi-ld/ex/mintaka/info {
+    set $req_uri "$uri";
+    auth_request /_check_oauth2_token;
+
+    proxy_pass http://mintaka:8080/info;
+    proxy_redirect     default;
+  }

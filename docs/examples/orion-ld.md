@@ -46,6 +46,35 @@ ngsi version --host orion-ld.example.com
 }
 ```
 
+## Sanity check for Mitaka
+
+When enabling Mintaka you can check the status by the following command:
+
+#### Request:
+
+```
+curl -s https://orion-ld.e-suda.info/ngsi-ld/ex/mintaka/info \
+  --header "Authorization: Bearer ${ACCESS_TOKEN}"
+```
+
+#### Response:
+
+```
+{
+  "git": {
+    "revision": "ff00861774957067d89b1262f9a0dde7bc9c0c79"
+  },
+  "build": {
+    "time": "24 January 2022, 12:51:28 +0000"
+  },
+  "project": {
+    "artifact-id": "mintaka",
+    "group-id": "org.fiware",
+    "version": "0.4.1"
+  }
+}
+```
+
 ## Examples
 
 Look at examples [here](https://github.com/lets-fiware/FIWARE-Big-Bang/tree/main/examples/orion-ld).
@@ -53,6 +82,7 @@ Look at examples [here](https://github.com/lets-fiware/FIWARE-Big-Bang/tree/main
 ## Related information
 
 -   [FIWARE / context.Orion-LD - GitHub](https://github.com/FIWARE/context.Orion-LD)
+-   [FIWARE / mintaka](https://github.com/fiware/mintaka)
 -   [ETSI GS CIM 009 V1.5.1 (2021-11)](https://www.etsi.org/deliver/etsi_gs/CIM/001_099/009/01.05.01_60/gs_CIM009v010501p.pdf)
 -   [ETSI ISG CIM / NGSI-LD API - Swagger](https://forge.etsi.org/swagger/ui/?url=https://forge.etsi.org/rep/NGSI-LD/NGSI-LD/raw/master/spec/updated/generated/full_api.json)
 -   [FIWARE Step-By-Step Tutorials for NGSI-LD](https://ngsi-ld-tutorials.readthedocs.io/en/latest/)

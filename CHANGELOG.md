@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.10.0-next
 
+-   Support Mintaka (#142)
 -   Support Orion-LD (#141)
 -   Update NGSI Go to 0.11.0 (#140)
 -   Update Orion to 3.5.0 (#139)

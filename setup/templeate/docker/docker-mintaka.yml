@@ -1,0 +1,42 @@
+version: "3"
+services:
+  mintaka:
+    image: ${IMAGE_MINTAKA}
+    depends_on:
+      - timescale-db
+    # __MINTAKA_PORTS_
+    environment:
+      - DATASOURCES_DEFAULT_HOST=timescale-db
+      - DATASOURCES_DEFAULT_USERNAME=${TIMESCALE_USER}
+      - DATASOURCES_DEFAULT_PASSWORD=${TIMESCALE_PASS}
+      - DATASOURCES_DEFAULT_DATABASE=orion
+      - DATASOURCES_DEFAULT_MAXIMUM_POOL_SIZE=2
+      - ENDPOINTS_INFO_ENABLED=true
+      - ENDPOINTS_INFO_SENSITIVE=false
+    restart: always
+    logging:
+      driver: syslog
+      options:
+        tag: "[mintaka]"
+
+  timescale-db:
+    image: ${IMAGE_TIMESCALE}
+    # __TIMESCALE_PORTS__
+    environment:
+      - POSTGRES_USER=${TIMESCALE_USER}
+      - POSTGRES_PASSWORD=${TIMESCALE_PASS}
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    command: ["postgres", "-c", "log_statement=none"]
+    volumes:
+      - ./data/timescale-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U orion"]
+      interval: 15s
+      timeout: 15s
+      retries: 5
+      start_period: 60s
+    restart: always
+    logging:
+      driver: syslog
+      options:
+        tag: "[timescale]"
