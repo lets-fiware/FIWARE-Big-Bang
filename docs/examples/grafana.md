@@ -1,4 +1,4 @@
-# Grafana (Experimental support)
+# Grafana
 
 ## Contents
 

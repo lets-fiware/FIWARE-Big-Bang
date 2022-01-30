@@ -38,7 +38,7 @@
 ### Supported third-party open source software
 
 -   Node-RED
--   Grafana (Experimental support)
+-   Grafana
 -   Mosquitto
 -   Elasticsearch (as a database for persitenting context data)
 
@@ -131,7 +131,7 @@ Please see each documentation for details as below:
 -   [IoT Agent for JSON](iotagent-json.md)
 -   [WireCloud](wirecloud.md)
 -   [Node-RED](node-red.md)
--   [Grafana](grafana.md) (Experimental support)
+-   [Grafana](grafana.md)
 -   [Regproxy](regproxy.md)
 -   [Queryproxy](queryproxy.md)
 -   [Certbot](certbot.md)
