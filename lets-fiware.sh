@@ -123,6 +123,16 @@ set_default_values() {
     ORION_LD_EXPOSE_PORT=none
   fi
 
+  if [ -z "${MINTAKA_EXPOSE_PORT}" ]; then
+    MINTAKA_EXPOSE_PORT=none
+  fi
+
+  if [ -z "${TIMESCALE_EXPOSE_PORT}" ]; then
+    TIMESCALE_EXPOSE_PORT=none
+  fi
+
+  MINTAKA="${MINTAKA:-true}"
+
   if [ -z "${CYGNUS_EXPOSE_PORT}" ]; then
     CYGNUS_EXPOSE_PORT=none
   fi
@@ -521,6 +531,8 @@ IMAGE_KEYROCK=${IMAGE_KEYROCK}
 IMAGE_WILMA=${IMAGE_WILMA}
 IMAGE_ORION=${IMAGE_ORION}
 IMAGE_ORION_LD=${IMAGE_ORION_LD}
+IMAGE_MINTAKA=${IMAGE_MINTAKA}
+IMAGE_TIMESCALE=${IMAGE_TIMESCALE}
 IMAGE_CYGNUS=${IMAGE_CYGNUS}
 IMAGE_COMET=${IMAGE_COMET}
 IMAGE_WIRECLOUD=${IMAGE_WIRECLOUD}
@@ -1860,6 +1872,38 @@ EOF
 }
 
 #
+# Mintaka
+#
+setup_mintaka() {
+  logging_info "${FUNCNAME[0]}"
+
+  TIMESCALE_USER=orion
+  TIMESCALE_PASS=$(pwgen -s 16 1)
+
+  add_docker_compose_yml "docker-mintaka.yml"
+
+  add_exposed_ports "${MINTAKA_EXPOSE_PORT}" "__MINTAKA_PORTS__" "8080"
+
+  add_exposed_ports "${TIMESCALE_EXPOSE_PORT}" "__TIMESCALE_PORTS__" "5432"
+
+  sed -i "/__NGINX_ORION_LD__/r ${SETUP_DIR}/templeate/nginx/nginx-mintaka" "${NGINX_SITES}/${ORION_LD}"
+
+  add_nginx_depends_on "mintaka"
+
+  add_rsyslog_conf "mintaka"
+
+  add_rsyslog_conf "timescale"
+
+  cat <<EOF >> .env
+
+# Mintaka
+
+TIMESCALE_USER=${TIMESCALE_USER}
+TIMESCALE_PASS=${TIMESCALE_PASS}
+EOF
+}
+
+#
 # Orion-LD
 #
 setup_orion_ld() {
@@ -1898,6 +1942,10 @@ setup_orion_ld() {
 
 CB_LD_URL=${CB_LD_URL}
 EOF
+
+  if ${MINTAKA}; then
+    setup_mintaka
+  fi
 }
 
 #
