@@ -53,7 +53,7 @@ When enabling Mintaka you can check the status by the following command:
 #### Request:
 
 ```
-curl -s https://orion-ld.e-suda.info/ngsi-ld/ex/mintaka/info \
+curl -s https://orion-ld.example.com/ngsi-ld/ex/mintaka/info \
   --header "Authorization: Bearer ${ACCESS_TOKEN}"
 ```
 

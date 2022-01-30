@@ -111,16 +111,16 @@ done
 Response:
 
 ```text
-user001@e-suda.info Uu2HADXh5ITIlIVt
-user002@e-suda.info Gbf4njxTp3tZApje
-user003@e-suda.info J6aNl3phuOurh8x8
-user004@e-suda.info 2Jm5bP7RJJmMD6D9
-user005@e-suda.info midj714vE8pD9ULs
-user006@e-suda.info jbrk2SC3SdVNsW8W
-user007@e-suda.info wlxTAGdRHU6ESmRa
-user008@e-suda.info sBfWNhVaye0zLHWh
-user009@e-suda.info R6ES3ezcdTXst2TI
-user010@e-suda.info A2djP94QYrH2LgVw
+user001@example.com Uu2HADXh5ITIlIVt
+user002@example.com Gbf4njxTp3tZApje
+user003@example.com J6aNl3phuOurh8x8
+user004@example.com 2Jm5bP7RJJmMD6D9
+user005@example.com midj714vE8pD9ULs
+user006@example.com jbrk2SC3SdVNsW8W
+user007@example.com wlxTAGdRHU6ESmRa
+user008@example.com sBfWNhVaye0zLHWh
+user009@example.com R6ES3ezcdTXst2TI
+user010@example.com A2djP94QYrH2LgVw
 ```
 
 The `pwgen` program generates passwords. You can install it by following the steps below:
