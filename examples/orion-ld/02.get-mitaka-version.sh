@@ -40,5 +40,5 @@ fi
 
 ACCESS_TOKEN=$(curl -sS "https://${KEYROCK}/token" --data "username=${IDM_ADMIN_EMAIL}" --data "password=${IDM_ADMIN_PASS}" | jq -r .access_token)
 
-curl -s https://orion-ld.e-suda.info/ngsi-ld/ex/mintaka/info \
+curl -s "${CB_LD_URL}/ngsi-ld/ex/mintaka/info" \
   --header "Authorization: Bearer ${ACCESS_TOKEN}" | jq .
