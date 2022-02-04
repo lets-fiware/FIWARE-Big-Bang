@@ -104,7 +104,7 @@ CYGNUS_EXPOSE_PORT=
 CYGNUS_LOG_LEVEL=INFO
 
 # Docker image for Cygnus
-IMAGE_CYGNUS=fiware/cygnus-ngsi:2.10.0
+IMAGE_CYGNUS=telefonicaiot/fiware-cygnus:2.16.0
 
 # Set a sub-domain name of Elasticsearch
 ELASTICSEARCH=
