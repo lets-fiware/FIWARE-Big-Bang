@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.10.0-next
 
+-   Update GitHub Actions (#145)
 -   Update Cygnus to 2.16.0 (#144)
 -   Update documentaion (#143)
 -   Support Mintaka (#142)
