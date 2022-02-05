@@ -42,8 +42,8 @@ logging_info() {
 # Syslog err
 #
 logging_err() {
-  echo "setup: $1" 1>&2
-  /usr/bin/logger -i -p "user.err" -t "FI-BB" "setup: $1"
+  echo "error: $1" 1>&2
+  /usr/bin/logger -i -p "user.err" -t "FI-BB" "setup error: $1"
 }
 
 #
