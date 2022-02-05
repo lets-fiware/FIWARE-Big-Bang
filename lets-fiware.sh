@@ -1798,6 +1798,10 @@ setup_keyrock() {
   if ${TOKENPROXY}; then
     sed -i -e "/# __NGINX_KEYROCK__/i \  location /token {\n    proxy_pass http://tokenproxy:1029/token;\n    proxy_redirect     default;\n  }" "${NGINX_SITES}/${KEYROCK}"
   fi
+
+  if ! ${IDM_DEBUG}; then
+    sed -i "/- DEBUG=idm:\*/d" "${DOCKER_COMPOSE_YML}"
+  fi
 }
 
 #
