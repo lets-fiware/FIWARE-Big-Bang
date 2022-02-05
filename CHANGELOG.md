@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.10.0-next
 
+-   Hardening logging for Keyrock (#147)
 -   Improve error message (#146)
 -   Update GitHub Actions (#145)
 -   Update Cygnus to 2.16.0 (#144)
