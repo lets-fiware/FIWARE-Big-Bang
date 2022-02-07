@@ -97,15 +97,15 @@ ngsi version --host orion.example.com
 ```json
 {
 "orion" : {
-  "version" : "3.5.0",
+  "version" : "3.5.1",
   "uptime" : "0 d, 0 h, 0 m, 1 s",
-  "git_hash" : "e86026dc05e0fec718f7d7fea6fcce4d58fc8d5e",
-  "compile_time" : "Fri Jan 28 09:14:42 UTC 2022",
+  "git_hash" : "56593100c692ae943fdfbc14be5f27d0e6908adb",
+  "compile_time" : "Sun Feb 6 21:02:25 UTC 2022",
   "compiled_by" : "root",
-  "compiled_in" : "999c711180e7",
-  "release_date" : "Fri Jan 28 09:14:42 UTC 2022",
+  "compiled_in" : "bf3518e8dd0b",
+  "release_date" : "Sun Feb 6 21:02:25 UTC 2022",
   "machine" : "x86_64",
-  "doc" : "https://fiware-orion.rtfd.io/en/3.5.0/",
+  "doc" : "https://fiware-orion.rtfd.io/en/3.5.1/",
   "libversions": {
      "boost": "1_66",
      "libcurl": "libcurl/7.61.1 OpenSSL/1.1.1k zlib/1.2.11 nghttp2/1.33.0",
