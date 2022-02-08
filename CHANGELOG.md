@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.10.0-next
 
+-   Add example to run Node-RED locally (#150)
 -   Update roadmap (#134)
 
 ## FIWARE Big Bang v0.10.0 - 20 Jan, 2022
