@@ -1,0 +1,8 @@
+version: "3"
+
+services:
+  node-red:
+    build: .
+    image: letsfiware/node-red-local
+    ports:
+      - 1880:1880

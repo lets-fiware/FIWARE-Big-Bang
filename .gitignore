@@ -19,3 +19,4 @@ whitelist
 .install
 ngsi-go-config.json
 ngsi-go-token-cache.json
+!extras/node-red/docker-compose.yml
