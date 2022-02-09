@@ -1,0 +1,20 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>jp.letsfiware</groupId>
+  <artifactId>download</artifactId>
+  <version>1</version>
+
+  <dependencies>
+    <dependency>
+      <groupId>io.buji</groupId>
+      <artifactId>buji-pac4j</artifactId>
+      <version>5.0.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.pac4j</groupId>
+      <artifactId>pac4j-oidc</artifactId>
+      <version>4.0.1</version>
+    </dependency>
+  </dependencies>
+</project>

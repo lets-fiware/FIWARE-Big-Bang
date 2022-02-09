@@ -1,5 +1,5 @@
 #!/bin/bash
-
+ 
 # MIT License
 #
 # Copyright (c) 2021-2022 Kazuhito Suda
@@ -559,6 +559,7 @@ IMAGE_ELASTICSEARCH=${IMAGE_ELASTICSEARCH}
 IMAGE_ELASTICSEARCH_DB=${IMAGE_ELASTICSEARCH_DB}
 IMAGE_MEMCACHED=${IMAGE_MEMCACHED}
 IMAGE_GRAFANA=${IMAGE_GRAFANA}
+IMAGE_ZEPPELIN=${IMAGE_ZEPPELIN}
 IMAGE_MOSQUITTO=${IMAGE_MOSQUITTO}
 IMAGE_NODE_RED=${IMAGE_NODE_RED}
 IMAGE_POSTFIX=${IMAGE_POSTFIX}
@@ -910,7 +911,7 @@ setup_init() {
 
   DOCKER_COMPOSE_YML=./docker-compose.yml
 
-  readonly APPS=(KEYROCK ORION ORION_LD CYGNUS COMET WIRECLOUD NGSIPROXY NODE_RED GRAFANA QUANTUMLEAP PERSEO IOTAGENT_UL IOTAGENT_JSON IOTAGENT_HTTP MOSQUITTO ELASTICSEARCH DRACO)
+  readonly APPS=(KEYROCK ORION ORION_LD CYGNUS COMET WIRECLOUD NGSIPROXY NODE_RED GRAFANA QUANTUMLEAP PERSEO IOTAGENT_UL IOTAGENT_JSON IOTAGENT_HTTP MOSQUITTO ELASTICSEARCH DRACO ZEPPELIN)
 
   val=
 
@@ -3031,6 +3032,127 @@ GF_INSTALL_PLUGINS="https://github.com/orchestracities/grafana-map-plugin/archiv
 EOF
 }
 
+#
+# Apache Zeppelin
+#
+setup_zeppelin() {
+  if [ -z "${ZEPPELIN}" ]; then
+    return
+  fi
+
+  logging_info "${FUNCNAME[0]}"
+
+  cp -r "${SETUP_DIR}"/docker/zeppelin "${CONFIG_DIR}"/
+
+  if $FIBB_TEST; then
+    rm -f "${CONFIG_DIR}"/zeppelin/Dockerfile
+    echo "FROM apache/zeppelin:0.9.0" > "${CONFIG_DIR}"/zeppelin/Dockerfile
+  fi
+
+  logging_info "build zeppelin container image"
+
+  cd "${CONFIG_DIR}"/zeppelin
+  ${DOCKER} build -t "${IMAGE_ZEPPELIN}" .
+  cd -
+
+  add_docker_compose_yml "docker-zeppelin.yml"
+
+  create_nginx_conf "${ZEPPELIN}" "nginx-zeppelin"
+
+  add_nginx_depends_on  "zeppelin"
+
+  add_rsyslog_conf "zeppelin"
+
+  ZEPPELIN_URL=https://${ZEPPELIN}/
+  ZEPPELIN_CALLBACK_URL="https://${ZEPPELIN}/api/callback?client_name=KeyrockOidcClient"
+
+  set +e
+  # Create application for Zeppelin
+  ZEPPELIN_CLIENT_ID=$(${NGSI_GO} applications --host "${IDM}" create --name "Zeppelin" --description "Zeppelin application (${HOST_NAME})" --url "${ZEPPELIN_URL}" --redirectUri "${ZEPPELIN_CALLBACK_URL}" --openid)
+  ZEPPELIN_CLIENT_SECRET=$(${NGSI_GO} applications --host "${IDM}" get --aid "${ZEPPELIN_CLIENT_ID}" | jq -r .application.secret )
+
+  # Create admin role and add it to Admin user
+  RID=$(${NGSI_GO} applications --host "${IDM}" roles --aid "${ZEPPELIN_CLIENT_ID}" create --name "admin")
+  ${NGSI_GO} applications --host "${IDM}" users --aid "${ZEPPELIN_CLIENT_ID}" assign --rid "${RID}" --uid "${IDM_ADMIN_UID}" > /dev/null
+
+  # Create user role
+  ${NGSI_GO} applications --host "${IDM}" roles --aid "${ZEPPELIN_CLIENT_ID}" create --name "user"
+  set -e
+
+  mkdir -p "${DATA_DIR}"/zeppelin/conf
+
+  local zeppelin_containter
+  zeppelin_container=zeppelin_"$$"
+
+  logging_info "run zeppelin container"
+
+  ${DOCKER} run -d --rm --tty --name "${zeppelin_container}" "${IMAGE_ZEPPELIN}"
+  sleep 5
+
+  local FOUND
+  FOUND=false
+
+  local COUNT
+  while ! ${FOUND}
+  do
+    set +e
+    COUNT=$(docker exec "${zeppelin_container}" ls -1 conf | grep -c interpreter.json)
+    set -e
+    if [ "${COUNT}" = "1" ]; then
+      FOUND=true
+    fi
+    sleep 1
+    logging_info "waiting for zeppelin container to be ready"
+  done
+
+  local file
+  for file in $(${DOCKER} exec "${zeppelin_container}" ls -1F conf | grep -v / | sed 's/\*$//')
+  do
+    ${DOCKER} cp "${zeppelin_container}":/opt/zeppelin/conf/"${file}" "${DATA_DIR}"/zeppelin/conf/
+  done
+
+  cd "${WORK_DIR}"
+  docker exec "${zeppelin_container}" tar czf notebook.tgz notebook/
+  docker cp "${zeppelin_container}:/opt/zeppelin/notebook.tgz" .
+  docker exec "${zeppelin_container}" rm /opt/zeppelin/notebook.tgz
+  tar zxf notebook.tgz
+  ${SUDO} mv notebook "${DATA_DIR}"/zeppelin/
+  ${SUDO} chown -R root:root "${DATA_DIR}"/zeppelin/notebook
+  cd -
+
+  ${SUDO} cp "${SETUP_DIR}"/zeppelin/'FIWARE Big Bang Example_2GWPW3QVB.zpln' "${DATA_DIR}"/zeppelin/notebook
+
+  ${DOCKER} stop "${zeppelin_container}"
+
+  "${SUDO}" patch "${DATA_DIR}"/zeppelin/conf/interpreter.json "${SETUP_DIR}"/zeppelin/interpreter.json.patch
+  "${SUDO}" chown 1000 "${DATA_DIR}"/zeppelin/conf/interpreter.json
+
+  ZEPPELIN_DEBUG=${ZEPPELIN_DEBUG:-false}
+
+  if ${ZEPPELIN_DEBUG}; then
+    "${SUDO}" sed -i "/log4j.rootLogger/s/INFO/DEBUG/" "${DATA_DIR}"/zeppelin/conf/log4j.properties
+  fi
+
+  local shiro_ini
+  shiro_ini="${DATA_DIR}"/zeppelin/conf/shiro.ini
+  
+  cp "${CONTRIB_DIR}"/zeppelin/shiro.ini "${shiro_ini}"
+
+  sed -i "s/KEYROCK/${KEYROCK}/" "${shiro_ini}"
+  sed -i "s/ZEPPELIN/${ZEPPELIN}/" "${shiro_ini}"
+  sed -i "s/CLIENTID/${ZEPPELIN_CLIENT_ID}/" "${shiro_ini}"
+  sed -i "s/SECRET/${ZEPPELIN_CLIENT_SECRET}/" "${shiro_ini}"
+
+  cat <<EOF >> .env
+
+# Zeppelin
+
+ZEPPELIN_CLIENT_ID=${ZEPPELIN_CLIENT_ID}
+ZEPPELIN_CLIENT_SECRET=${ZEPPELIN_CLIENT_SECRET}
+ZEPPELIN_CALLBACK_URL=${ZEPPELIN_CALLBACK_URL}
+EOF
+}
+
 setup_postfix() {
   if ! ${POSTFIX}; then
     return
@@ -3251,6 +3373,7 @@ setup_main() {
   setup_perseo
   setup_node_red
   setup_grafana
+  setup_zeppelin
   setup_postfix
 
   down_keyrock

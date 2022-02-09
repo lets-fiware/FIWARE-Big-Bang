@@ -1,5 +1,7 @@
 ## FIWARE Big Bang v0.11.0-next
 
+-   Support Apache Zeppelin (#160)
+-   Add Apache Zeppelin images (#159)
 -   Update documentaion (#157)
 -   Update Quantumleap to 0.8.3 (#158)
 

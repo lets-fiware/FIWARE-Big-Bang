@@ -323,6 +323,8 @@ install_test4() {
   sed -i -e "s/^\(IOTAGENT_HTTP=\).*/\1iotagent-http/" config.sh
   sed -i -e "s/^\(IOTA_HTTP_AUTH=\).*/\1basic/" config.sh
   sed -i -e "s/^\(MOSQUITTO=\).*/\1mosquitto/" config.sh
+  sed -i -e "s/^\(ZEPPELIN=\).*/\1zeppelin/" config.sh
+  sed -i -e "s/^\(ZEPPELIN_DEBUG=\).*/\1true/" config.sh
 
   export FIBB_TEST_DOCKER_CMD=rekcod
   export FIBB_TEST_SKIP_INSTALL_WIDGET=true

@@ -21,6 +21,7 @@ nav:
       - 'Queryproxy': installation/queryproxy.md
       - 'Node-RED': installation/node-red.md
       - 'Grafana': installation/grafana.md
+      - 'Zeppelin': installation/zeppelin.md
       - 'Certbot': installation/certbot.md
       - 'Firewall': installation/firewall.md
       - 'Multi-server': installation/multi_server.md
@@ -43,4 +44,5 @@ nav:
       - 'WireCloud': examples/wirecloud.md
       - 'Node-RED': examples/node-red.md
       - 'Grafana': examples/grafana.md
+      - 'Zeppelin': examples/zeppelin.md
     - 'Troubleshooting': troubleshooting.md

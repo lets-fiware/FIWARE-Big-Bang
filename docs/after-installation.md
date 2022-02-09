@@ -24,6 +24,7 @@
     -   [Sanity check for Node-RED](#sanity-check-for-node-red)
     -   [Access Node-RED API](#access-node-red-api)
     -   [Sanity check for Grafana](#sanity-check-for-grafana)
+    -   [Snaity check for Zeppelin](#sanity-check-for-zeppelin)
 
 </details>
 
@@ -398,3 +399,39 @@ curl https://node-red.example.com/settings \
 Open at `https://grafana.example.com` to access the Grafana GUI.
 
 ![](https://raw.githubusercontent.com/lets-fiware/FIWARE-Big-Bang/gh-pages/images/grafana/grafana-sign-in.png)
+
+## Sanity check for Zeppelin
+
+Once Zeppelin is running, you can access the Zeppelin web application.
+Open at `https://zeppelin.example.com` to access the Zeppelin GUI.
+You will be redirected to the Keyrock login page.
+
+![](https://raw.githubusercontent.com/lets-fiware/FIWARE-Big-Bang/gh-pages/images/zeppelin/zeppelin-01.jpg)
+
+Once you have logged in, you will be redirected to the Zeppelin GUI.
+
+![](https://raw.githubusercontent.com/lets-fiware/FIWARE-Big-Bang/gh-pages/images/zeppelin/zeppelin-02.jpg)
+
+### Get Zeppelin version
+
+You can get the Zeppelin version by the following command:
+
+#### Request:
+
+```bash
+curl -s https://zeppelin.example.com/api/version
+```
+
+#### Response:
+
+```json
+{
+  "status": "OK",
+  "message": "Zeppelin version",
+  "body": {
+    "git-commit-id": "",
+    "git-timestamp": "",
+    "version": "0.9.0"
+  }
+}
+```
