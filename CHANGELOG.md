@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.10.0-next
 
+-   Update Node-RED to 2.2.0 (#151)
 -   Update Orion to 3.5.1 (#148)
 -   Hardening logging for Keyrock (#147)
 -   Improve error message (#146)
