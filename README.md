@@ -103,7 +103,7 @@ See full documentation [here](https://fi-bb.letsfiware.jp/) for details.
 
 The name of this product comes from the Big Bang theory of the universe. Because most FIWARE generic enablers in
 the Core Context Management chapter have an astrology name and this product creates a FIWARE instance as your own
-universe in which various FIWARE GEs run.
+universe in which different FIWARE GEs run.
 
 ## Copyright and License
 
