@@ -62,4 +62,4 @@ https://node-red.example.com/node-red005        node-red005@example.com XgnFHj63
 -   [FIWARE/node-red-contrib-FIWARE_official - GitHub](https://github.com/FIWARE/node-red-contrib-FIWARE_official)
 -   [Node-RED - GitHub](https://github.com/node-red/node-red)
 -   [Node-RED portal site](https://nodered.org/)
--   [nodered/node-red - Dcker HUB](https://hub.docker.com/r/nodered/node-red)
+-   [nodered/node-red - Docker HUB](https://hub.docker.com/r/nodered/node-red)
