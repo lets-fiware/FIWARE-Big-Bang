@@ -311,9 +311,11 @@ NODE_RED_INSTANCE_NUMBER=
 NODE_RED_INSTANCE_USERNAME=
 
 # httpNodeRoot for Node-RED instance. default: / or /node-red???
+#   Must be a path starting with '/'
 NODE_RED_INSTANCE_HTTP_NODE_ROOT=
 
 # httpAdminRoot for Node-RED instance. default: / or /node-red???
+#   Must be a path starting with '/'
 NODE_RED_INSTANCE_HTTP_ADMIN_ROOT=
 
 # Logging level for Node-RED

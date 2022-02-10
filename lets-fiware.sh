@@ -2844,7 +2844,7 @@ EOF
   for i in $(seq "${NODE_RED_INSTANCE_NUMBER}")
   do
     number=$(printf "%03d" "$i")
-    http_node_root=${NODE_RED_INSTANCE_HTTP_NODE_ROOT}${number}
+    http_node_root=${NODE_RED_INSTANCE_HTTP_ADMIN_ROOT}${number}${NODE_RED_INSTANCE_HTTP_NODE_ROOT}
     http_admin_root=${NODE_RED_INSTANCE_HTTP_ADMIN_ROOT}${number}
     username=${NODE_RED_INSTANCE_USERNAME}${number}
     env_val=NODE_RED_${number}_

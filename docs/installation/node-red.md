@@ -17,12 +17,15 @@
 
 You can specify configurations by editing the `config.sh` file.
 
-| Variable name                   | Description                      | Default value |
-| ------------------------------- | -------------------------------- | ------------- |
-| NODE\_RED                       | A sub-domain name of Node-RED    | (empty)       |
-| NODE\_RED\_INSTANCE\_NUMBER     | Number of Node-RED instance.     | 1             |
-| NODE\_RED\_INSTANCE\_USERNAME   | Username for Node-RED instance.  | node-red      |
-| NODE\_RED\_INSTANCE\_HTTP\_ROOT | HTTP root for Node-RED instance. | /node-red     |
+| Variable name                          | Description                                                           | Default value                      |
+| -------------------------------------- | --------------------------------------------------------------------- | ---------------------------------- |
+| NODE\_RED                              | A sub-domain name of Node-RED                                         | (empty)                            |
+| NODE\_RED\_INSTANCE\_NUMBER            | Number of Node-RED instance.                                          | 1                                  |
+| NODE\_RED\_INSTANCE\_USERNAME          | Username for Node-RED instance.                                       | node-red                           |
+| NODE\_RED\_INSTANCE\_HTTP\_ROOT        | HTTP root for Node-RED instance. Must be a path starting with '/'     | / (single) or /node-red??? (multi) |
+| NODE\_RED\_INSTANCE\_HTTP\_ADMIN\_ROOT | httpAdminRoot for Node-RED instance. Must be a path starting with '/' | / (single) or /node-red??? (multi) |
+| NODE\_RED\_LOGGING\_LEVEL              | Logging level for Node-RED instance.                                  | Logging level for Node-RED         |
+| NODE\_RED\_LOGGING\_METRICS            | Logging metrics for Node-RED instance.                                | (empty)                            |
 
 ## How to setup
 
@@ -56,6 +59,13 @@ https://node-red.example.com/node-red003        node-red003@example.com W1XEgeJj
 https://node-red.example.com/node-red004        node-red004@example.com jdZV5SGXEZbtGjTP
 https://node-red.example.com/node-red005        node-red005@example.com XgnFHj63gqxfqyE1
 ```
+
+#### HTTP root value for Multi-instance
+
+| NODE\_RED\_INSTANCE\_HTTP\_ROOT | HTTP root         | Example                   |
+| ------------------------------- | ----------------- | ------------------------- |
+| (empty)                         | /node-red???/     | /node-red???/worldmap     |
+| /abc                            | /node-red???/abc/ | /node-red???/abc/worldmap |
 
 ## Related information
 
