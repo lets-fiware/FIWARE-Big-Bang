@@ -1,4 +1,6 @@
-## FIWARE Big Bang v0.11.0  - 10 Feb, 2022
+## FIWARE Big Bang v0.11.0-next
+
+## FIWARE Big Bang v0.11.0 - 10 Feb, 2022
 
 -   Fix issue #153 that incorrect http root path when deploying multi-instance for Node-RED (#154)
 -   Fix typos (#152)
