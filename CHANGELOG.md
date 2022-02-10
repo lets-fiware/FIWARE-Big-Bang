@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.10.0-next
 
+-   Fix issue #153 that incorrect http root path when deploying multi-instance for Node-RED (#154)
 -   Fix typos (#152)
 -   Update Node-RED to 2.2.0 (#151)
 -   Update Orion to 3.5.1 (#148)
