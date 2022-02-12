@@ -192,7 +192,7 @@ QUANTUMLEAP_EXPOSE_PORT=
 QUANTUMLEAP_LOGLEVEL=INFO
 
 # Docker image for Quantumleap
-IMAGE_QUANTUMLEAP=orchestracities/quantumleap:release-0.8.3
+IMAGE_QUANTUMLEAP=orchestracities/quantumleap:0.8.3
 
 # Docker image for Crate DB
 IMAGE_CRATE=crate:4.6.6
