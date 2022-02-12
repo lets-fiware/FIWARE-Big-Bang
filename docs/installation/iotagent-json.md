@@ -98,3 +98,4 @@ IOTA_HTTP_BASIC_PASS=
 -   [IoT Agent for JSON - FIWARE Step-By-Step Tutorials for NGSIv2](https://fiware-tutorials.readthedocs.io/en/latest/iot-agent-json.html)
 -   [IoT Agent over MQTT - FIWARE Step-By-Step Tutorials for NGSIv2](https://fiware-tutorials.readthedocs.io/en/latest/iot-over-mqtt.html)
 -   [NGSI Go tutorial for IoT Agent](https://ngsi-go.letsfiware.jp/tutorial/iot-agent/)
+-   [telefonicaiot/iotagent-json - Docker Hub](https://hub.docker.com/r/telefonicaiot/iotagent-json)

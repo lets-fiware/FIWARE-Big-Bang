@@ -24,3 +24,4 @@ Open at `https://wirecloud.example.com` to access the WireCloud GUI.
 -   [WireCloud - Read the docs](https://wirecloud.readthedocs.io/en/stable/)
 -   [NGSI.js reference documentation](https://ficodes.github.io/ngsijs/stable/NGSI.html)
 -   [Application Mashups - FIWARE Step-By-Step Tutorials for NGSIv2](https://fiware-tutorials.readthedocs.io/en/latest/application-mashups.html)
+-   [fiware/wirecloud - Docker Hub](https://hub.docker.com/r/fiware/wirecloud)
