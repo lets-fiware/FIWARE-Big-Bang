@@ -32,6 +32,7 @@ nav:
     - 'Examples':
       - 'Keyrock': examples/keyrock.md
       - 'Orion': examples/orion.md
+      - 'Orion-LD': examples/orion-ld.md
       - 'Cygnus': examples/cygnus.md
       - 'Comet': examples/comet.md
       - 'Perseo': examples/perseo.md

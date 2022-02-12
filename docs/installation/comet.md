@@ -52,3 +52,4 @@ CYGNUS=cygnus
 -   [STH-Comet - Read the docs](https://fiware-sth-comet.readthedocs.io/en/latest/)
 -   [Short Term History - FIWARE Step-By-Step Tutorials for NGSIv2](https://fiware-tutorials.readthedocs.io/en/latest/short-term-history.html)
 -   [NGSI Go tutorial for STH-Comet](https://ngsi-go.letsfiware.jp/tutorial/comet/)
+-   [telefonicaiot/fiware-sth-comet - Docker Hub](https://hub.docker.com/r/telefonicaiot/fiware-sth-comet)

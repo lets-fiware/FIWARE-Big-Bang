@@ -38,3 +38,5 @@ ngsi version --host perseo.example.com --pretty
 -   [Perseo Context-Aware CEP - GitHub](https://github.com/telefonicaid/perseo-fe)
 -   [Perseo-core (EPL server) - GitHub](https://github.com/telefonicaid/perseo-core)
 -   [NGSI Go tutorial for Perseo](https://ngsi-go.letsfiware.jp/tutorial/perseo/)
+-   [telefonicaiot/perseo-fe - Docker Hub](https://hub.docker.com/r/telefonicaiot/perseo-fe)
+-   [telefonicaiot/perseo-core - Docker Hub](https://hub.docker.com/r/telefonicaiot/perseo-core)
