@@ -342,6 +342,18 @@ GF_LOG_LEVEL=info
 IMAGE_GRAFANA=grafana/grafana:6.1.6
 
 #
+# Zeppelin
+#
+# Set a sub-domain name of Zeppelin
+ZEPPELIN=
+
+# Logging level for Zeppelin
+ZEPPELIN_DEBUG=
+
+# Docker image for Zeppelin
+IMAGE_ZEPPELIN=letsfiware/zeppelin:0.11.0-next
+
+#
 # Queryproxy
 #
 # Use queryproxy. (true or false) Default: false

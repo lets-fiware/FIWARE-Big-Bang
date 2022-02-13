@@ -39,6 +39,7 @@
 
 -   Node-RED
 -   Grafana
+-   Apache Zeppelin
 -   Mosquitto
 -   Elasticsearch (as a database for persitenting context data)
 
@@ -132,6 +133,7 @@ Please see each documentation for details as below:
 -   [WireCloud](wirecloud.md)
 -   [Node-RED](node-red.md)
 -   [Grafana](grafana.md)
+-   [Zeppelin](zeppelin.md)
 -   [Regproxy](regproxy.md)
 -   [Queryproxy](queryproxy.md)
 -   [Certbot](certbot.md)

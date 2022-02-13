@@ -1,0 +1,48 @@
+server {
+  listen 80;
+  server_name HOST;
+
+  location / {
+      return 301 https://$host$request_uri;
+  }
+
+  location ^~ /.well-known/acme-challenge/ {
+    default_type "text/plain";
+    root         /var/www/html/HOST;
+  }
+
+  access_log /var/log/nginx/HOST-access-http.log;
+  error_log /var/log/nginx/HOST-error-http.log;
+}
+
+upstream _zeppelin {
+    server zeppelin:8080;
+}
+
+server {
+  listen 443 http2 ssl;
+  server_name HOST;
+
+  ssl_certificate /etc/letsencrypt/live/HOST/fullchain.pem;
+  ssl_certificate_key /etc/letsencrypt/live/HOST/privkey.pem;
+
+  location / {
+    proxy_pass http://_zeppelin;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header Host $http_host;
+    proxy_set_header X-NginX-Proxy true;
+    proxy_redirect off;
+  }
+  
+  location /ws {
+    proxy_pass http://_zeppelin/ws;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade websocket;
+    proxy_set_header Connection upgrade;
+    proxy_read_timeout 86400;
+  }
+
+  access_log /var/log/nginx/HOST-access.log;
+  error_log /var/log/nginx/HOST-error.log;
+}

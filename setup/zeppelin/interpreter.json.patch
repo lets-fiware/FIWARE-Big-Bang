@@ -1,0 +1,22 @@
+1524c1524
+<           "value": "localhost",
+---
+>           "value": "mongo",
+1536c1536
+<           "value": "test",
+---
+>           "value": "sth_openiot",
+1578c1578,1588
+<       "dependencies": [],
+---
+>       "dependencies": [
+>         {
+>           "groupArtifactVersion": "org.apache.commons:commons-lang3:3.2",
+>           "local": false
+>         },
+>         {
+>           "groupArtifactVersion": "commons-io:commons-io:2.6",
+>           "local": false,
+>           "exclusions": []
+>         }
+>       ],
