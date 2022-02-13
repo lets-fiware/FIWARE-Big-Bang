@@ -1,4 +1,4 @@
-## FIWARE Big Bang v0.11.0-next
+## FIWARE Big Bang v0.12.0 - 13 Feb, 2022
 
 -   Support Apache Zeppelin (#160)
 -   Add Apache Zeppelin images (#159)
