@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.12.0-next
 
+-   Hardening widgets installation for WireCloud (#165)
 -   Update Node-RED to 2.2.1 (#164)
 
 ## FIWARE Big Bang v0.12.0 - 13 Feb, 2022

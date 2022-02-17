@@ -2237,9 +2237,54 @@ EOF
 }
 
 #
+# login and logoff wirecloud
+#
+login_and_logoff_wirecloud() {
+  logging_info "${FUNCNAME[0]}"
+
+  wait "https://${WIRECLOUD}/" "200"
+
+  sleep 1
+
+  ${CURL} -sL "https://${WIRECLOUD}/login" -c "${WORK_DIR}/cookie01.txt"  -o "${WORK_DIR}/out1.txt"
+
+  CSRF_TOKEN=$(sed -n "/name='_csrf/s/.*value='\(.*\)'.*/\1/p" "${WORK_DIR}/out1.txt")
+  OAUTH2_URL=$(sed -n "/\/oauth2\/authorize/s/.*action=\"\([^\"]*\)\".*/\1/p" "${WORK_DIR}/out1.txt" | sed -e "s/amp;//g")
+
+  sleep 1
+
+  ${CURL} -sL -b "${WORK_DIR}/cookie01.txt" -c "${WORK_DIR}/cookie02.txt" \
+    -o "${WORK_DIR}/out2.txt" \
+    --data "email=${IDM_ADMIN_EMAIL}" \
+    --data "password=${IDM_ADMIN_PASS}" \
+    --data "_csrf=${CSRF_TOKEN}" \
+    -X POST "https://${KEYROCK}${OAUTH2_URL}"
+
+  CSRF_TOKEN=$(sed -n "/name='_csrf/s/.*value='\(.*\)'.*/\1/p" "${WORK_DIR}/out2.txt")
+  OAUTH2_URL=$(sed -n "/enable_app/s/.*action=\"\([^\"]*\)\".*/\1/p" "${WORK_DIR}/out2.txt" | sed -e "s/amp;//g")
+
+  sleep 1
+
+  ${CURL} -sL -b "${WORK_DIR}/cookie02.txt" -c "${WORK_DIR}/cookie03.txt" -o "${WORK_DIR}/out3.txt" --data "_csrf=${CSRF_TOKEN}" \
+    --data "user_authorized_application[shared_attributes]=username" \
+    --data "user_authorized_application[shared_attributes]=email" \
+    --data "user_authorized_application[shared_attributes]=identity_attributes" \
+    --data "user_authorized_application[shared_attributes]=image" \
+    --data "user_authorized_application[shared_attributes]=gravatar" \
+    --data "user_authorized_application[shared_attributes]=eidas_profile" \
+    -X POST "https://${KEYROCK}${OAUTH2_URL}"
+
+  sleep 1
+
+  ${CURL} -sL -b "${WORK_DIR}/cookie03.txt" -o "${WORK_DIR}/out4.txt" "https://${WIRECLOUD}/logout"
+}
+
+#
 # patch widget
 #
 patch_widget() {
+  logging_info "${FUNCNAME[0]}"
+
   local widget widget_path patch_dir ql_patch
 
   widget=$1
@@ -2295,7 +2340,7 @@ install_widgets_for_wirecloud() {
 
   logging_info "${FUNCNAME[0]}"
 
-  wait "https://${WIRECLOUD}/" "200"
+  login_and_logoff_wirecloud
 
   sleep 1
 
@@ -2319,9 +2364,15 @@ install_widgets_for_wirecloud() {
 
       curl -sL "${line}" -o "${fullpath}"
       patch_widget "${name}" "${fullpath}"
-      ${DOCKER_COMPOSE} exec --tty wirecloud python manage.py addtocatalogue --public "/widgets/${name}"
+      ${NGSI_GO} macs --host "${WIRECLOUD}" install --file "${fullpath}" --overwrite
     fi
   done
+
+  cat <<EOF > "${WORK_DIR}/patch.sql"
+UPDATE catalogue_catalogueresource SET public = true;
+\q
+EOF
+  sudo sh -c "${DOCKER_COMPOSE} exec -T postgres psql -U postgres postgres < ${WORK_DIR}/patch.sql"
 }
 
 #
@@ -2375,8 +2426,19 @@ EOF
   setup_postgres
 
   if $FIBB_TEST; then
+    local wirecloud_containter
+    wirecloud_container=wirecloud_"$$"
+
+    docker run -d --rm --tty --name "${wirecloud_container}" --entrypoint=/usr/bin/tail -e DEBUG=True -d "${IMAGE_WIRECLOUD}" -f /opt/wirecloud_instance/manage.py
+    sleep 1
+    docker cp "${wirecloud_container}:/usr/local/lib/python3.6/site-packages/requests/sessions.py" "${CONFIG_DIR}"/
+    docker stop "${wirecloud_container}"
+
+    sed -i "s/verify = merge_setting(verify, self.verify)/verify = False/" "${CONFIG_DIR}/sessions.py"
+
     add_to_docker_compose_yml "__WIRECLOUD_ENVIRONMENT__" "     - REQUESTS_CA_BUNDLE=/root_ca/root-ca.crt"
     add_to_docker_compose_yml "__WIRECLOUD_VOLUMES__" "     - \${CONFIG_DIR}/root_ca/root-ca.crt:/root_ca/root-ca.crt"
+    add_to_docker_compose_yml "__WIRECLOUD_VOLUMES__" "     - \${CONFIG_DIR}/sessions.py:/usr/local/lib/python3.6/site-packages/requests/sessions.py"
   fi
 }
 
