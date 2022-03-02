@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.12.0-next
 
+-   Update Orion to 3.6.0 (#167)
 -   Update Node-RED to 2.2.2 (#166)
 -   Hardening widgets installation for WireCloud (#165)
 -   Update Node-RED to 2.2.1 (#164)
