@@ -1,4 +1,4 @@
-## FIWARE Big Bang v0.12.0-next
+## FIWARE Big Bang v0.13.0 - 3 March, 2022
 
 -   Update Orion to 3.6.0 (#167)
 -   Update Node-RED to 2.2.2 (#166)
