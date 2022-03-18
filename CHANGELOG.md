@@ -1,5 +1,7 @@
 ## FIWARE Big Bang v0.13.0-next
 
+-   Suppress npm update check in Keyrock and Wilma (#170)
+
 ## FIWARE Big Bang v0.13.0 - 3 March, 2022
 
 -   Update Orion to 3.6.0 (#167)

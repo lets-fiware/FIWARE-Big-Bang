@@ -22,6 +22,7 @@ services:
       - IDM_DEBUG=${IDM_DEBUG}
       - DEBUG=idm:*
       - IDM_OIDC_JWT_ALGORITHM=RS256
+      - NO_UPDATE_NOTIFIER=true
     # __KEYROCK_ENVIRONMENT__
     volumes:
       - ./config/keyrock/certs/applications:/opt/fiware-idm/certs/applications

@@ -13,6 +13,7 @@ services:
       - PEP_PROXY_USERNAME=${PEP_PROXY_USERNAME}
       - PEP_PASSWORD=${PEP_PASSWORD}
       - PEP_PROXY_AUTH_FOR_NGINX=true
+      - NO_UPDATE_NOTIFIER=true
     restart: always
     logging:
       driver: syslog
