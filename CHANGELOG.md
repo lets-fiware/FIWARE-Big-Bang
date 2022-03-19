@@ -1,4 +1,4 @@
-## FIWARE Big Bang v0.13.0-next
+## FIWARE Big Bang v0.14.0 - 19 March, 2022
 
 -   Update NGSI Go to 0.12.0 (#171)
 -   Suppress npm update check in Keyrock and Wilma (#170)
