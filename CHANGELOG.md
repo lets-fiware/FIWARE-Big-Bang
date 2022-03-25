@@ -1,5 +1,7 @@
 ## FIWARE Big Bang v0.14.0-next
 
+-   Fix hyperlink to cla.pdf (#174)
+
 ## FIWARE Big Bang v0.14.0 - 19 March, 2022
 
 -   Update NGSI Go to 0.12.0 (#171)
