@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.14.0-next
 
+-   Update STH Comet to 2.9.0 (#175)
 -   Fix hyperlink to cla.pdf (#174)
 
 ## FIWARE Big Bang v0.14.0 - 19 March, 2022
