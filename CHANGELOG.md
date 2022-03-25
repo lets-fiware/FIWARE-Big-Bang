@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.14.0-next
 
+-   Update Cygnus to 2.17.0 (#176)
 -   Update STH Comet to 2.9.0 (#175)
 -   Fix hyperlink to cla.pdf (#174)
 
