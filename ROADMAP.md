@@ -18,10 +18,9 @@ any time.
 ## Short term
 
 The following list of features are planned to be addressed in the short term,
-and incorporated in the next release of the product planned for March 2022:
+and incorporated in the next release of the product planned for June 2022:
 
--   Orion-LD, Mintaka
--   Draco
+-   Node-RED custom nodes for FIWARE Open APIs
 
 ## Medium term
 
