@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.14.0-next
 
+-   Update Mintaka to 0.5.7 (#179)
 -   Update product roadmap (#178)
 -   Update Perseo FE to 1.21.2 and Perseo Core to 1.9.0 (#177)
 -   Update Cygnus to 2.17.0 (#176)
