@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.14.0-next
 
+-   Remove node-red-contrib-FIWARE_official (#180)
 -   Update Mintaka to 0.5.7 (#179)
 -   Update product roadmap (#178)
 -   Update Perseo FE to 1.21.2 and Perseo Core to 1.9.0 (#177)
