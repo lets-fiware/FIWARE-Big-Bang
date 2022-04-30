@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.14.0-next
 
+-   Add node-red-contrib-letsfiware-NGSI (#182)
 -   Remove node-red-contrib-FIWARE_official (#180)
 -   Update Mintaka to 0.5.7 (#179)
 -   Update product roadmap (#178)
