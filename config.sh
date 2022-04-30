@@ -176,7 +176,7 @@ DRACO_EXPOSE_PORT=
 DRACO_DISABLE_NIFI_DOCS=
 
 # Docker image for Draco
-IMAGE_DRACO=ging/fiware-draco:2.0.0
+IMAGE_DRACO=ging/fiware-draco:2.1.0
 
 #
 # Quantumleap
