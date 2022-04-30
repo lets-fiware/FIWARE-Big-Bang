@@ -1,4 +1,4 @@
-## FIWARE Big Bang v0.14.0-next
+## FIWARE Big Bang v0.15.0 - 30 April, 2022
 
 -   Update Draco to 2.1.0 (#183)
 -   Add node-red-contrib-letsfiware-NGSI (#182)
