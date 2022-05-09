@@ -1,5 +1,7 @@
 ## FIWARE Big Bang v0.15.0-next
 
+-   Update Mintaka to 0.5.10 (#186)
+
 ## FIWARE Big Bang v0.15.0 - 30 April, 2022
 
 -   Update Draco to 2.1.0 (#183)
