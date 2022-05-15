@@ -51,4 +51,4 @@ ${NGSI_GO} broker add --host "${ORION}" --ngsiType v2 --brokerHost "${HOST}"
 
 ${NGSI_GO} broker get --host "${ORION}"
 
-${NGSI_GO} queryproxy server --host "${ORION}" --replaceURL "${URL}" ${VERBOSE} --qhost 0.0.0.0
+${NGSI_GO} queryproxy server --host "${ORION}" --replaceURL "${URL}" "${VERBOSE}" --qhost 0.0.0.0

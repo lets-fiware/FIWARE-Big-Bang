@@ -94,7 +94,7 @@ up_keyrock_for_multi_server() {
 
   FIBB_KEYROCK_URL=http://localhost:3000/
 
-  sudo /usr/local/bin/docker-compose -f keyrock-compose.yml up -d
+  sudo /usr/bin/docker compose -f keyrock-compose.yml up -d
 
   wait "${FIBB_KEYROCK_URL}" "200"
 
@@ -121,7 +121,7 @@ up_keyrock_for_multi_server() {
 down_keyrock_for_multi_server() {
   cd ./tests/keyrock
 
-  sudo /usr/local/bin/docker-compose -f keyrock-compose.yml down
+  sudo /usr/bin/docker compose -f keyrock-compose.yml down
 
   rm -f ngsi-go-config.json ngsi-go-token-cache.json
 
@@ -155,7 +155,6 @@ setup() {
     sed -i -e "/ngsi_bash_autocomplete/d" ~/.bashrc
   fi
 
-  sudo rm -f /usr/local/bin/docker-compose
   sudo rm -f /etc/redhat-release
 
   local ngsi_go_version
@@ -344,7 +343,7 @@ install_test5() {
   export FIBB_WAIT_TIME=1
   ${KCOV} ./coverage ./lets-fiware.sh example.com
 
-  sudo docker-compose -f docker-idm.yml down
+  sudo /usr/bin/docker compose -f docker-idm.yml down
 
   while [ "1" != "$(sudo docker ps | wc -l)" ]
   do
