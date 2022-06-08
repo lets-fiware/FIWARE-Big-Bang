@@ -1,6 +1,6 @@
 ## FIWARE Big Bang v0.15.0-next
 
--   Update Mintaka to 0.5.12 (#189)
+-   Update Mintaka to 0.5.13 (#189)
 -   Update Cygnus to 2.18.0 (#188)
 -   Update Orion to 3.7.0 (#187)
 -   Update Mintaka to 0.5.10 (#186)
