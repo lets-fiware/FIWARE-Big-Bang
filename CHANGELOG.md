@@ -1,3 +1,5 @@
+## FIWARE Big Bang v0.16.0-next
+
 ## FIWARE Big Bang v0.16.0 - 11 June, 2022
 
 -   Update Mintaka to 0.5.13 (#189)
