@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.16.0-next
 
+-   Update Mintaka to 0.5.14 (#194)
 -   Update IoT Agent for JSON to 1.22.0 (#193)
 -   Update IoT Agent for UltraLight to 1.21.0 (#192)
 
