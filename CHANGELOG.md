@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.16.0-next
 
+-   Update Perseo FE to 1.24.0 and Perseo Core to 1.12.0 (#195)
 -   Update Mintaka to 0.5.14 (#194)
 -   Update IoT Agent for JSON to 1.22.0 (#193)
 -   Update IoT Agent for UltraLight to 1.21.0 (#192)

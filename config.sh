@@ -156,8 +156,8 @@ PERSEO_SMTP_SECURE=
 PERSEO_LOG_LEVEL=
 
 # Docker images for Perseo
-IMAGE_PERSEO_CORE=telefonicaiot/perseo-core:1.9.0
-IMAGE_PERSEO_FE=telefonicaiot/perseo-fe:1.21.2
+IMAGE_PERSEO_CORE=telefonicaiot/perseo-core:1.12.0
+IMAGE_PERSEO_FE=telefonicaiot/perseo-fe:1.24.0
 
 #
 # Draco
