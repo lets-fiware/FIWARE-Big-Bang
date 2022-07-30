@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.16.0-next
 
+-   Update Orion-LD to 1.1.0 (#197)
 -   Update Mintaka to 0.5.15 (#196)
 -   Update Perseo FE to 1.24.0 and Perseo Core to 1.12.0 (#195)
 -   Update Mintaka to 0.5.14 (#194)
