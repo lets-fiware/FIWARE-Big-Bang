@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.17.0-next
 
+-   Update Cygnus to 2.20.0 (#201)
 -   Update Orion-LD to 1.1.2 (#200)
 
 ## FIWARE Big Bang v0.17.0 - 31 July, 2022
