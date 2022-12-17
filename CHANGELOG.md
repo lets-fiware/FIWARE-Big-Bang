@@ -1,4 +1,4 @@
-## FIWARE Big Bang v0.17.0-next
+## FIWARE Big Bang v0.18.0 - 17  December, 2022
 
 -   Update documentations (#207)
 -   Support Ubuntu 22.04 (#206)
