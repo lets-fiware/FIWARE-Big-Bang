@@ -18,9 +18,9 @@ any time.
 ## Short term
 
 The following list of features are planned to be addressed in the short term,
-and incorporated in the next release of the product planned for June 2022:
+and incorporated in the next release of the product planned for March 2023:
 
--   Node-RED custom nodes for FIWARE Open APIs
+-   Support latest version of FIWARE GE
 
 ## Medium term
 
