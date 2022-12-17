@@ -1,5 +1,7 @@
 ## FIWARE Big Bang v0.17.0-next
 
+-   Update Orion-LD to 1.1.2 (#200)
+
 ## FIWARE Big Bang v0.17.0 - 31 July, 2022
 
 -   Update Orion-LD to 1.1.0 (#197)
