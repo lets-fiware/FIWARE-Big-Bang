@@ -133,7 +133,7 @@ COMET_EXPOSE_PORT=
 COMET_LOGOPS_LEVEL=INFO
 
 # Docker image for Comet
-IMAGE_COMET=telefonicaiot/fiware-sth-comet:2.9.0
+IMAGE_COMET=telefonicaiot/fiware-sth-comet:2.10.0
 
 #
 # Perseo
