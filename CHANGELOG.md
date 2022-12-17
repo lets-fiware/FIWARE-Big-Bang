@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.17.0-next
 
+-   Update Perseo FE to 1.26.0 and Perseo Core to 1.13.0 (#205)
 -   Update IoT Agent for JSON to 1.25.0 (#204)
 -   Update IoT Agent for UltraLight to 1.24.0 (#203)
 -   Update STH Comet to 2.10.0 (#202)
