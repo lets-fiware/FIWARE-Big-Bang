@@ -11,6 +11,7 @@ What types of changes does your code introduce to the project: _Put an `x` in th
 -   [ ] Bugfix (non-breaking change which fixes an issue)
 -   [ ] New feature (non-breaking change which adds functionality)
 -   [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
+-   [ ] Update docker image version of FIWARE GE.
 -   [ ] Update only documentation, not any source code.
 
 ## Checklist
