@@ -53,8 +53,9 @@ from the Internet via a network equipment
 ### Supported Linux distribution
 
 The FIWARE Big Bang supports CentOS and Ubuntu as Linux distribution.
-The recommended Linux distribution is Ubuntu 20.04.
+The recommended Linux distribution is Ubuntu 22.04.
 
+-   Ubuntu 22.04
 -   Ubuntu 20.04
 -   Ubuntu 18.04
 -   CentOS 7, 8
