@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.17.0-next
 
+-   Update IoT Agent for UltraLight to 1.24.0 (#203)
 -   Update STH Comet to 2.10.0 (#202)
 -   Update Cygnus to 2.20.0 (#201)
 -   Update Orion-LD to 1.1.2 (#200)
