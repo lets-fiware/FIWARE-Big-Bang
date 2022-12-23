@@ -1,5 +1,7 @@
 ## FIWARE Big Bang v0.19.0-next
 
+-   Update documentation (#215)
+
 ## FIWARE Big Bang v0.19.0 - 23 December, 2022
 
 -   Update ROADMAP.md (#212)
