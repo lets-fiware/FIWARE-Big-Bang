@@ -13,20 +13,20 @@ The NGSI Go binary is installed in `/usr/local/bin`.
 #### Installation on Linux
 
 ```console
-curl -OL https://github.com/lets-fiware/ngsi-go/releases/download/v0.9.0/ngsi-v0.9.0-linux-amd64.tar.gz
-sudo tar zxvf ngsi-v0.9.0-linux-amd64.tar.gz -C /usr/local/bin
+curl -OL https://github.com/lets-fiware/ngsi-go/releases/download/v0.12.0/ngsi-v0.12.0-linux-amd64.tar.gz
+sudo tar zxvf ngsi-v0.12.0-linux-amd64.tar.gz -C /usr/local/bin
 ```
 
-`ngsi-v0.9.0-linux-arm.tar.gz` and `ngsi-v0.9.0-linux-arm64.tar.gz` binaries are also available.
+`ngsi-v0.12.0-linux-arm.tar.gz` and `ngsi-v0.12.0-linux-arm64.tar.gz` binaries are also available.
 
 #### Installation on Mac
 
 ```console
-curl -OL https://github.com/lets-fiware/ngsi-go/releases/download/v0.9.0/ngsi-v0.9.0-darwin-amd64.tar.gz
-sudo tar zxvf ngsi-v0.9.0-darwin-amd64.tar.gz -C /usr/local/bin
+curl -OL https://github.com/lets-fiware/ngsi-go/releases/download/v0.12.0/ngsi-v0.12.0-darwin-amd64.tar.gz
+sudo tar zxvf ngsi-v0.12.0-darwin-amd64.tar.gz -C /usr/local/bin
 ```
 
-`ngsi-v0.9.0-darwin-arm64.tar.gz` binary is also available.
+`ngsi-v0.12.0-darwin-arm64.tar.gz` binary is also available.
 
 ### Install bash autocomplete file for NGSI Go
 
