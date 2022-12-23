@@ -1,6 +1,7 @@
 =======
-## FIWARE Big Bang v0.18.0-next
+## FIWARE Big Bang v0.19.0 - 23 December, 2022
 
+-   Update ROADMAP.md (#212)
 -   Update Keyrock docker images (#211)
 
 ## FIWARE Big Bang v0.18.0 - 17 December, 2022
