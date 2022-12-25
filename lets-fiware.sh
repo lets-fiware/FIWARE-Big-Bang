@@ -2981,7 +2981,6 @@ setup_node_red() {
   logging_info "${FUNCNAME[0]}"
 
   cp -r "${SETUP_DIR}"/docker/node-red "${CONFIG_DIR}"/
-  cp "${CONTRIB_DIR}/node-red-contrib-FIWARE_official/contextbroker.js" "${CONFIG_DIR}"/node-red/contextbroker.js
 
   cd "${CONFIG_DIR}"/node-red > /dev/null
   ${DOCKER} build -t "${IMAGE_NODE_RED}" .
