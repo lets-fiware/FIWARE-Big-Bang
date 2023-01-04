@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.19.0-next
 
+-   Update Mintaka to 0.5.30 (#219)
 -   Update copyright date (#218)
 -   Remove unnecessary source (#217)
 -   Update Mintaka to 0.5.28 (#216)
