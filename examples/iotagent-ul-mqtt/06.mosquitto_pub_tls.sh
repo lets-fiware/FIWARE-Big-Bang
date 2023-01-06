@@ -21,6 +21,11 @@ if ! ${MQTT_TLS}; then
   exit 1
 fi
 
+if ! type mosquitto_pub >/dev/null 2>&1; then
+  echo "sudo apt-get install mosquitto-clients or sudo yum install mosquitto-clients"
+  exit 1
+fi
+
 while true 
 do
   DATE=$(date "+%Y-%m-%dT%H:%M:%S+0000" -u)
