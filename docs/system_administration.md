@@ -40,6 +40,7 @@ the lets-fiware.sh script.
 | admin        | Print a username and a password for Admin user               |
 | get-token    | Get an OAuth2 access token                                   |
 | multi-server | Print variables for multi-server installation                |
+| mqtt         | Print variables for MQTT                                     |
 | collect      | Collect system information                                   |
 | log          | Print log for FIWARE Big Bang (/var/log/fiware/fi-bb.log)    |
 | log-dir      | List files in the log directory (/var/log/fiware)            |
