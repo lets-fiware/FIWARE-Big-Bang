@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.19.0-next
 
+-   Add script for MQTT (#221)
 -   Update example scripts (#220)
 -   Update Mintaka to 0.5.30 (#219)
 -   Update copyright date (#218)
