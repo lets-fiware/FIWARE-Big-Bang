@@ -34,3 +34,5 @@ multi-server:
 	./config/script/multi_server.sh
 mqtt:
 	./config/script/mqtt.sh
+subdomains:
+	./config/script/subdomains.sh
