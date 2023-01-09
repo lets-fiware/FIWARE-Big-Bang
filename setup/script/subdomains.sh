@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # MIT License
 #
@@ -26,7 +26,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-set -ue
+set -eu
+
+LANG=C
+
+APPS=(KEYROCK ORION CYGNUS COMET WIRECLOUD NGSIPROXY NODE_RED GRAFANA QUANTUMLEAP IOTAGENT_UL IOTAGENT_JSON IOTAGENT_HTTP MOSQUITTO ELASTICSEARCH)
 
 cd "$(dirname "$0")"
 cd ../..
@@ -36,4 +40,12 @@ if [ ! -e .env ]; then
   exit 1
 fi
 
-grep "^M[O|Q]" .env | grep -v LOG
+. ./.env
+
+for NAME in "${APPS[@]}"
+do
+  eval VAL=\"\$"$NAME"\"
+  if [ -n "$VAL" ]; then
+    grep "^${NAME}=" ./.env
+  fi
+done

@@ -41,6 +41,7 @@ the lets-fiware.sh script.
 | get-token    | Get an OAuth2 access token                                   |
 | multi-server | Print variables for multi-server installation                |
 | mqtt         | Print variables for MQTT                                     |
+| subdomains   | Print list of subdomains                                     |
 | collect      | Collect system information                                   |
 | log          | Print log for FIWARE Big Bang (/var/log/fiware/fi-bb.log)    |
 | log-dir      | List files in the log directory (/var/log/fiware)            |
