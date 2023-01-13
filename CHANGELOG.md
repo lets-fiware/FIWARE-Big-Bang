@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.19.0-next
 
+-   Update Orion to 3.8.0 (#224)
 -   Update Mintaka to 0.5.31 (#223)
 -   Add script for subdomains (#222)
 -   Add script for MQTT (#221)
