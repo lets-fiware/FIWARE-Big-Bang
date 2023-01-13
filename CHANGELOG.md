@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.19.0-next
 
+-   Update Mintaka to 0.5.31 (#223)
 -   Add script for subdomains (#222)
 -   Add script for MQTT (#221)
 -   Update example scripts (#220)
