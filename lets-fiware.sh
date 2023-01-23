@@ -3259,8 +3259,6 @@ setup_ngsi_go() {
     NGSI_GO="${NGSI_GO} --insecureSkipVerify"
   fi
 
-  SERVERS=("$(${NGSI_GO} server list --all -1)")
-
   local save_orion
   save_orion=${ORION}
   local save_keyrock
@@ -3292,6 +3290,48 @@ setup_ngsi_go() {
   KEYROCK=${save_keyrock}
 
   ${NGSI_GO} settings clear
+}
+
+create_script_to_setup_ngsi_go() {
+  logging_info "${FUNCNAME[0]}"
+
+  local save_orion
+  save_orion=${ORION}
+  local save_keyrock
+  save_keyrock=${KEYROCK}
+
+  SCRIPT_FILE="setup_ngsi_go.sh"
+  if [ -e "${SCRIPT_FILE}" ]; then
+    rm -f "${SCRIPT_FILE}" 
+  fi
+  echo -e "#!/bin/bash\n\n# This file was created by FIWARE Big Bang.\n# See https://github.com/lets-fiware/ngsi-go for how to install NGSI Go.\n" > "${SCRIPT_FILE}"
+  echo -e "read -p \"Enter admin email: \" IDM_ADMIN_EMAIL\nread -p \"Enter admin password: \" IDM_ADMIN_PASS\n" >> "${SCRIPT_FILE}"
+  chmod 0755 "${SCRIPT_FILE}"
+
+  for NAME in "${APPS[@]}"
+  do
+    if [ "${NAME}" = "ORION" ] && [ -n "${MULTI_SERVER_ORION_HOST}" ]; then
+      ORION=${MULTI_SERVER_ORION_HOST}
+    fi
+    eval VAL=\"\$"$NAME"\"
+    if [ -n "$VAL" ]; then
+      case "${NAME}" in
+          "KEYROCK" ) echo "ngsi server add --host ${VAL} --serverType keyrock --serverHost https://${VAL} --username \"\${IDM_ADMIN_EMAIL}\" --password \"\${IDM_ADMIN_PASS}\" --overWrite" >> "${SCRIPT_FILE}" ;;
+          "ORION" )  echo "ngsi broker add --host ${VAL} --ngsiType v2 --brokerHost https://${VAL} --idmType tokenproxy --idmHost ttps://${KEYROCK}/token --username \"\${IDM_ADMIN_EMAIL}\" --password \"\${IDM_ADMIN_PASS}\" --overWrite" >> "${SCRIPT_FILE}" ;;
+          "ORION_LD" ) echo "ngsi broker add --host ${VAL} --ngsiType ld --brokerHost https://${VAL} --idmType tokenproxy --idmHost ttps://${KEYROCK}/token--username \"\${IDM_ADMIN_EMAIL}\" --password \"\${IDM_ADMIN_PASS}\" --overWrite" >> "${SCRIPT_FILE}" ;;
+          "CYGNUS" ) echo "ngsi server add --host ${VAL} --serverType cygnus --serverHost https://${VAL} --idmType tokenproxy --idmHost ttps://${KEYROCK}/token --username \"\${IDM_ADMIN_EMAIL}\" --password \"\${IDM_ADMIN_PASS}\" --overWrite" >> "${SCRIPT_FILE}" ;;
+          "COMET" ) echo "ngsi server add --host ${VAL} --serverType comet --serverHost https://${VAL} --idmType tokenproxy --idmHost ttps://${KEYROCK}/token --username \"\${IDM_ADMIN_EMAIL}\" --password \"\${IDM_ADMIN_PASS}\" --overWrite" >> "${SCRIPT_FILE}" ;;
+          "IOTAGENT_UL" ) echo "ngsi server add --host ${VAL} --serverType iota --serverHost https://${VAL} --idmType tokenproxy --idmHost ttps://${KEYROCK}/token --username \"\${IDM_ADMIN_EMAIL}\" --password \"\${IDM_ADMIN_PASS}\" --service openiot --path / --overWrite" >> "${SCRIPT_FILE}" ;;
+          "IOTAGENT_JSON" ) echo "ngsi server add --host ${VAL} --serverType iota --serverHost https://${VAL} --idmType tokenproxy --idmHost ttps://${KEYROCK}/token --username \"\${IDM_ADMIN_EMAIL}\" --password \"\${IDM_ADMIN_PASS}\" --service openiot --path / --overWrite" >> "${SCRIPT_FILE}" ;;
+          "WIRECLOUD" ) echo "ngsi server add --host ${VAL} --serverType wirecloud --serverHost https://${VAL} --idmType keyrock --idmHost ttps://${KEYROCK}/oauth2/token --username \"\${IDM_ADMIN_EMAIL}\" --password \"\${IDM_ADMIN_PASS}\" --clientId \"${WIRECLOUD_CLIENT_ID}\" --clientSecret \"${WIRECLOUD_CLIENT_SECRET}\" --overWrite" >> "${SCRIPT_FILE}" ;;
+          "QUANTUMLEAP" ) echo "ngsi server add --host ${VAL} --serverType quantumleap --serverHost https://${VAL} --idmType tokenproxy --idmHost ttps://${KEYROCK}/token --username \"\${IDM_ADMIN_EMAIL}\" --password \"\${IDM_ADMIN_PASS}\" --overWrite" >> "${SCRIPT_FILE}" ;;
+          "PERSEO" ) echo "ngsi server add --host ${VAL} --serverType perseo --serverHost https://${VAL} --idmType tokenproxy --idmHost https://${KEYROCK}/token --username \"\${IDM_ADMIN_EMAIL}\" --password \"\${IDM_ADMIN_PASS}\" --overWrite" >> "${SCRIPT_FILE}" ;;
+      esac
+    fi
+  done
+
+  ORION=${save_orion}
+  KEYROCK=${save_keyrock}
 }
 
 #
@@ -3441,6 +3481,7 @@ setup_main() {
 
   update_nginx_file
   setup_ngsi_go
+  create_script_to_setup_ngsi_go
 
   setup_logging_step2
 

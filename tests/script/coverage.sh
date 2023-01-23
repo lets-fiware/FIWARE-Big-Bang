@@ -264,6 +264,8 @@ install_test1() {
   sed -i -e "s/^\(REGPROXY_USERNAME=\).*/\1fiware/" config.sh
   sed -i -e "s/^\(REGPROXY_PASSWORD=\).*/\1abcd/" config.sh
 
+  touch setup_ngsi_go.sh
+
   ${KCOV} ./coverage ./lets-fiware.sh example.com
 }
 

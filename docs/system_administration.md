@@ -67,3 +67,10 @@ And also the log files are rotated on a regular basis. Look at the `/etc/logrota
 When installing, server certificates automatically are created or reused if already exists.
 They are renewed by a cron job. Look at the `/etc/cron.d/fiware-big-bang` file. And also you can
 renew or revoke server certificates manually with make command.
+
+## How to create environment for NGSI Go on another machine
+
+### Setup NGSI Go
+
+To setup NGSI Go on another machine, see here [https://github.com/lets-fiware/ngsi-go](https://github.com/lets-fiware/ngsi-go).
+And copy and run the `setup_ngsi_go.sh` script on the machine. It asks you an admin email and a password.
