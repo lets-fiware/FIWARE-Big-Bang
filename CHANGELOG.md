@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.20.0-next
 
+-   Add init flag to IoT Agent and Comet (#228)
 -   Add init flag to Keyrock and Wilma (#227)
 
 ## FIWARE Big Bang v0.20.0 - 14 January, 2023

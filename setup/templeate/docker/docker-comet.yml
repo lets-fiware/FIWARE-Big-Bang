@@ -2,6 +2,7 @@ version: "3"
 services:
   comet:
     image: ${IMAGE_COMET}
+    init: true
     # __COMET_PORTS__
     depends_on:
       # __COMET_DEPENDS_ON__
