@@ -1,5 +1,7 @@
 ## FIWARE Big Bang v0.20.0-next
 
+-   Add init flag to Keyrock and Wilma (#227)
+
 ## FIWARE Big Bang v0.20.0 - 14 January, 2023
 
 -   Update Orion to 3.8.0 (#224)

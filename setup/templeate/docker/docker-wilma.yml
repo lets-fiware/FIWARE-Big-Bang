@@ -2,6 +2,7 @@ version: "3"
 services:
   wilma:
     image: ${IMAGE_WILMA}
+    init: true
     # __WILMA_DEPENDS_ON__
     environment:
       - PEP_PROXY_DEBUG=true
