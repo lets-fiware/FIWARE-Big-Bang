@@ -2,6 +2,7 @@ version: "3"
 services:
   keyrock:
     image: ${IMAGE_KEYROCK}
+    init: true
     depends_on:
     # __KEYROCK_DEPENDS_ON__
     environment:
