@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.20.0-next
 
+-   Fix invalid URL escape in get_token.sh (#232)
 -   Add feature to create ngsi go environment (#229)
 -   Add init flag to IoT Agent and Comet (#228)
 -   Add init flag to Keyrock and Wilma (#227)
