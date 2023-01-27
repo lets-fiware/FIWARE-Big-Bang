@@ -1,5 +1,7 @@
 ## FIWARE Big Bang v0.20.0-next
 
+-   Maintain documentation (#236)
+-   Fixes JSON measures in docs/installation/iotagent-json.md (#233)
 -   Fix invalid URL escape in get_token.sh (#232)
 -   Add feature to create ngsi go environment (#229)
 -   Add init flag to IoT Agent and Comet (#228)
