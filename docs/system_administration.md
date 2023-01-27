@@ -16,19 +16,20 @@
 
 The following files and directories will be created.
 
-| File or directory             | Description                                                                             |
-| ----------------------------- | --------------------------------------------------------------------------------------- |
-| .                             | A root directory of FI-BB. It's a directory in which you ran lets-fiware.sh command.    |
-| ./docker-compose.yml          | A config file for docker-compose which has the configuration information of FIWARE GEs. |
-| ./.env                        | A file which has environment variables for docker-compose.yml file.                     |
-| ./Makefile                    | A file for make command.                                                                |
-| ./config                      | A directory which has configuration files for running Docker containers.                |
-| ./data                        | A directory which has persistent data for running Docker containers.                    |
-| /etc/letsencrypt              | A directory which has server certificate files.                                         |
-| /var/log/fiware               | A directory which has log files.                                                        |
-| /etc/rsyslog.d/10-fiware.conf | A config file for rsyslog. In the case of CentOS, the filename is 'fiware.conf'.        |
-| /etc/logrotate.d/fiware       | A config file for logroate.                                                             |
-| /etc/cron.d/fiware-big-bang   | A config file for cron                                                                  |
+| File or directory              | Description                                                                                                                                                                                                  |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| .                              | A root directory of FI-BB. It's a directory in which you ran lets-fiware.sh command.                                                                                                                         |
+| ./docker-compose.yml           | A config file for docker-compose which has the configuration information of FIWARE GEs.                                                                                                                      |
+| ./.env                         | A file which has environment variables for docker-compose.yml file.                                                                                                                                          |
+| ./Makefile                     | A file for make command.                                                                                                                                                                                     |
+| ./config                       | A directory which has configuration files for running Docker containers.                                                                                                                                     |
+| ./config/keyrock/whitelist.txt | A whitelist of email domains for Keyrock. See [Keyrock documentation](https://fiware-idm.readthedocs.io/en/latest/installation_and_administration_guide/configuration/index.html#email-filtering) in detail. |
+| ./data                         | A directory which has persistent data for running Docker containers.                                                                                                                                         |
+| /etc/letsencrypt               | A directory which has server certificate files.                                                                                                                                                              |
+| /var/log/fiware                | A directory which has log files.                                                                                                                                                                             |
+| /etc/rsyslog.d/10-fiware.conf  | A config file for rsyslog. In the case of CentOS, the filename is 'fiware.conf'.                                                                                                                             |
+| /etc/logrotate.d/fiware        | A config file for logroate.                                                                                                                                                                                  |
+| /etc/cron.d/fiware-big-bang    | A config file for cron                                                                                                                                                                                       |
 
 ## Make command for system administration
 
