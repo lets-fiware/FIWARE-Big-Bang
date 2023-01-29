@@ -111,7 +111,7 @@ To read MongoDB data from the command line, you need to be in a MongoDB containe
 #### Command:
 
 ```bash
-docker-compose exec mongo bash
+docker compose exec mongo bash
 ```
 
 #### Result:
@@ -292,7 +292,7 @@ To read MySQL data from the command line, you need to be in a MySQL container.
 #### Command:
 
 ```bash
-docker-compose exec mysql bash
+docker compose exec mysql bash
 ```
 
 #### Result:
@@ -490,7 +490,7 @@ To read PostgreSQL data from the command line, you need to be in a PostgreSQL co
 #### Command:
 
 ```bash
-docker-compose exec postgres bash
+docker compose exec postgres bash
 ```
 
 #### Result:

@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.20.0-next
 
+-   Add Docker Compose V2 (#238)
 -   Add documentation about adding user (#237)
 -   Maintain documentation (#236)
 -   Fixes JSON measures in docs/installation/iotagent-json.md (#233)

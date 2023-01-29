@@ -31,6 +31,6 @@ set -ue
 for file in docker-compose.yml docker-cert.yml docker-idm.yml
 do
   if [ -e ${file} ]; then
-    sudo /usr/local/bin/docker-compose -f ${file} down --remove-orphan
+    /usr/bin/docker compose -f ${file} down --remove-orphans
   fi
 done

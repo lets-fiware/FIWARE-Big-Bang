@@ -1,17 +1,17 @@
 build:
-	sudo /usr/local/bin/docker-compose build
+	sudo ./setup/build.sh
 up:
-	sudo /usr/local/bin/docker-compose up -d
+	sudo ./setup/up.sh
 down:
-	./setup/down.sh
+	sudo ./setup/down.sh
 ps:
-	sudo /usr/local/bin/docker-compose ps
+	sudo ./setup/ps.sh
 clean:
-	./setup/clean.sh
+	sudo ./setup/clean.sh
 nginx-test:
-	sudo /usr/local/bin/docker-compose exec nginx nginx -t
+	sudo /usr/bin/docker compose exec nginx nginx -t
 nginx-reload:
-	sudo /usr/local/bin/docker-compose exec nginx nginx -s reload
+	sudo /usr/bin/docker compose exec nginx nginx -s reload
 log-dir:
 	ls -l /var/log/fiware
 logrotation:
