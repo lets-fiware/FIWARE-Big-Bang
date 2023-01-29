@@ -1,4 +1,15 @@
 #!/bin/sh
+FORCE_CLEAN=${FORCE_CLEAN:-false}
+
+if [ "${FORCE_CLEAN}" != "true" ]; then
+  echo "!CAUTION! This command cleans up your FIWARE instance including your all data."
+  read -p "Are you sure you want to run it? (y/N): " ans
+
+  if [ "${ans}" != "y" ]; then
+    echo "Canceled"
+    exit 1
+  fi
+fi
 
 for file in docker-compose.yml docker-cert.yml docker-idm.yml
 do

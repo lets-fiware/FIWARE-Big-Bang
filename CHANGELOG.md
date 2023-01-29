@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.20.0-next
 
+-   Check data persistence directory (#239)
 -   Add Docker Compose V2 (#238)
 -   Add documentation about adding user (#237)
 -   Maintain documentation (#236)

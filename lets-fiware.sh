@@ -85,7 +85,8 @@ check_data_direcotry() {
   logging_info "${FUNCNAME[0]}"
 
   if [ -d ./data ]; then
-    ${DOCKER_COMPOSE} up -d --build
+    echo "FIWARE instance already exists."
+    echo "If you want to create new FIWARE instance, run 'make clean' before running lets-fiware.sh"
     exit "${ERR_CODE}"
   fi
 }
@@ -3586,6 +3587,8 @@ main() {
 
   init_cmd
 
+  check_data_direcotry
+
   remove_files
 
   check_machine
@@ -3593,8 +3596,6 @@ main() {
   get_distro
 
   setup_init
-
-  check_data_direcotry
 
   make_directories
 
