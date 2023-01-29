@@ -2779,7 +2779,8 @@ setup_draco() {
 
   ${DOCKER} run -d --rm --tty --name "${draco_container}" --entrypoint=/usr/bin/tail "${IMAGE_DRACO}" -f /opt/nifi/nifi-current/conf/bootstrap.conf
   sleep 3
-  docker cp "${draco_container}":/opt/nifi/scripts/secure.sh "${CONFIG_DIR}"/draco/secure.sh
+  ${DOCKER} cp "${draco_container}":/opt/nifi/scripts/secure.sh "${WORK_DIR}"/secure.sh
+  cp "${WORK_DIR}"/secure.sh "${CONFIG_DIR}"/draco/secure.sh
   sed -e 1d "${SETUP_DIR}"/draco/nifi-patch.sh >> "${CONFIG_DIR}"/draco/secure.sh
 
   local file
