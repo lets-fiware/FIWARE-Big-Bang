@@ -51,7 +51,7 @@ the lets-fiware.sh script.
 | build        | Build docker containers for FIWARE instance                  |
 | up           | Create and start docker containers for FIWARE instance       |
 | down         | Stop and remove docker containers for FIWARE instance        |
-| clean        | !CAUTION! Clean up FIWARE instance                           |
+| clean        | !CAUTION! Clean up FIWARE instance including your all data   |
 | nginx-test   | Test configuration for nginx                                 |
 | nginx-reload | Reload configuration for nginx                               |
 | cert-renew   | Renew all server certificates                                |

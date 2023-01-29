@@ -225,7 +225,8 @@ fibb_down() {
 
   sleep 5
 
-  make clean
+  # make clean
+  FORCE_CLEAN=true ./setup/clean.sh
 }
 
 install_test1() {
