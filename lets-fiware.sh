@@ -851,7 +851,9 @@ install_docker_compose_centos() {
 check_docker_compose() {
   logging_info "${FUNCNAME[0]}"
 
+  set +e
   found=$(sudo docker info --format '{{json . }}' | jq -r '.ClientInfo.Plugins | .[].Name' | grep -ic compose)
+  set -e
   if [ "${found}" -eq 0 ]; then
     case "${DISTRO}" in
       "Ubuntu" ) install_docker_compose_ubuntu ;;

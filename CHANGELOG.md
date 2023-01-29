@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.20.0-next
 
+-   Fix fail while setting up Docker Compose V2 (#240)
 -   Check data persistence directory (#239)
 -   Add Docker Compose V2 (#238)
 -   Add documentation about adding user (#237)
