@@ -441,7 +441,7 @@ IMAGE_MYSQL=mysql:5.7
 POSTGRES_EXPOSE_PORT=
 
 # Docker images for PostgreSQL
-IMAGE_POSTGRES=postgres:11
+IMAGE_POSTGRES=postgres:15
 
 #
 # Nginx
