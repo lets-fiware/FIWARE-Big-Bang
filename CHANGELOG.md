@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.20.0-next
 
+-   Fix fail while setting up Draco (#242)
 -   Update Postgres to 15 (#241)
 -   Fix fail while setting up Docker Compose V2 (#240)
 -   Check data persistence directory (#239)
