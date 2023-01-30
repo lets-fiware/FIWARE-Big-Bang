@@ -771,9 +771,7 @@ install_docker_ubuntu() {
       gnupg \
       lsb-release
   curl -fsSL https://download.docker.com/linux/ubuntu/gpg | ${SUDO} gpg --dearmor --yes -o /usr/share/keyrings/docker-archive-keyring.gpg
-  echo \
-  "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
-  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+  echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
   ${APT_GET} update
   ${APT_GET} install -y docker-ce docker-ce-cli containerd.io
   ${SYSTEMCTL} start docker
@@ -852,7 +850,7 @@ check_docker_compose() {
   logging_info "${FUNCNAME[0]}"
 
   set +e
-  found=$(sudo docker info --format '{{json . }}' | jq -r '.ClientInfo.Plugins | .[].Name' | grep -ic compose)
+  found=$(sudo docker info --format '{{json . }}' | jq -r '.ClientInfo.Plugins | .[].Name' | ${GREP_CMD} -ic compose)
   set -e
   if [ "${found}" -eq 0 ]; then
     case "${DISTRO}" in
@@ -3392,7 +3390,7 @@ copy_scripts() {
 boot_up_containers() {
   logging_info "${FUNCNAME[0]}"
 
-  logging_info "docker-compose up -d --build"
+  logging_info "docker compose up -d --build"
   ${DOCKER_COMPOSE} up -d --build
 
   if [ -n "${DRACO}" ]; then
@@ -3532,6 +3530,7 @@ init_cmd() {
   YUM_CONFIG_MANAGER="${SUDO} ${MOCK_PATH}yum-config-manager"
   FIREWALL_CMD="${SUDO} ${MOCK_PATH}firewall-cmd"
   UNAME="${FIBB_TEST_UNAME_CMD:-uname}"
+  GREP_CMD="${FIBB_TEST_GREP_CMD:-grep}"
   DOCKER_CMD="${FIBB_TEST_DOCKER_CMD:-docker}"
   DOCKER_COMPOSE="${SUDO} /usr/bin/docker compose"
   HOST_CMD="${FIBB_TEST_HOST_CMD:-host}"
@@ -3564,10 +3563,6 @@ remove_files() {
         rm -f "${file}"
       fi
     done
-
-    if [ -d "${DATA_DIR}" ]; then
-      "${SUDO}" rm -fr "${DATA_DIR}"
-    fi
 
     "${SUDO}" rm -fr "${CONFIG_DIR}"
     rm -fr "${WORK_DIR}"

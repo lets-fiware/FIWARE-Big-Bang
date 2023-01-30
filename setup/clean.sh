@@ -3,9 +3,9 @@ FORCE_CLEAN=${FORCE_CLEAN:-false}
 
 if [ "${FORCE_CLEAN}" != "true" ]; then
   echo "!CAUTION! This command cleans up your FIWARE instance including your all data."
-  read -p "Are you sure you want to run it? (y/N): " ans
+  read -p "Are you sure you want to run it? (Y/n): " ans
 
-  if [ "${ans}" != "y" ]; then
+  if [ "${ans}" != "Y" ]; then
     echo "Canceled"
     exit 1
   fi

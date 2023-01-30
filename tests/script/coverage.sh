@@ -210,6 +210,10 @@ EOF
 
   echo "cat - > /dev/null" >> "${MOCK_DIR}/apt-key"
 
+  echo -e "#!/bin/sh\necho 0" >> "${MOCK_DIR}/grep_mock"
+  chmod +x "${MOCK_DIR}/grep_mock"
+  export FIBB_TEST_GREP_CMD="grep_mock"
+
   reset_env
 }
 
@@ -471,7 +475,6 @@ error_test() {
 
   touch .install
   touch docker-compose.yml
-  mkdir data
 
   echo "*** aarch64 not supported ***" 1>&2
   echo -e "#!/bin/sh\necho \"aarch64\"" >> "${MOCK_DIR}/uname"
