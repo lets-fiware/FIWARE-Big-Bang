@@ -28,7 +28,7 @@
 
 set -Ceuo pipefail
 
-VERSION=0.20.0
+VERSION=0.21.0
 
 #
 # Syslog info
@@ -85,7 +85,8 @@ check_data_direcotry() {
   logging_info "${FUNCNAME[0]}"
 
   if [ -d ./data ]; then
-    ${DOCKER_COMPOSE} up -d --build
+    echo "FIWARE instance already exists."
+    echo "If you want to create new FIWARE instance, run 'make clean' before running lets-fiware.sh"
     exit "${ERR_CODE}"
   fi
 }
@@ -762,16 +763,16 @@ setup_firewall() {
 install_docker_ubuntu() {
   logging_info "${FUNCNAME[0]}"
 
-  ${SUDO} cp -p /etc/apt/sources.list{,.bak}
   ${APT_GET} update
   ${APT_GET} install -y \
       apt-transport-https \
       ca-certificates \
       curl \
-      gnupg-agent \
-      software-properties-common
-  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | ${APT_KEY} add -
-  ${ADD_APT_REPOSITORY} "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+      gnupg \
+      lsb-release
+  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | ${SUDO} gpg --dearmor --yes -o /usr/share/keyrings/docker-archive-keyring.gpg
+  echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+  ${APT_GET} update
   ${APT_GET} install -y docker-ce docker-ce-cli containerd.io
   ${SYSTEMCTL} start docker
   ${SYSTEMCTL} enable docker
@@ -800,8 +801,8 @@ check_docker() {
 
   if ! type "${DOCKER_CMD}" >/dev/null 2>&1; then
     case "${DISTRO}" in
-       "Ubuntu" ) install_docker_ubuntu ;;
-       "CentOS" ) install_docker_centos ;;
+      "Ubuntu" ) install_docker_ubuntu ;;
+      "CentOS" ) install_docker_centos ;;
     esac
   fi
 
@@ -825,25 +826,38 @@ check_docker() {
 }
 
 #
-# Check docker-compose
+# Install Docker compose V2 for Ubuntu
+#
+install_docker_compose_ubuntu() {
+  logging_info "${FUNCNAME[0]}"
+
+  ${APT_GET} install -y docker-compose-plugin
+}
+
+#
+# Install Docker compose V2 for CentOS
+#
+install_docker_compose_centos() {
+  logging_info "${FUNCNAME[0]}"
+
+  ${YUM} install -y docker-compose-plugin
+}
+
+#
+# Check docker compose v2
 #
 check_docker_compose() {
   logging_info "${FUNCNAME[0]}"
 
-  if [ -e "${DOCKER_COMPOSE_CMD}" ]; then
-    local ver
-    ver=$(${DOCKER_COMPOSE} --version)
-    logging_info "${FUNCNAME[0]} ${ver}"
-
-    ver=$(${DOCKER_COMPOSE} version --short | awk -F. '{printf "%2d%02d%02d", $1,$2,$3}')
-    if [ "${ver}" -ge 11700 ]; then
-      return
-    fi
+  set +e
+  found=$(sudo docker info --format '{{json . }}' | jq -r '.ClientInfo.Plugins | .[].Name' | ${GREP_CMD} -ic compose)
+  set -e
+  if [ "${found}" -eq 0 ]; then
+    case "${DISTRO}" in
+      "Ubuntu" ) install_docker_compose_ubuntu ;;
+      "CentOS" ) install_docker_compose_centos ;;
+    esac
   fi
-
-  curl -sOL https://github.com/docker/compose/releases/download/1.29.2/docker-compose-Linux-x86_64
-  ${SUDO} mv docker-compose-Linux-x86_64 "${DOCKER_COMPOSE_CMD}"
-  ${SUDO} chmod a+x "${DOCKER_COMPOSE_CMD}"
 }
 
 #
@@ -2763,7 +2777,8 @@ setup_draco() {
 
   ${DOCKER} run -d --rm --tty --name "${draco_container}" --entrypoint=/usr/bin/tail "${IMAGE_DRACO}" -f /opt/nifi/nifi-current/conf/bootstrap.conf
   sleep 3
-  docker cp "${draco_container}":/opt/nifi/scripts/secure.sh "${CONFIG_DIR}"/draco/secure.sh
+  ${DOCKER} cp "${draco_container}":/opt/nifi/scripts/secure.sh "${WORK_DIR}"/secure.sh
+  cp "${WORK_DIR}"/secure.sh "${CONFIG_DIR}"/draco/secure.sh
   sed -e 1d "${SETUP_DIR}"/draco/nifi-patch.sh >> "${CONFIG_DIR}"/draco/secure.sh
 
   local file
@@ -3259,8 +3274,6 @@ setup_ngsi_go() {
     NGSI_GO="${NGSI_GO} --insecureSkipVerify"
   fi
 
-  SERVERS=("$(${NGSI_GO} server list --all -1)")
-
   local save_orion
   save_orion=${ORION}
   local save_keyrock
@@ -3292,6 +3305,48 @@ setup_ngsi_go() {
   KEYROCK=${save_keyrock}
 
   ${NGSI_GO} settings clear
+}
+
+create_script_to_setup_ngsi_go() {
+  logging_info "${FUNCNAME[0]}"
+
+  local save_orion
+  save_orion=${ORION}
+  local save_keyrock
+  save_keyrock=${KEYROCK}
+
+  SCRIPT_FILE="setup_ngsi_go.sh"
+  if [ -e "${SCRIPT_FILE}" ]; then
+    rm -f "${SCRIPT_FILE}" 
+  fi
+  echo -e "#!/bin/bash\n\n# This file was created by FIWARE Big Bang.\n# See https://github.com/lets-fiware/ngsi-go for how to install NGSI Go.\n" > "${SCRIPT_FILE}"
+  echo -e "read -p \"Enter admin email: \" IDM_ADMIN_EMAIL\nread -p \"Enter admin password: \" IDM_ADMIN_PASS\n" >> "${SCRIPT_FILE}"
+  chmod 0755 "${SCRIPT_FILE}"
+
+  for NAME in "${APPS[@]}"
+  do
+    if [ "${NAME}" = "ORION" ] && [ -n "${MULTI_SERVER_ORION_HOST}" ]; then
+      ORION=${MULTI_SERVER_ORION_HOST}
+    fi
+    eval VAL=\"\$"$NAME"\"
+    if [ -n "$VAL" ]; then
+      case "${NAME}" in
+          "KEYROCK" ) echo "ngsi server add --host ${VAL} --serverType keyrock --serverHost https://${VAL} --username \"\${IDM_ADMIN_EMAIL}\" --password \"\${IDM_ADMIN_PASS}\" --overWrite" >> "${SCRIPT_FILE}" ;;
+          "ORION" )  echo "ngsi broker add --host ${VAL} --ngsiType v2 --brokerHost https://${VAL} --idmType tokenproxy --idmHost ttps://${KEYROCK}/token --username \"\${IDM_ADMIN_EMAIL}\" --password \"\${IDM_ADMIN_PASS}\" --overWrite" >> "${SCRIPT_FILE}" ;;
+          "ORION_LD" ) echo "ngsi broker add --host ${VAL} --ngsiType ld --brokerHost https://${VAL} --idmType tokenproxy --idmHost ttps://${KEYROCK}/token--username \"\${IDM_ADMIN_EMAIL}\" --password \"\${IDM_ADMIN_PASS}\" --overWrite" >> "${SCRIPT_FILE}" ;;
+          "CYGNUS" ) echo "ngsi server add --host ${VAL} --serverType cygnus --serverHost https://${VAL} --idmType tokenproxy --idmHost ttps://${KEYROCK}/token --username \"\${IDM_ADMIN_EMAIL}\" --password \"\${IDM_ADMIN_PASS}\" --overWrite" >> "${SCRIPT_FILE}" ;;
+          "COMET" ) echo "ngsi server add --host ${VAL} --serverType comet --serverHost https://${VAL} --idmType tokenproxy --idmHost ttps://${KEYROCK}/token --username \"\${IDM_ADMIN_EMAIL}\" --password \"\${IDM_ADMIN_PASS}\" --overWrite" >> "${SCRIPT_FILE}" ;;
+          "IOTAGENT_UL" ) echo "ngsi server add --host ${VAL} --serverType iota --serverHost https://${VAL} --idmType tokenproxy --idmHost ttps://${KEYROCK}/token --username \"\${IDM_ADMIN_EMAIL}\" --password \"\${IDM_ADMIN_PASS}\" --service openiot --path / --overWrite" >> "${SCRIPT_FILE}" ;;
+          "IOTAGENT_JSON" ) echo "ngsi server add --host ${VAL} --serverType iota --serverHost https://${VAL} --idmType tokenproxy --idmHost ttps://${KEYROCK}/token --username \"\${IDM_ADMIN_EMAIL}\" --password \"\${IDM_ADMIN_PASS}\" --service openiot --path / --overWrite" >> "${SCRIPT_FILE}" ;;
+          "WIRECLOUD" ) echo "ngsi server add --host ${VAL} --serverType wirecloud --serverHost https://${VAL} --idmType keyrock --idmHost ttps://${KEYROCK}/oauth2/token --username \"\${IDM_ADMIN_EMAIL}\" --password \"\${IDM_ADMIN_PASS}\" --clientId \"${WIRECLOUD_CLIENT_ID}\" --clientSecret \"${WIRECLOUD_CLIENT_SECRET}\" --overWrite" >> "${SCRIPT_FILE}" ;;
+          "QUANTUMLEAP" ) echo "ngsi server add --host ${VAL} --serverType quantumleap --serverHost https://${VAL} --idmType tokenproxy --idmHost ttps://${KEYROCK}/token --username \"\${IDM_ADMIN_EMAIL}\" --password \"\${IDM_ADMIN_PASS}\" --overWrite" >> "${SCRIPT_FILE}" ;;
+          "PERSEO" ) echo "ngsi server add --host ${VAL} --serverType perseo --serverHost https://${VAL} --idmType tokenproxy --idmHost https://${KEYROCK}/token --username \"\${IDM_ADMIN_EMAIL}\" --password \"\${IDM_ADMIN_PASS}\" --overWrite" >> "${SCRIPT_FILE}" ;;
+      esac
+    fi
+  done
+
+  ORION=${save_orion}
+  KEYROCK=${save_keyrock}
 }
 
 #
@@ -3335,7 +3390,7 @@ copy_scripts() {
 boot_up_containers() {
   logging_info "${FUNCNAME[0]}"
 
-  logging_info "docker-compose up -d --build"
+  logging_info "docker compose up -d --build"
   ${DOCKER_COMPOSE} up -d --build
 
   if [ -n "${DRACO}" ]; then
@@ -3441,6 +3496,7 @@ setup_main() {
 
   update_nginx_file
   setup_ngsi_go
+  create_script_to_setup_ngsi_go
 
   setup_logging_step2
 
@@ -3474,9 +3530,9 @@ init_cmd() {
   YUM_CONFIG_MANAGER="${SUDO} ${MOCK_PATH}yum-config-manager"
   FIREWALL_CMD="${SUDO} ${MOCK_PATH}firewall-cmd"
   UNAME="${FIBB_TEST_UNAME_CMD:-uname}"
+  GREP_CMD="${FIBB_TEST_GREP_CMD:-grep}"
   DOCKER_CMD="${FIBB_TEST_DOCKER_CMD:-docker}"
-  DOCKER_COMPOSE_CMD="/usr/local/bin/docker-compose"
-  DOCKER_COMPOSE="${SUDO} ${DOCKER_COMPOSE_CMD}"
+  DOCKER_COMPOSE="${SUDO} /usr/bin/docker compose"
   HOST_CMD="${FIBB_TEST_HOST_CMD:-host}"
   WAIT_TIME=${FIBB_WAIT_TIME:-300}
   SKIP_INSTALL_WIDGET="${FIBB_TEST_SKIP_INSTALL_WIDGET:-false}"
@@ -3508,10 +3564,6 @@ remove_files() {
       fi
     done
 
-    if [ -d "${DATA_DIR}" ]; then
-      "${SUDO}" rm -fr "${DATA_DIR}"
-    fi
-
     "${SUDO}" rm -fr "${CONFIG_DIR}"
     rm -fr "${WORK_DIR}"
     rm -f "${ENV_FILE}"
@@ -3533,6 +3585,8 @@ main() {
 
   init_cmd
 
+  check_data_direcotry
+
   remove_files
 
   check_machine
@@ -3540,8 +3594,6 @@ main() {
   get_distro
 
   setup_init
-
-  check_data_direcotry
 
   make_directories
 

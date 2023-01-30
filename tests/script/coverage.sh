@@ -94,7 +94,7 @@ up_keyrock_for_multi_server() {
 
   FIBB_KEYROCK_URL=http://localhost:3000/
 
-  sudo /usr/local/bin/docker-compose -f keyrock-compose.yml up -d
+  sudo /usr/bin/docker compose -f keyrock-compose.yml up -d
 
   wait "${FIBB_KEYROCK_URL}" "200"
 
@@ -121,7 +121,7 @@ up_keyrock_for_multi_server() {
 down_keyrock_for_multi_server() {
   cd ./tests/keyrock
 
-  sudo /usr/local/bin/docker-compose -f keyrock-compose.yml down
+  sudo /usr/bin/docker compose -f keyrock-compose.yml down
 
   rm -f ngsi-go-config.json ngsi-go-token-cache.json
 
@@ -155,7 +155,6 @@ setup() {
     sed -i -e "/ngsi_bash_autocomplete/d" ~/.bashrc
   fi
 
-  sudo rm -f /usr/local/bin/docker-compose
   sudo rm -f /etc/redhat-release
 
   local ngsi_go_version
@@ -211,6 +210,10 @@ EOF
 
   echo "cat - > /dev/null" >> "${MOCK_DIR}/apt-key"
 
+  echo -e "#!/bin/sh\necho 0" >> "${MOCK_DIR}/grep_mock"
+  chmod +x "${MOCK_DIR}/grep_mock"
+  export FIBB_TEST_GREP_CMD="grep_mock"
+
   reset_env
 }
 
@@ -226,7 +229,8 @@ fibb_down() {
 
   sleep 5
 
-  make clean
+  # make clean
+  FORCE_CLEAN=true ./setup/clean.sh
 }
 
 install_test1() {
@@ -263,6 +267,8 @@ install_test1() {
   sed -i -e "s/^\(REGPROXY_IDMHOST=\).*/\1\/token/" config.sh
   sed -i -e "s/^\(REGPROXY_USERNAME=\).*/\1fiware/" config.sh
   sed -i -e "s/^\(REGPROXY_PASSWORD=\).*/\1abcd/" config.sh
+
+  touch setup_ngsi_go.sh
 
   ${KCOV} ./coverage ./lets-fiware.sh example.com
 }
@@ -342,7 +348,7 @@ install_test5() {
   export FIBB_WAIT_TIME=1
   ${KCOV} ./coverage ./lets-fiware.sh example.com
 
-  sudo docker-compose -f docker-idm.yml down
+  sudo /usr/bin/docker compose -f docker-idm.yml down
 
   while [ "1" != "$(sudo docker ps | wc -l)" ]
   do
@@ -469,7 +475,6 @@ error_test() {
 
   touch .install
   touch docker-compose.yml
-  mkdir data
 
   echo "*** aarch64 not supported ***" 1>&2
   echo -e "#!/bin/sh\necho \"aarch64\"" >> "${MOCK_DIR}/uname"

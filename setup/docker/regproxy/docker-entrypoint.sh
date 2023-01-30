@@ -69,9 +69,9 @@ ${NGSI_GO} broker add \
   --idmHost "${IDMHOST}" \
   --username "${USERNAME}" \
   --password "${PASSWORD}" \
-  ${CLIENT_ID} \
-  ${CLIENT_SECRET}
+  "${CLIENT_ID}" \
+  "${CLIENT_SECRET}"
 
 ${NGSI_GO} broker get --host "${ORION}"
 
-${NGSI_GO} regproxy server --host "${ORION}" ${VERBOSE}
+${NGSI_GO} regproxy server --host "${ORION}" "${VERBOSE}"

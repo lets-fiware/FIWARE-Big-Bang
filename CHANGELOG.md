@@ -1,3 +1,20 @@
+## FIWARE Big Bang v0.21.0 - 31 January, 2023
+
+-   ADD feature_request.md (#244)
+-   ADD test cases (#243)
+-   Fix fail while setting up Draco (#242)
+-   Update Postgres to 15 (#241)
+-   Fix fail while setting up Docker Compose V2 (#240)
+-   Check data persistence directory (#239)
+-   Add Docker Compose V2 (#238)
+-   Add documentation about adding user (#237)
+-   Maintain documentation (#236)
+-   Fixes JSON measures in docs/installation/iotagent-json.md (#233)
+-   Fix invalid URL escape in get_token.sh (#232)
+-   Add feature to create ngsi go environment (#229)
+-   Add init flag to IoT Agent and Comet (#228)
+-   Add init flag to Keyrock and Wilma (#227)
+
 ## FIWARE Big Bang v0.20.0 - 14 January, 2023
 
 -   Update Orion to 3.8.0 (#224)

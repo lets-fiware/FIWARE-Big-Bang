@@ -58,16 +58,15 @@ make ps
 #### Response:
 
 ```text
-sudo /usr/local/bin/docker-compose ps
-            Name                          Command                   State                                        Ports
--------------------------------------------------------------------------------------------------------------------------------------------------------
-fiware-big-bang_keyrock_1      docker-entrypoint.sh npm start   Up (healthy)     3000/tcp
-fiware-big-bang_mongo_1        docker-entrypoint.sh --noj ...   Up               27017/tcp
-fiware-big-bang_mysql_1        docker-entrypoint.sh mysqld      Up               3306/tcp, 33060/tcp
-fiware-big-bang_nginx_1        /docker-entrypoint.sh ngin ...   Up               0.0.0.0:443->443/tcp,:::443->443/tcp, 0.0.0.0:80->80/tcp,:::80->80/tcp
-fiware-big-bang_orion_1        sh -c rm /tmp/contextBroke ...   Up               1026/tcp
-fiware-big-bang_tokenproxy_1   docker-entrypoint.sh             Up               1029/tcp
-fiware-big-bang_wilma_1        docker-entrypoint.sh npm start   Up (unhealthy)   1027/tcp
+sudo docker compose ps
+NAME                           COMMAND                  SERVICE             STATUS                PORTS
+fiware-big-bang_keyrock_1      "docker-entrypoint.s…"   keyrock             running (healthy)     3000/tcp
+fiware-big-bang_mongo_1        "docker-entrypoint.s…"   mongo               running               27017/tcp
+fiware-big-bang_mysql_1        "docker-entrypoint.s…"   mysql               running               33060/tcp
+fiware-big-bang_nginx_1        "/docker-entrypoint.…"   nginx               running               0.0.0.0:80->80/tcp, 0.0.0.0:443->443/tcp, :::80->80/tcp, :::443->443/tcp
+fiware-big-bang_orion_1        "sh -c 'rm /tmp/cont…"   orion               running               1026/tcp
+fiware-big-bang_tokenproxy_1   "docker-entrypoint.sh"   tokenproxy          running               1029/tcp
+fiware-big-bang_wilma_1        "docker-entrypoint.s…"   wilma               running (unhealthy)   1027/tcp
 ```
 
 ### Get an access token

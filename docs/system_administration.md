@@ -16,19 +16,20 @@
 
 The following files and directories will be created.
 
-| File or directory             | Description                                                                             |
-| ----------------------------- | --------------------------------------------------------------------------------------- |
-| .                             | A root directory of FI-BB. It's a directory in which you ran lets-fiware.sh command.    |
-| ./docker-compose.yml          | A config file for docker-compose which has the configuration information of FIWARE GEs. |
-| ./.env                        | A file which has environment variables for docker-compose.yml file.                     |
-| ./Makefile                    | A file for make command.                                                                |
-| ./config                      | A directory which has configuration files for running Docker containers.                |
-| ./data                        | A directory which has persistent data for running Docker containers.                    |
-| /etc/letsencrypt              | A directory which has server certificate files.                                         |
-| /var/log/fiware               | A directory which has log files.                                                        |
-| /etc/rsyslog.d/10-fiware.conf | A config file for rsyslog. In the case of CentOS, the filename is 'fiware.conf'.        |
-| /etc/logrotate.d/fiware       | A config file for logroate.                                                             |
-| /etc/cron.d/fiware-big-bang   | A config file for cron                                                                  |
+| File or directory              | Description                                                                                                                                                                                                  |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| .                              | A root directory of FI-BB. It's a directory in which you ran lets-fiware.sh command.                                                                                                                         |
+| ./docker-compose.yml           | A config file for docker compose which has the configuration information of FIWARE GEs.                                                                                                                      |
+| ./.env                         | A file which has environment variables for docker-compose.yml file.                                                                                                                                          |
+| ./Makefile                     | A file for make command.                                                                                                                                                                                     |
+| ./config                       | A directory which has configuration files for running Docker containers.                                                                                                                                     |
+| ./config/keyrock/whitelist.txt | A whitelist of email domains for Keyrock. See [Keyrock documentation](https://fiware-idm.readthedocs.io/en/latest/installation_and_administration_guide/configuration/index.html#email-filtering) in detail. |
+| ./data                         | A directory which has persistent data for running Docker containers.                                                                                                                                         |
+| /etc/letsencrypt               | A directory which has server certificate files.                                                                                                                                                              |
+| /var/log/fiware                | A directory which has log files.                                                                                                                                                                             |
+| /etc/rsyslog.d/10-fiware.conf  | A config file for rsyslog. In the case of CentOS, the filename is 'fiware.conf'.                                                                                                                             |
+| /etc/logrotate.d/fiware        | A config file for logroate.                                                                                                                                                                                  |
+| /etc/cron.d/fiware-big-bang    | A config file for cron                                                                                                                                                                                       |
 
 ## Make command for system administration
 
@@ -50,7 +51,7 @@ the lets-fiware.sh script.
 | build        | Build docker containers for FIWARE instance                  |
 | up           | Create and start docker containers for FIWARE instance       |
 | down         | Stop and remove docker containers for FIWARE instance        |
-| clean        | !CAUTION! Clean up FIWARE instance                           |
+| clean        | !CAUTION! Clean up FIWARE instance including your all data   |
 | nginx-test   | Test configuration for nginx                                 |
 | nginx-reload | Reload configuration for nginx                               |
 | cert-renew   | Renew all server certificates                                |
@@ -67,3 +68,10 @@ And also the log files are rotated on a regular basis. Look at the `/etc/logrota
 When installing, server certificates automatically are created or reused if already exists.
 They are renewed by a cron job. Look at the `/etc/cron.d/fiware-big-bang` file. And also you can
 renew or revoke server certificates manually with make command.
+
+## How to create environment for NGSI Go on another machine
+
+### Setup NGSI Go
+
+To setup NGSI Go on another machine, see here [https://github.com/lets-fiware/ngsi-go](https://github.com/lets-fiware/ngsi-go).
+And copy and run the `setup_ngsi_go.sh` script on the machine. It asks you an admin email and a password.

@@ -50,7 +50,7 @@ fi
 
 . ./.env
 
-/usr/local/bin/docker-compose down
+/usr/bin/docker compose down
 
 for NAME in KEYROCK ORION COMET WIRECLOUD NGSIPROXY NODE_RED GRAFANA QUANTUMLEAP
 do

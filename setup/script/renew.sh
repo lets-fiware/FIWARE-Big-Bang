@@ -65,5 +65,5 @@ logging "user.info" "${result}"
 
 if echo "${result}" | grep -q "FI-BB"; then
   logging "user.info" "nginx reload"
-  /usr/local/bin/docker-compose exec nginx nginx -s reload
+  /usr/bin/docker compose exec nginx nginx -s reload
 fi

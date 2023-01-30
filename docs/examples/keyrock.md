@@ -48,6 +48,12 @@ Open at `https://keyrock.example.com` to access the Keyrock GUI.
 
 ## Create user
 
+To run the following examples, replace `example.com` with your domain or sub-domain. If you want to add a user
+with an email address with another domain, before doint that, add the domain to `config/keyrock/whitelist.txt`
+and restart your Keyrock instance. The FIWARE Big bang sets up a Keyrock instance with `whitelist` as the email
+list type. Please see [Keyrock documentation](https://fiware-idm.readthedocs.io/en/latest/installation_and_administration_guide/configuration/index.html#email-filtering)
+in detail.
+
 ### Create a user
 
 Request:

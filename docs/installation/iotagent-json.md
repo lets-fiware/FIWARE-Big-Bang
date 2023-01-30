@@ -20,7 +20,7 @@ You can specify configurations for IoT Agent for JSON by editing the `config.sh`
 | Variable name                 | Description                                                                                                   | Default value |
 | ----------------------------- | ------------------------------------------------------------------------------------------------------------- | ------------- |
 | IOTAGENT\_JSON                | A sub-domain name of IoT Agent for JSON                                                                       | (empty)       |
-| IOTA\_JSON\_DEFAULT\_RESOURCE | The default path the IoT Agent uses listening for UltraLight measures.                                        | /iot/ul       |
+| IOTA\_JSON\_DEFAULT\_RESOURCE | The default path the IoT Agent uses listening for measures.                                                   | /iot/json     |
 | IOTA\_JSON\_TIMESTAMP         | Whether to supply timestamp information with each measurement received from attached devices. (true or false) | true          |
 | IOTA\_JSON\_AUTOCAST          | Ensure JSON number values are read as numbers not strings. (true or false)                                    | true          |
 

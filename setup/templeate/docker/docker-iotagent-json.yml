@@ -2,6 +2,7 @@ version: "3"
 services:
   iotagent-json:
     image: ${IMAGE_IOTAGENT_JSON}
+    init: true
     depends_on:
       - mongo
       # __IOTA_JSON_DEPENDS_ON__
