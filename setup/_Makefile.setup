@@ -1,0 +1,16 @@
+down:
+	sudo ./setup/down.sh
+ps:
+	sudo ./setup/ps.sh
+clean:
+	sudo ./setup/clean.sh
+log-dir:
+	ls -l /var/log/fiware
+cert-revoke:
+	sudo ./config/script/revoke.sh
+cert-list:
+	sudo ls -l /etc/letsencrypt/live/
+log:
+	cat /var/log/fiware/fi-bb.log
+collect:
+	./config/script/collect.sh

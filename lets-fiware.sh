@@ -411,7 +411,6 @@ set_and_check_values() {
 
   IDM_ADMIN_UID="admin"
 
-  SETUP_DIR=./setup
   TEMPLEATE=${SETUP_DIR}/templeate
 
   set_default_values
@@ -3552,6 +3551,8 @@ init_cmd() {
 # Remove unnecessary directories and files
 #
 remove_files() {
+  logging_info "${FUNCNAME[0]}"
+
   if [ -e "${INSTALL}" ]; then
     for file in docker-compose.yml docker-cert.yml docker-idm.yml
     do
@@ -3574,6 +3575,16 @@ remove_files() {
 }
 
 #
+# Copy Makefile
+#
+copy_makefile() {
+  logging_info "${FUNCNAME[0]}"
+
+  SETUP_DIR=./setup
+  cp "${SETUP_DIR}/_Makefile.setup" ./Makefile
+}
+
+#
 # main
 #
 main() {
@@ -3582,6 +3593,8 @@ main() {
   SELF_DIR=$(cd "$(dirname "$0")"; pwd)
 
   parse_args "$@"
+
+  copy_makefile
 
   init_cmd
 
