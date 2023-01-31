@@ -28,6 +28,14 @@
 
 set -ue
 
+echo "!CAUTION! This command revokes server certificates for your FIWARE instance"
+read -p "Are you sure you want to run it? (Y/n): " ans
+
+if [ "${ans}" != "Y" ]; then
+  echo "Canceled"
+  exit 1
+fi
+
 if [ ${EUID:-${UID}} != 0 ]; then
     echo "This script must be run as root"
     exit 1
@@ -52,7 +60,7 @@ fi
 
 /usr/bin/docker compose down
 
-for NAME in KEYROCK ORION COMET WIRECLOUD NGSIPROXY NODE_RED GRAFANA QUANTUMLEAP
+for NAME in KEYROCK ORION ORION_LD CYGNUS COMET WIRECLOUD NGSIPROXY NODE_RED GRAFANA QUANTUMLEAP PERSEO IOTAGENT_UL IOTAGENT_JSON IOTAGENT_HTTP MOSQUITTO ELASTICSEARCH DRACO ZEPPELIN
 do
   eval VAL=\"\$$NAME\"
   if [ -n "$VAL" ] && [ -d "${CERT_DIR}/live/${VAL}" ]; then
