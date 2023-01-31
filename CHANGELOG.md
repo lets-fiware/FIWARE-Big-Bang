@@ -1,5 +1,7 @@
 ## FIWARE Big Bang v0.21.0-next
 
+-   ADD Makefile for setting up (#249)
+
 ## FIWARE Big Bang v0.21.0 - 31 January, 2023
 
 -   ADD feature_request.md (#244)

@@ -33,3 +33,5 @@ rm -fr ./.work
 rm -f ./.env
 rm -f ./node-red_users.txt
 rm -f .install
+
+cp ./setup/_Makefile.setup Makefile
