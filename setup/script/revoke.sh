@@ -28,6 +28,14 @@
 
 set -ue
 
+echo "!CAUTION! This command revokes server certificates for your FIWARE instance"
+read -p "Are you sure you want to run it? (Y/n): " ans
+
+if [ "${ans}" != "Y" ]; then
+  echo "Canceled"
+  exit 1
+fi
+
 if [ ${EUID:-${UID}} != 0 ]; then
     echo "This script must be run as root"
     exit 1
