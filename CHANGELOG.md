@@ -1,9 +1,9 @@
-## FIWARE Big Bang v0.21.0-next
+## FIWARE Big Bang v0.22.0 - 31 January, 2023
 
 -   UPDATE revoke.sh (#250)
 -   ADD Makefile for setting up (#249)
 
-## FIWARE Big Bang v0.21.0 - 31 January, 2023
+## FIWARE Big Bang v0.21.0 - 30 January, 2023
 
 -   ADD feature_request.md (#244)
 -   ADD test cases (#243)
