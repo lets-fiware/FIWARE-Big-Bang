@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.22.0-next
 
+-   ADD Japanese translation (#254)
 -   FIX typos in documentation (#253)
 
 ## FIWARE Big Bang v0.22.0 - 31 January, 2023
