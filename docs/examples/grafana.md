@@ -5,7 +5,7 @@
 <details>
 <summary><strong>Details</strong></summary>
 
--   [Sanity check for Grafana](#~anity-check-for-grafana)
+-   [Sanity check for Grafana](#sanity-check-for-grafana)
 
 </details>
 

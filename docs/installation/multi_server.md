@@ -5,6 +5,7 @@
 <details>
 <summary><strong>Details</strong></summary>
 
+-   [What is multi-server installation](#what-is-multi-server-installation)
 -   [Configuration parameters](#configuration-parameters)
 -   [How to setup](#how-to-setup)
 -   [Example](#example)
@@ -203,7 +204,7 @@ IoT Agent for JSON is installed in an additional VM.
 
 #### Configuration for a main VM
 
-Expose the port 1026 of Orion with `ORION_EXPOSE_PORT=all`so that IoT Agent can access Orion.
+Expose the port 1026 of Orion with `ORION_EXPOSE_PORT=all` so that IoT Agent can access Orion.
 
 ```bash
 KEYROCK=keyrock

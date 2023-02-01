@@ -172,7 +172,7 @@ Set up an broker endpoint and security configuration.
 
 ![](https://raw.githubusercontent.com/lets-fiware/FIWARE-Big-Bang/gh-pages/images/node-red/node-red-003.png)
 
-## Inject payload
+### Inject payload
 
 ![](https://raw.githubusercontent.com/lets-fiware/FIWARE-Big-Bang/gh-pages/images/node-red/node-red-004.png)
 

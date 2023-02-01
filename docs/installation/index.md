@@ -154,7 +154,7 @@ Please see [this documentation](expose-ports.md) for details.
 
 Configuration examples are as shown:
 
-### Examples 1
+### Example 1
 
 Configure Orion Context broker.
 
@@ -163,7 +163,7 @@ KEYROCK=keyrock
 ORION=orion
 ```
 
-### Examples 2
+### Example 2
 
 To store persistent context data to PostgreSQL, configure Cygnus and PostgreSQL.
 
@@ -174,7 +174,7 @@ CYGNUS=cygnus
 CYGNUS_POSTGRES=true
 ```
 
-### Examples 3
+### Example 3
 
 To persists Time Series Context Data, configure Comet and Cygnus.
 
@@ -185,7 +185,7 @@ COMET=comet
 CYGNUS=cygnus
 ```
 
-### Examples 4
+### Example 4
 
 Configure IoT Agent for UltraLight 2.0 over HTTP with basic authentication.
 
@@ -196,7 +196,8 @@ IOTAGENT_UL=iotagent-ul
 IOTAGENT_HTTP=iotagent-http
 IOTA_HTTP_AUTH=basic
 ```
-### Examples 5
+
+### Example 5
 
 Configure IoT Agent for UltraLight 2.0 over MQTT TLS.
 
@@ -208,7 +209,7 @@ MOSQUITTO=mosquitto
 MQTT_TLS=true
 ```
 
-### Examples 6
+### Example 6
 
 Configure WireCloud.
 
@@ -219,9 +220,9 @@ WIRECLOUD=wirecloud
 NGSIPROXY=ngsiproxy
 ```
 
-### Examples 7
+### Example 7
 
-Configure Node-RED..
+Configure Node-RED.
 
 ```bash
 KEYROCK=keyrock

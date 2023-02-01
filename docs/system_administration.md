@@ -9,6 +9,8 @@
 -   [Make command for system administration](#make-command-for-system-administration)
 -   [Log files](#log-files)
 -   [Server certificates](#server-certificates)
+-   [How to create environment for NGSI Go on another machine](#how-to-create-environment-for-ngsi-go-on-another-machine)
+    -   [Setup NGSI Go](#setup-ngsi-go)
 
 </details>
 

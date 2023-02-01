@@ -6,6 +6,7 @@
 <summary><strong>Details</strong></summary>
 
 -   [Sanity check for Orion-LD](#sanity-check-for-orion-ld)
+-   [Sanity check for Mitaka](#sanity-check-for-mitaka)
 -   [Examples](#examples)
 -   [Related information](#related-information)
 

@@ -27,8 +27,7 @@ You can specify configurations by editing the `config.sh` file.
 ## How to setup
 
 To set up Perseo, configure some environment variables in config.sh.
-
-First, set a sub-domain name for Perseo to `CYGNUS=` as shown:
+First, set a sub-domain name for Perseo to `PERSEO=` as shown:
 
 ```bash
 PERSEO=perseo

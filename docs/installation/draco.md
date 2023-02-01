@@ -18,10 +18,10 @@ You can specify configurations by editing the `config.sh` file.
 | Variable name              | Description                                    | Default value |
 | -------------------------- | ---------------------------------------------- | ------------- |
 | DRACO                      | A sub-domain name of Draco                     | (empty)       |
-| DRACO\_MONGO               | Use MongoDB sink for Draco. true or false      | false         |
-| DRACO\_MYSQL               | Use MySQL sink for Draco. true or false        | false         |
-| DRACO\_POSTGRES            | Use PostgreSQL sink for Draco. true or false   | false         |
-| DRACO\_EXPOSE\_PORT        | Expose port for Draco. (none, local, all) 5050 | none          |
+| DRACO\_MONGO               | Use MongoDB sink for Draco. (true or false)    | false         |
+| DRACO\_MYSQL               | Use MySQL sink for Draco. (true or false)      | false         |
+| DRACO\_POSTGRES            | Use PostgreSQL sink for Draco. (true or false) | false         |
+| DRACO\_EXPOSE\_PORT        | Expose port 5050 for Draco. (none, local, all) | none          |
 | DRACO\_DISABLE\_NIFI\_DOCS | Enable NiFi Documentation path (/nifi-docs)    | true          |
 
 ## How to setup

@@ -1,5 +1,7 @@
 ## FIWARE Big Bang v0.22.0-next
 
+-   FIX typos in documentation (#253)
+
 ## FIWARE Big Bang v0.22.0 - 31 January, 2023
 
 -   UPDATE revoke.sh (#250)

@@ -7,7 +7,7 @@
 
 -   [Minimal mode (STH-Comet ONLY)](#minimal-mode-sth-comet-only)
     -   [Sanity check for Comet](#sanity-check-for-comet)
-    -   [Subscribing to Context Changes](subscribing-to-context-changes)
+    -   [Subscribing to Context Changes](#subscribing-to-context-changes)
     -   [Create context data](#create-context-data)
     -   [List subscriptions](#list-subscriptions)
     -   [Raw data consumption](#raw-data-consumption)

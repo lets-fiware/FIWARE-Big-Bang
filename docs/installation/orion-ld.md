@@ -15,19 +15,19 @@
 
 You can specify configurations by editing the `config.sh` file.
 
-| Variable name           | Description                            | Default value             |
-| ----------------------- | -------------------------------------- | ------------------------- |
-| ORION\_LD               | A sub-domain name of Orion.            | orion                     | 
-| ORION\_LD\_EXPOSE\_PORT | Expose port 1026. (none, local or all) | none                      |
-| MINTAKA                 | Enable mintaka (false, true)           | true                      |
-| MINTAKA\_EXPOSE\_PORT   | Expose port 8080. (none, local or all) | none                      |
-| TIMESCALE\_PASS         | Set a password for Timescale DB.       | (automatically generated) |
-| TIMESCALE\_EXPOSE\_PORT | Expose port 5432. (none, local or all) | none                      |
+| Variable name           | Description                                          | Default value             |
+| ----------------------- | ---------------------------------------------------- | ------------------------- |
+| ORION\_LD               | A sub-domain name of Orion-LD.                       | orion                     |
+| ORION\_LD\_EXPOSE\_PORT | Expose port 1026 for Orion-LD. (none, local or all)  | none                      |
+| MINTAKA                 | Enable Mintaka (false, true)                         | true                      |
+| MINTAKA\_EXPOSE\_PORT   | Expose port 8080 for Mintaka. (none, local or all)   | none                      |
+| TIMESCALE\_PASS         | Set a password for Timescale DB.                     | (automatically generated) |
+| TIMESCALE\_EXPOSE\_PORT | Expose port 5432 for Timescale. (none, local or all) | none                      |
 
 ## How to setup
 
 To set up Orion-LD and Mintaka, configure an environment variable in config.sh.
-Set a sub-domain name for Orion-LD to `ORION_LD` as shown:
+Set a sub-domain name for Orion-LD to `ORION_LD=` as shown:
 
 ```bash
 ORION_LD=orion-ld

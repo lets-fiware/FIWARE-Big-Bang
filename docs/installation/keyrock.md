@@ -28,7 +28,7 @@ You can specify configurations by editing the `config.sh` file.
 ## How to setup
 
 To set up Keyrock, configure an environment variable in config.sh.
-Set a sub-domain name for Keyrock to `KEYROCK` as shown:
+Set a sub-domain name for Keyrock to `KEYROCK=` as shown:
 
 ```bash
 KEYROCK=keyrock

@@ -23,7 +23,7 @@ You can specify configurations by editing the `config.sh` file.
 ## How to setup
 
 To set up Orion, configure an environment variable in config.sh.
-Set a sub-domain name for Orion to `ORION` as shown:
+Set a sub-domain name for Orion to `ORION=` as shown:
 
 ```bash
 ORION=orion

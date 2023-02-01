@@ -24,7 +24,7 @@ You can specify configurations by editing the `config.sh` file.
 | NODE\_RED\_INSTANCE\_USERNAME          | Username for Node-RED instance.                                       | node-red                           |
 | NODE\_RED\_INSTANCE\_HTTP\_ROOT        | HTTP root for Node-RED instance. Must be a path starting with '/'     | / (single) or /node-red??? (multi) |
 | NODE\_RED\_INSTANCE\_HTTP\_ADMIN\_ROOT | httpAdminRoot for Node-RED instance. Must be a path starting with '/' | / (single) or /node-red??? (multi) |
-| NODE\_RED\_LOGGING\_LEVEL              | Logging level for Node-RED instance.                                  | Logging level for Node-RED         |
+| NODE\_RED\_LOGGING\_LEVEL              | Logging level for Node-RED instance.                                  | info                               |
 | NODE\_RED\_LOGGING\_METRICS            | Logging metrics for Node-RED instance.                                | (empty)                            |
 
 ## How to setup
@@ -32,7 +32,7 @@ You can specify configurations by editing the `config.sh` file.
 ### Single-instance
 
 To set up Node-RED, configure an environment variable in config.sh. Set a sub-domain name
-for Node-RED to `NODE_RED` as shown:
+for Node-RED to `NODE_RED=` as shown:
 
 ```bash
 NODE_RED=node-red
@@ -41,8 +41,8 @@ NODE_RED=node-red
 ### Multi-instance
 
 To set up multiple Node-RED instances, configure an environment variable in config.sh.
-Set a sub-domain name for Node-RED to `NODE_RED` and set number of instances to
-`NODE_RED_INSTANCE_NUMBER` as shown:
+Set a sub-domain name for Node-RED to `NODE_RED=` and set number of instances to
+`NODE_RED_INSTANCE_NUMBER=` as shown:
 
 ```bash
 NODE_RED=node-red
