@@ -25,7 +25,7 @@
 # SOFTWARE.
 
 curdir = $(shell pwd)
-files = '*.md' 'docs/*.md'
+files = '*.md' 'docs/en/*.md'
 container = letsfiware/textlint:1.0
 vol = -v $(curdir):/work
 
