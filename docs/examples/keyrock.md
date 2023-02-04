@@ -56,25 +56,25 @@ in detail.
 
 ### Create a user
 
-Request:
+#### Request:
 
 ```bash
 ngsi users create --host keyrock.example.com --username user001 --email user001@example.com --password 1234
 ```
 
-Response:
+#### Response:
 
 ```text
 36d8086c-4fc4-4954-9ee2-592e7debe5a0
 ```
 
-Request:
+#### Request:
 
 ```bash
 ngsi users get --uid 36d8086c-4fc4-4954-9ee2-592e7debe5a0 --pretty
 ```
 
-Response:
+#### Response:
 
 ```json
 {
@@ -96,7 +96,7 @@ Response:
 
 ### Create users
 
-Request:
+#### Request:
 
 ```bash
 #!/bin/sh
@@ -114,7 +114,7 @@ do
 done
 ```
 
-Response:
+#### Response:
 
 ```text
 user001@example.com Uu2HADXh5ITIlIVt

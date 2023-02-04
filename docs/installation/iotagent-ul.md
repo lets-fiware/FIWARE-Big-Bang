@@ -6,6 +6,8 @@
 <summary><strong>Details</strong></summary>
 
 -   [Configuration parameters](#configuration-parameters)
+    -   [IoT Agent for UL over MQTT](#iot-agent-for-ul-over-mqtt)
+    -   [IoT Agent for UL over HTTP](#iot-agent-for-ul-over-http)
 -   [How to setup](#how-to-setup)
     -   [IoT Agent for UL over MQTT](#iot-agent-for-ul-over-mqtt)
     -   [IoT Agent for UL over HTTP](#iot-agent-for-ul-over-http)
@@ -20,17 +22,17 @@ You can specify configurations for IoT Agent for UL by editing the `config.sh` f
 | Variable name               | Description                                                                                                   | Default value |
 | --------------------------- | ------------------------------------------------------------------------------------------------------------- | ------------- |
 | IOTAGENT\_UL                | A sub-domain name of IoT Agent for UltraLight 2.0                                                             | (empty)       |
-| IOTA\_UL\_DEFAULT\_RESOURCE | The default path the IoT Agent uses listening for UltraLight measures.                                        | /iot/ul       |
+| IOTA\_UL\_DEFAULT\_RESOURCE | The default path the IoT Agent for UltraLight 2.0 uses listening for measures                                 | /iot/ul       |
 | IOTA\_UL\_TIMESTAMP         | Whether to supply timestamp information with each measurement received from attached devices. (true or false) | true          |
 | IOTA\_UL\_AUTOCAST          | Ensure JSON number values are read as numbers not strings. (true or false)                                    | true          |
 
 ### IoT Agent for UL over MQTT
 
-| Variable name | Description                             | Default value |
-| ------------- | --------------------------------------- | ------------- |
-| MOSQUITTO     | A sub-domain name of Mosquitto          | (empty)       |
-| MQTT\_1883    | Use MQTT Port 1883. true or false       | false         |
-| MQTT\_TLS     | Use MQTT TLS (Port 8883). true or false | true          |
+| Variable name | Description                               | Default value |
+| ------------- | ----------------------------------------- | ------------- |
+| MOSQUITTO     | A sub-domain name of Mosquitto            | (empty)       |
+| MQTT\_1883    | Use MQTT Port 1883. (true or false)       | false         |
+| MQTT\_TLS     | Use MQTT TLS (Port 8883). (true or false) | true          |
 
 ### IoT Agent for UL over HTTP
 
@@ -47,14 +49,14 @@ You can specify configurations for IoT Agent for UL by editing the `config.sh` f
 
 To set up IoT Agent for UL over MQTT, configure some environment variables in config.sh.
 
-First, set a sub-domain name for IoT Agent to `IOTAGENT_UL` and `MOSQUITTO` as shown:
+First, set a sub-domain name for IoT Agent to `IOTAGENT_UL=` and `MOSQUITTO=` as shown:
 
 ```bash
 IOTAGENT_UL=iotagent-ul
 MOSQUITTO=mosquitto
 ```
 
-To specify ports to use for the listener of Mosquitto, set `MQTT_1883` and/or `MQTT_TLS` to true.
+To specify ports to use for the listener of Mosquitto, set `MQTT_1883=` and/or `MQTT_TLS=` to true.
 The default listener is 8883 port (TLS).
 
 ```bash
@@ -66,7 +68,7 @@ MQTT_TLS=
 
 To set up IoT Agent for UL over HTTP, configure some environment variables in config.sh.
 
-First, set a sub-domain name for IoT Agent to `IOTAGENT_UL` and `IOTAGENT_HTTP` as shown:
+First, set a sub-domain name for IoT Agent to `IOTAGENT_UL=` and `IOTAGENT_HTTP=` as shown:
 
 ```bash
 IOTAGENT_UL=iotagent-ul

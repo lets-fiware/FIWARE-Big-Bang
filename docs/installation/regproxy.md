@@ -17,7 +17,7 @@ You can specify configurations by editing the `config.sh` file.
 
 | Variable name            | Description                            | Default value |
 | ------------------------ | -------------------------------------- | ------------- |
-| REGPROXY                 | Use regproxy. true or false            | false         |
+| REGPROXY                 | Use regproxy. (true or false)          | false         |
 | REGPROXY\_NGSITYPE       | NgsiType for remote broker. (v2 or ld) | v2            |
 | REGPROXY\_HOST           | Host for remote broker.                | (empty)       |
 | REGPROXY\_IDMTYPE        | IdM type for remote broker.            | (empty)       |

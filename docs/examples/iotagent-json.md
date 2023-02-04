@@ -6,21 +6,21 @@
 <summary><strong>Details</strong></summary>
 
 -   [Sanity check for IoT Agent for JSON](#sanity-check-for-iot-agent-for-json)
--   [IoT Agent for JSON over MQTT](#iot-agent-for-json-over-mqtt-1)
+-   [IoT Agent for JSON over MQTT](#iot-agent-for-json-over-mqtt)
     -   [Create service](#create-service)
     -   [List services](#list-services)
     -   [Create device](#create-device)
     -   [List devices](#list-devices)
     -   [Send data](#send-data)
-    -   [List entities](#list-entities)
+    -   [Get entity](#get-entity)
     -   [Examples](#examples)
--   [IoT Agent for JSON over HTTP](#iot-agent-for-json-over-http-1)
+-   [IoT Agent for JSON over HTTP](#iot-agent-for-json-over-http)
     -   [Create service](#create-service-1)
     -   [List services](#list-services-1)
     -   [Create device](#create-device-1)
     -   [List devices](#list-devices-1)
     -   [Send data](#send-data-1)
-    -   [Get entity](#get-entity)
+    -   [Get entity](#get-entity--11)
     -   [Examples](#examples-1)
 -   [Related information](#related-information)
 
@@ -210,7 +210,7 @@ mosquitto_pub \
   --cafile ./config/mosquitto/isrgrootx1.pem
 ```
 
-### List entities
+### Get entity
 
 #### Request:
 
@@ -313,6 +313,7 @@ ngsi services \
   --resource /iot/json \
   --cbroker http://orion:1026
 ```
+
 ### List services
 
 #### Request:

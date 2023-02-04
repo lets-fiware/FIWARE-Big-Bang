@@ -6,15 +6,15 @@
 <summary><strong>Details</strong></summary>
 
 -   [Sanity check for IoT Agent for UltraLight 2.0](#sanity-check-for-iot-agent-for-ul)
--   [IoT Agent for UL over MQTT](#iot-agent-for-ul-over-mqtt-1)
+-   [IoT Agent for UL over MQTT](#iot-agent-for-ul-over-mqtt)
     -   [Create service](#create-service)
     -   [List services](#list-services)
     -   [Create device](#create-device)
     -   [List devices](#list-devices)
     -   [Send data](#send-data)
-    -   [List entities](#list-entities)
+    -   [Get entity](#get-entity)
     -   [Examples](#examples)
--   [IoT Agent for UL over HTTP](#iot-agent-for-ul-over-http-1)
+-   [IoT Agent for UL over HTTP](#iot-agent-for-ul-over-http)
     -   [Create service](#create-service-1)
     -   [List services](#list-services-1)
     -   [Create device](#create-device-1)
@@ -212,7 +212,7 @@ mosquitto_pub \
   --cafile ./config/mosquitto/isrgrootx1.pem
 ```
 
-### List entities
+### Get entity
 
 #### Request:
 
@@ -315,6 +315,7 @@ ngsi services \
   --resource /iot/ul \
   --cbroker http://orion:1026
 ```
+
 ### List services
 
 #### Request:

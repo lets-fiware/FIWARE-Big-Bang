@@ -6,6 +6,8 @@
 <summary><strong>Details</strong></summary>
 
 -   [Configuration parameters](#configuration-parameters)
+    -   [IoT Agent for JSON over MQTT](#iot-agent-for-json-over-mqtt)
+    -   [IoT Agent for JSON over HTTP](#iot-agent-for-json-over-http)
 -   [How to setup](#how-to-setup)
     -   [IoT Agent for JSON over MQTT](#iot-agent-for-json-over-mqtt)
     -   [IoT Agent for JSON over HTTP](#iot-agent-for-json-over-http)
@@ -20,17 +22,17 @@ You can specify configurations for IoT Agent for JSON by editing the `config.sh`
 | Variable name                 | Description                                                                                                   | Default value |
 | ----------------------------- | ------------------------------------------------------------------------------------------------------------- | ------------- |
 | IOTAGENT\_JSON                | A sub-domain name of IoT Agent for JSON                                                                       | (empty)       |
-| IOTA\_JSON\_DEFAULT\_RESOURCE | The default path the IoT Agent uses listening for measures.                                                   | /iot/json     |
+| IOTA\_JSON\_DEFAULT\_RESOURCE | The default path the IoT Agent for JSON uses listening for measures                                           | /iot/json     |
 | IOTA\_JSON\_TIMESTAMP         | Whether to supply timestamp information with each measurement received from attached devices. (true or false) | true          |
 | IOTA\_JSON\_AUTOCAST          | Ensure JSON number values are read as numbers not strings. (true or false)                                    | true          |
 
 ### IoT Agent for JSON over MQTT
 
-| Variable name                 | Description                             | Default value |
-| ----------------------------- | --------------------------------------- | ------------- |
-| MOSQUITTO                     | A sub-domain name of Mosquitto          | (empty)       |
-| MQTT\_1883                    | Use MQTT Port 1883. true or false       | false         |
-| MQTT\_TLS                     | Use MQTT TLS (Port 8883). true or false | true          |
+| Variable name                 | Description                               | Default value |
+| ----------------------------- | ----------------------------------------- | ------------- |
+| MOSQUITTO                     | A sub-domain name of Mosquitto            | (empty)       |
+| MQTT\_1883                    | Use MQTT Port 1883. (true or false)       | false         |
+| MQTT\_TLS                     | Use MQTT TLS (Port 8883). (true or false) | true          |
 
 ## IoT Agent for JSON over HTTP
 
@@ -47,14 +49,14 @@ You can specify configurations for IoT Agent for JSON by editing the `config.sh`
 
 To set up IoT Agent for JSON over MQTT, configure some environment variables in config.sh.
 
-First, set a sub-domain name for IoT Agent to `IOTAGENT_JSON` and `MOSQUITTO` as shown:
+First, set a sub-domain name for IoT Agent to `IOTAGENT_JSON=` and `MOSQUITTO=` as shown:
 
 ```bash
 IOTAGENT_JSON=iotagent-json
 MOSQUITTO=mosquitto
 ```
 
-To specify ports to use for the listener of Mosquitto, set `MQTT_1883` and/or `MQTT_TLS` to true.
+To specify ports to use for the listener of Mosquitto, set `MQTT_1883=` and/or `MQTT_TLS=` to true.
 The default listener is 8883 port (TLS).
 
 ```bash
@@ -66,7 +68,7 @@ MQTT_TLS=
 
 To set up IoT Agent for JSON over HTTP, configure some environment variables in config.sh.
 
-First, Set a sub-domain name for IoT Agent to `IOTAGENT_JSON` and `IOTAGENT_HTTP` as shown:
+First, Set a sub-domain name for IoT Agent to `IOTAGENT_JSON=` and `IOTAGENT_HTTP=` as shown:
 
 ```bash
 IOTAGENT_JSON=iotagent-json

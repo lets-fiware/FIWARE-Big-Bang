@@ -23,7 +23,7 @@ You can specify configurations by editing the `config.sh` file.
 ## How to setup
 
 To set up WireCloud, configure an environment variable in config.sh.
-Set a sub-domain name for WireCloud and Ngsiproxy to `WIRECLOUD` as `NGSIPROXY` as shown:
+Set a sub-domain name for WireCloud and Ngsiproxy to `WIRECLOUD=` and `NGSIPROXY=` as shown:
 
 ```bash
 WIRECLOUD=wirecloud

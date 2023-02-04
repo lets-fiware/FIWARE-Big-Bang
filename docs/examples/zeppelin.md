@@ -7,6 +7,8 @@
 
 -   [Sanity check for Zeppelin](#sanity-check-for-zeppelin)
 -   [Print historical data on Zeppelin notebook](#print-historical-data-on-zeppelin-notebook)
+-   [Related information](#related-information)
+
 
 </details>
 
@@ -137,3 +139,8 @@ You will see a historical data on the notebook.
 #### Scatter Chart
 
 ![](https://raw.githubusercontent.com/lets-fiware/FIWARE-Big-Bang/gh-pages/images/zeppelin/zeppelin-11.jpg)
+
+## Related information
+
+-   [Apache Zeppelin](https://zeppelin.apache.org/)
+-   [Zeppelin - GitHub](https://github.com/apache/zeppelin)

@@ -25,6 +25,7 @@
     -   [Access Node-RED API](#access-node-red-api)
     -   [Sanity check for Grafana](#sanity-check-for-grafana)
     -   [Snaity check for Zeppelin](#sanity-check-for-zeppelin)
+    -   [Get Zeppelin version](#get-zeppelin-version)
 
 </details>
 
@@ -399,7 +400,7 @@ Open at `https://grafana.example.com` to access the Grafana GUI.
 
 ![](https://raw.githubusercontent.com/lets-fiware/FIWARE-Big-Bang/gh-pages/images/grafana/grafana-sign-in.png)
 
-## Sanity check for Zeppelin
+### Sanity check for Zeppelin
 
 Once Zeppelin is running, you can access the Zeppelin web application.
 Open at `https://zeppelin.example.com` to access the Zeppelin GUI.

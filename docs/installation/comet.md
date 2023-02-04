@@ -29,7 +29,7 @@ You can specify configurations by editing the `config.sh` file.
 ### Minimal mode (STH-Comet ONLY)
 
 The minimal mode persists Time Series Context Data into MongoDB through Comet. To set up Comet with minimal mode
-(STH-Comet ONLY), configure an environment variable in config.sh. Set a sub-domain name for Comet to `COMET` as shown:
+(STH-Comet ONLY), configure an environment variable in config.sh. Set a sub-domain name for Comet to `COMET=` as shown:
 
 ```bash
 COMET=comet
@@ -39,7 +39,7 @@ COMET=comet
 
 The formal mode persists Time Series Context Data into MongoDB through Cygnus. To set up Comet with formal mode
 (Cygnus + STH-Comet), configure an environment variable in config.sh. Set a sub-domain name for Comet and Cygnus
-to `COMET` and `CYGNUS` as shown:
+to `COMET=` and `CYGNUS=` as shown:
 
 ```bash
 COMET=comet
