@@ -15,25 +15,23 @@
 [![Ubuntu 22.04](https://github.com/lets-fiware/FIWARE-Big-Bang/actions/workflows/ubuntu-22.04.yml/badge.svg)](https://github.com/lets-fiware/FIWARE-Big-Bang/actions/workflows/ubuntu-22.04.yml)
 <br/>
 
-The FIWARE Big Bang is a turnkey solution for setting up a FIWARE instance in the cloud.
+FIWARE Big Bang は、クラウドに FIWARE インスタンスをセットアップするためのターンキー・ソリューションです。
 
-| :books: [Documentation](https://fi-bb.letsfiware.jp/) | :dart: [Roadmap](./ROADMAP.md) |
+| :books: [Documentation](https://fi-bb.letsfiware.jp/ja/) | :dart: [Roadmap](./ROADMAP.md) |
 |-------------------------------------------------------|--------------------------------|
 
-このドキュメントは[日本語](./README.ja.md)でもご覧いただけます。
-
-## What is FIWARE Big Bang?
+## FIWARE Big Bang とは
 
 > I am at all events convinced that He does not play dice.
 >
 > — Albert Einstein
 
-The FIWARE Big Bang allows you to install FIWARE Generic enablers easily into your virtual machine in the cloud.
-FI-BB stands for FIWARE Big Bang.
+FIWARE Big Bang を使用すると、FIWARE Generic enablers をクラウド内の仮想マシンに簡単にインストールできます。
+FI-BB は FIWARE Big Bang の略名です。
 
-## Supported FIWARE GEs and third-party open source software
+## サポートしている FIWARE GEs とサードパーティ・オープンソース・ソフトウェア
 
-### Supported FIWARE GEs
+### サポートしている FIWARE GEs
 
 -   Keyrock
 -   Wilma
@@ -47,68 +45,68 @@ FI-BB stands for FIWARE Big Bang.
 -   Draco
 -   WireCloud
 -   Ngsiproxy
--   IoT Agent for UltraLight (over HTTP and MQTT)
--   IoT Agent for JSON (over HTTP and MQTT)
+-   IoT Agent for UltraLight (over HTTP および MQTT)
+-   IoT Agent for JSON (over HTTP および MQTT)
 
-### Supported third-party open source software
+### サポートしているサードパーティ・オープンソース・ソフトウェア
 
 -   Node-RED
 -   Grafana
--   Apache Zeppelin (Experimental support)
+-   Apache Zeppelin (実験的サポート)
 -   Mosquitto
--   Elasticsearch (as a database for persitenting context data)
+-   Elasticsearch (コンテキスト・データを永続化するためのデータベースとして使用)
 
-## Requirements
+## 要件
 
--   A virtual machine with a public IP address (global IP address) or a virtual machine that can be accessed
-    from the Internet via a network equipment
--   An own domain name
--   Ports exposed on the internet
+-   パブリック IP アドレス (グローバル IP アドレス) を持つ仮想マシン、またはネットワーク機器を介して
+    インターネットからアクセスできる仮想マシン
+-   独自ドメイン
+-   インターネット上で公開するポート
     -   443 (HTTPS)
     -   80 (HTTP)
-    -   1883 when enabling MQTT
-    -   8883 when enabling MQTT TLS
--   Supported Linux distribution
-    -   Ubuntu 22.04 (Recommended Linux distribution)
+    -   MQTT を有効にしたとき、1883
+    -   MQTT TLS を有効にしたとき、8883
+-   サポートしている Linux ディストリビューション
+    -   Ubuntu 22.04 (推奨 Linux ディストリビューション)
     -   Ubuntu 20.04
     -   Ubuntu 18.04
     -   CentOS 7, 8
 
-## Prerequisite
+## 前提条件
 
-Before running the setup script, you need to register sub-domain names of FIWARE GEs in DNS using A records
-or CNAME records.
+セットアップ・スクリプトを実行する前に、A レコードまたは CNAME レコードを使用して、FIWARE GEs
+のサブドメイン名を DNS に登録する必要があります。
 
 -   keyrock.example.com
 -   orion.example.com
 
-## Getting Started
+## 使用方法
 
-Download a tar.gz file for the FIWARE Big Bang.
+FIWARE Big Bang の tar.gz ファイルをダウンロードします。
 
 ```bash
 curl -sL https://github.com/lets-fiware/FIWARE-Big-Bang/archive/refs/tags/v0.22.0.tar.gz | tar zxf -
 ```
 
-Move to the `FIWARE-Big-Bang-0.22.0` directory.
+`FIWARE-Big-Bang-0.22.0` ディレクトリに移動します。
 
 ```bash
 cd FIWARE-Big-Bang-0.22.0/
 ```
 
-Run the `lets-fiware.sh` script with your own domain name and a public IP address.
+独自のドメイン名とパブリック IP アドレスを指定して、`lets-fiware.sh` スクリプトを実行します。
 
 ```bash
 ./lets-fiware.sh example.com XX.XX.XX.XX
 ```
 
-See full documentation [here](https://fi-bb.letsfiware.jp/) for details.
+詳細については、[こちら](https://fi-bb.letsfiware.jp/ja/) のドキュメントを参照してください。
 
-## Why is it named FIWARE Big Bang?
+## FIWARE Big Bang の名前の由来は
 
-The name of this product comes from the Big Bang theory of the universe. Because most FIWARE generic enablers in
-the Core Context Management chapter have an astrology name and this product creates a FIWARE instance as your own
-universe in which different FIWARE GEs run.
+このプロダクトの名前は、宇宙のビッグバン理論に由来しています。コア・コンテキスト管理のチャプターのほとんどの
+FIWARE generic enablers は星座の名前を持ち、このプロダクトは、様々 FIWARE GE を実行する FIWARE インスタンスを
+作成するためです。それはあなたの宇宙です。
 
 ## Copyright and License
 
