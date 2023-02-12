@@ -87,13 +87,13 @@ or CNAME records.
 Download a tar.gz file for the FIWARE Big Bang.
 
 ```bash
-curl -sL https://github.com/lets-fiware/FIWARE-Big-Bang/archive/refs/tags/v0.22.0.tar.gz | tar zxf -
+curl -sL https://github.com/lets-fiware/FIWARE-Big-Bang/archive/refs/tags/v0.23.0.tar.gz | tar zxf -
 ```
 
-Move to the `FIWARE-Big-Bang-0.22.0` directory.
+Move to the `FIWARE-Big-Bang-0.23.0` directory.
 
 ```bash
-cd FIWARE-Big-Bang-0.22.0/
+cd FIWARE-Big-Bang-0.23.0/
 ```
 
 Run the `lets-fiware.sh` script with your own domain name and a public IP address.
