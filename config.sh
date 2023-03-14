@@ -72,7 +72,7 @@ MINTAKA=
 MINTAKA_EXPOSE_PORT=
 
 # Docker image for Mintaka
-IMAGE_MINTAKA=fiware/mintaka:0.5.31
+IMAGE_MINTAKA=fiware/mintaka:0.5.35
 
 # Set a password for Timescale DB. Default: automatically generated
 TIMESCALE_PASS=
