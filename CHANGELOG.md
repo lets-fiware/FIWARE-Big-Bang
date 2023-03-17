@@ -1,9 +1,11 @@
 ## FIWARE Big Bang v0.24.0-next
 
+-   Update Node-RED to 3.0.2 (#263)
+
 ## FIWARE Big Bang v0.24.0 - 17 March, 2023
 
--   Fix issue that the data directory could not be deleted (#259)
--   Update Mintaka to 0.5.35 (#258)
+-   Fix issue that the data directory could not be deleted (#260)
+-   Update Mintaka to 0.5.35 (#259)
 -   Update Orion to 3.8.1 (#257)
 
 ## FIWARE Big Bang v0.23.0 - 12 February, 2023
