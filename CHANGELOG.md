@@ -1,3 +1,5 @@
+## FIWARE Big Bang v0.24.0-next
+
 ## FIWARE Big Bang v0.24.0 - 17 March, 2023
 
 -   Fix issue that the data directory could not be deleted (#259)
