@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.23.0-next
 
+-   Fix issue that the data directory could not be deleted (#259)
 -   Update Mintaka to 0.5.35 (#258)
 -   Update Orion to 3.8.1 (#257)
 

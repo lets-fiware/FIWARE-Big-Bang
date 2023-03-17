@@ -3596,15 +3596,17 @@ main() {
 
   copy_makefile
 
+  get_distro
+
   init_cmd
+
+  install_commands
 
   check_data_direcotry
 
   remove_files
 
   check_machine
-
-  get_distro
 
   setup_init
 
@@ -3615,8 +3617,6 @@ main() {
   set_and_check_values
 
   setup_logging_step1
-
-  install_commands
 
   setup_firewall
 
