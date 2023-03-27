@@ -1,3 +1,5 @@
+## FIWARE Big Bang v0.25.0-next
+
 ## FIWARE Big Bang v0.25.0 - 27 March, 2023
 
 -   Fix feature of creating setup_ngsi_go.sh script (#264)
