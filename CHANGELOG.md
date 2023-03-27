@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.24.0-next
 
+-   Fix feature of creating setup_ngsi_go.sh script (#264)
 -   Update Node-RED to 3.0.2 (#263)
 
 ## FIWARE Big Bang v0.24.0 - 17 March, 2023
