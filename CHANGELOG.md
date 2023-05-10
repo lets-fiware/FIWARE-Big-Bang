@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.25.0-next
 
+-   Update Orion-LD to 1.2.0 and Mintaka to 0.5.36 (#268)
 -   Deprecate ubuntu 18.04 (#269)
 
 ## FIWARE Big Bang v0.25.0 - 27 March, 2023
