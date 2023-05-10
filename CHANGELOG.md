@@ -1,4 +1,4 @@
-## FIWARE Big Bang v0.25.0-next
+## FIWARE Big Bang v0.26.0 - 10 May, 2023
 
 -   ADD GitHub Discussions badge (#270)
 -   Update Orion-LD to 1.2.0 and Mintaka to 0.5.36 (#268)
