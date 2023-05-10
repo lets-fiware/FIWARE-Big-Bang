@@ -60,7 +60,7 @@ ORION_LD=
 ORION_LD_EXPOSE_PORT=
 
 # Docker image for Orion
-IMAGE_ORION_LD=fiware/orion-ld:1.1.2
+IMAGE_ORION_LD=quay.io/fiware/orion-ld:1.2.0
 
 #
 # Mintaka
@@ -72,7 +72,7 @@ MINTAKA=
 MINTAKA_EXPOSE_PORT=
 
 # Docker image for Mintaka
-IMAGE_MINTAKA=fiware/mintaka:0.5.35
+IMAGE_MINTAKA=quay.io/fiware/mintaka:0.5.36
 
 # Set a password for Timescale DB. Default: automatically generated
 TIMESCALE_PASS=
