@@ -10,7 +10,6 @@
 [![Tests](https://github.com/lets-fiware/FIWARE-Big-Bang/actions/workflows/ubuntu-latest.yml/badge.svg)](https://github.com/lets-fiware/FIWARE-Big-Bang/actions/workflows/ubuntu-latest.yml)
 [![codecov](https://codecov.io/gh/lets-fiware/FIWARE-Big-Bang/branch/main/graph/badge.svg?token=OHFTT6TUIS)](https://codecov.io/gh/lets-fiware/FIWARE-Big-Bang)
 <br/>
-[![Ubuntu 18.04](https://github.com/lets-fiware/FIWARE-Big-Bang/actions/workflows/ubuntu-18.04.yml/badge.svg)](https://github.com/lets-fiware/FIWARE-Big-Bang/actions/workflows/ubuntu-18.04.yml)
 [![Ubuntu 20.04](https://github.com/lets-fiware/FIWARE-Big-Bang/actions/workflows/ubuntu-20.04.yml/badge.svg)](https://github.com/lets-fiware/FIWARE-Big-Bang/actions/workflows/ubuntu-20.04.yml)
 [![Ubuntu 22.04](https://github.com/lets-fiware/FIWARE-Big-Bang/actions/workflows/ubuntu-22.04.yml/badge.svg)](https://github.com/lets-fiware/FIWARE-Big-Bang/actions/workflows/ubuntu-22.04.yml)
 <br/>
@@ -69,7 +68,6 @@ FI-BB は FIWARE Big Bang の略名です。
 -   サポートしている Linux ディストリビューション
     -   Ubuntu 22.04 (推奨 Linux ディストリビューション)
     -   Ubuntu 20.04
-    -   Ubuntu 18.04
     -   CentOS 7, 8
 
 ## 前提条件

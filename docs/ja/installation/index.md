@@ -61,7 +61,6 @@ FIWARE Big Bang は、Linux ディストリビューションとして Ubuntu �
 
 -   Ubuntu 22.04 (推奨 Linux ディストリビューション)
 -   Ubuntu 20.04
--   Ubuntu 18.04
 -   CentOS 7, 8
 
 ### ドメイン名 
