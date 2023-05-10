@@ -57,7 +57,6 @@ The recommended Linux distribution is Ubuntu 22.04.
 
 -   Ubuntu 22.04
 -   Ubuntu 20.04
--   Ubuntu 18.04
 -   CentOS 7, 8
 
 ### Domain name
