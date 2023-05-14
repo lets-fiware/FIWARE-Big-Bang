@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.26.0-next
 
+-   Update certbot to v2.6.0 (#274)
 -   FIX cert renew error (#273)
 
 ## FIWARE Big Bang v0.26.0 - 10 May, 2023
