@@ -472,7 +472,7 @@ CERT_TEST=
 CERT_FORCE_RENEWAL=
 
 # Docker image for Certbot
-IMAGE_CERTBOT=certbot/certbot:v1.18.0
+IMAGE_CERTBOT=certbot/certbot:v2.6.0
 
 #
 # Multi-server mode

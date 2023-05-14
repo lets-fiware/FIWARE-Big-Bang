@@ -52,7 +52,7 @@ do
   fi
 done
 
-if [ "${IMAGE_CERTBOT}" != "certbot/certbot:v1.18.0" ]; then
+if [ "${IMAGE_CERTBOT}" != "certbot/certbot:v2.6.0" ]; then
   echo "Error IMAGE_CERTBOT"
   exit 1
 fi
