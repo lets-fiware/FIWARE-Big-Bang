@@ -1,3 +1,5 @@
+## FIWARE Big Bang v0.27.0-next
+
 ## FIWARE Big Bang v0.27.0 - 14 May, 2023
 
 -   Update certbot to v2.6.0 (#274)
