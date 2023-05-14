@@ -51,15 +51,13 @@ fi
 . ./.env
 
 if [ -n "${CERT_FORCE_RENEWAL}" ]; then
-  if "${CERT_FORCE_RENEWAL}"; then
-    CERT_FORCE_RENEWAL=--force-renewal
-  else
-    CERT_FORCE_RENEWAL=
-  fi
+  # shellcheck disable=SC2086
+  result=$(sudo docker run --rm -v "${CERTBOT_DIR}:/var/www/html" -v "${CERT_DIR}:/etc/letsencrypt" -v /var/log/letsencrypt:/var/log/letsencrypt "${IMAGE_CERTBOT}" renew --webroot -w /var/www/html ${CERT_TEST} --post-hook='echo FI-BB' --force-renewal)
+else
+  # shellcheck disable=SC2086
+  result=$(sudo docker run --rm -v "${CERTBOT_DIR}:/var/www/html" -v "${CERT_DIR}:/etc/letsencrypt" -v /var/log/letsencrypt:/var/log/letsencrypt "${IMAGE_CERTBOT}" renew --webroot -w /var/www/html ${CERT_TEST} --post-hook='echo FI-BB')
 fi
 
-# shellcheck disable=SC2086
-result=$(sudo docker run --rm -v "${CERTBOT_DIR}:/var/www/html" -v "${CERT_DIR}:/etc/letsencrypt" "${IMAGE_CERTBOT}" renew --webroot -w /var/www/html ${CERT_TEST} --post-hook='echo FI-BB' "$CERT_FORCE_RENEWAL")
 
 logging "user.info" "${result}"
 
