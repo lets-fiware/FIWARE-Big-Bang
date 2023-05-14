@@ -1,5 +1,7 @@
 ## FIWARE Big Bang v0.26.0-next
 
+-   FIX cert renew error (#273)
+
 ## FIWARE Big Bang v0.26.0 - 10 May, 2023
 
 -   ADD GitHub Discussions badge (#270)
