@@ -1,5 +1,7 @@
 ## FIWARE Big Bang v0.27.0-next
 
+-   Update Orion-LD to 1.2.1 and Mintaka to 0.5.37 (#276)
+
 ## FIWARE Big Bang v0.27.0 - 14 May, 2023
 
 -   Update certbot to v2.6.0 (#274)
