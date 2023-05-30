@@ -60,7 +60,7 @@ ORION_LD=
 ORION_LD_EXPOSE_PORT=
 
 # Docker image for Orion
-IMAGE_ORION_LD=quay.io/fiware/orion-ld:1.2.0
+IMAGE_ORION_LD=quay.io/fiware/orion-ld:1.2.1
 
 #
 # Mintaka
