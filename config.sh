@@ -447,7 +447,7 @@ IMAGE_POSTGRES=postgres:15
 # Nginx
 #
 # Docker images for Nginx
-IMAGE_NGINX=nginx:1.21
+IMAGE_NGINX=nginx:1.25
 
 #
 # Firewall (firewalld)
