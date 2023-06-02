@@ -1,4 +1,4 @@
-## FIWARE Big Bang v0.27.0-next
+## FIWARE Big Bang v0.28.0 - 03 June, 2023
 
 -   Update Orion to 3.9.0 (#280)
 -   Update nginx to 1.25 (#279)
