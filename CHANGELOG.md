@@ -1,5 +1,7 @@
 ## FIWARE Big Bang v0.28.0-next
 
+-   Update Orion to 3.10.1 (#283)
+
 ## FIWARE Big Bang v0.28.0 - 03 June, 2023
 
 -   Update Orion to 3.9.0 (#280)
