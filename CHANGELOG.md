@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.28.0-next
 
+-   Update Mintaka to 0.5.39 (#284)
 -   Update Orion to 3.10.1 (#283)
 
 ## FIWARE Big Bang v0.28.0 - 03 June, 2023
