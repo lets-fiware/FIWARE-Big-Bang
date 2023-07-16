@@ -13,6 +13,7 @@ services:
       - ${CONFIG_NGINX}/sites-enable:/etc/nginx/sites-enable
       - ${CONFIG_NGINX}/fullchain.pem:/etc/nginx/fullchain.pem:ro
       - ${CONFIG_NGINX}/privkey.pem:/etc/nginx/privkey.pem:ro
+      - ${CERTBOT_DIR}:/var/www/html
       - ${CERT_DIR}:/etc/letsencrypt
       - ${NGINX_LOG_DIR}:/var/log/nginx
       # __NGINX_VOLUMES__
