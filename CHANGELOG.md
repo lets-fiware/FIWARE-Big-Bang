@@ -1,4 +1,4 @@
-## FIWARE Big Bang v0.28.0-next
+## FIWARE Big Bang v0.29.0 - 19 July, 2023
 
 -   FIX cert renew error (#287)
 -   FIX cert renew error (#286)
