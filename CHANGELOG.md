@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.28.0-next
 
+-   Update Orion-LD to 1.3.0 and Mintaka to 0.5.40 (#288)
 -   FIX cert renew error (#287)
 -   FIX cert renew error (#286)
 -   ADD http2 directive for Nginx (#285)
