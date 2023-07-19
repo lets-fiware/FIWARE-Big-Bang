@@ -52,10 +52,10 @@ fi
 
 if [ -n "${CERT_FORCE_RENEWAL}" ]; then
   # shellcheck disable=SC2086
-  result=$(sudo docker run --rm -v "${CERTBOT_DIR}:/var/www/html" -v "${CERT_DIR}:/etc/letsencrypt" -v /var/log/letsencrypt:/var/log/letsencrypt "${IMAGE_CERTBOT}" renew --webroot -w /var/www/html ${CERT_TEST} --post-hook='echo FI-BB' --force-renewal)
+  result=$(sudo docker run --rm -v "${CERTBOT_DIR}:/var/www/html" -v "${CERT_DIR}:/etc/letsencrypt" -v /var/log/letsencrypt:/var/log/letsencrypt "${IMAGE_CERTBOT}" renew --webroot ${CERT_TEST} --post-hook='echo FI-BB' --force-renewal)
 else
   # shellcheck disable=SC2086
-  result=$(sudo docker run --rm -v "${CERTBOT_DIR}:/var/www/html" -v "${CERT_DIR}:/etc/letsencrypt" -v /var/log/letsencrypt:/var/log/letsencrypt "${IMAGE_CERTBOT}" renew --webroot -w /var/www/html ${CERT_TEST} --post-hook='echo FI-BB')
+  result=$(sudo docker run --rm -v "${CERTBOT_DIR}:/var/www/html" -v "${CERT_DIR}:/etc/letsencrypt" -v /var/log/letsencrypt:/var/log/letsencrypt "${IMAGE_CERTBOT}" renew --webroot ${CERT_TEST} --post-hook='echo FI-BB')
 fi
 
 
