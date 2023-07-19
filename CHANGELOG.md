@@ -1,4 +1,4 @@
-## FIWARE Big Bang v0.28.0-next
+## FIWARE Big Bang v0.29.0 - 19 July, 2023
 
 -   Update Orion-LD to 1.3.0 and Mintaka to 0.5.40 (#288)
 -   FIX cert renew error (#287)

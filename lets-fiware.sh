@@ -28,7 +28,7 @@
 
 set -Ceuo pipefail
 
-VERSION=0.28.0-next
+VERSION=0.29.0
 
 #
 # Syslog info
