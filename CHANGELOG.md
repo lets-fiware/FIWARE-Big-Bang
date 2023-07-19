@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.28.0-next
 
+-   FIX cert renew error (#287)
 -   FIX cert renew error (#286)
 -   ADD http2 directive for Nginx (#285)
 -   Update Mintaka to 0.5.39 (#284)
