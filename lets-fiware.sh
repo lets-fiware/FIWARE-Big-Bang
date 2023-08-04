@@ -2771,6 +2771,7 @@ setup_draco() {
   draco_cert="${CONFIG_DIR}/draco/cert"
 
   mkdir -p "${draco_cert}"
+  "${SUDO}" chown -R 1000:1000 "${draco_cert}"
   mkdir -p "${DATA_DIR}"/draco/conf/templates
 
   local draco_containter
@@ -2797,14 +2798,12 @@ setup_draco() {
 
   ${DOCKER} stop "${draco_container}"
 
-  set +e
   ${DOCKER} run --rm --tty --entrypoint /bin/sh \
     -v "${draco_cert}":/opt/nifi/nifi-current/localhost \
     "${IMAGE_DRACO}" /opt/nifi/nifi-toolkit-current/bin/tls-toolkit.sh \
     standalone \
     --hostnames localhost \
     --isOverwrite
-  set -e
 
   # Update host information
   DRACO_MONGO_HOST=${DRACO_MONGO_HOST:-mongo}
@@ -2857,14 +2856,12 @@ setup_draco() {
   # Create application for Draco
   DRACO_ROOT_URL=https://${DRACO}/
   DRACO_REDIRECT_URL=https://${DRACO}:443/nifi-api/access/oidc/callback
-  set +e
   DRACO_OIDC_CLIENT_ID=$(${NGSI_GO} applications --host "${IDM}" create --name "Draco" --description "Draco application (${HOST_NAME})" --url "${DRACO_ROOT_URL}" --redirectUri "${DRACO_REDIRECT_URL}" --openid)
   DRACO_OIDC_CLIENT_SECRET=$(${NGSI_GO} applications --host "${IDM}" get --aid "${DRACO_OIDC_CLIENT_ID}" | jq -r .application.secret )
 
   DRACO_OIDC_DISCOVERY_URL="https://${KEYROCK}/idm/applications/${DRACO_OIDC_CLIENT_ID}/.well-known/openid-configuration"
-  DRACO_KEYSTORE_PASSWORD=$(sed -n "/^nifi.security.keystorePasswd=/s/\(.*\)=\(.*\)/\2/p" "${draco_cert}/nifi.properties")
-  DRACO_TRUSTSTORE_PASSWORD=$(sed -n "/^nifi.security.truststorePasswd=/s%\(.*\)=\(.*\)%\2%p" "${draco_cert}/nifi.properties")
-  set -e
+  DRACO_KEYSTORE_PASSWORD=$("${SUDO}" sed -n "/^nifi.security.keystorePasswd=/s/\(.*\)=\(.*\)/\2/p" "${draco_cert}/nifi.properties")
+  DRACO_TRUSTSTORE_PASSWORD=$("${SUDO}" sed -n "/^nifi.security.truststorePasswd=/s%\(.*\)=\(.*\)%\2%p" "${draco_cert}/nifi.properties")
 
   cat <<EOF >> .env
 
