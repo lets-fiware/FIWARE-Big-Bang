@@ -1,5 +1,7 @@
 ## FIWARE Big Bang v0.29.0-next
 
+-   Fix issue that Keyrock fails to create application with openid (#292)
+
 ## FIWARE Big Bang v0.29.0 - 19 July, 2023
 
 -   Update Orion-LD to 1.3.0 and Mintaka to 0.5.40 (#288)
