@@ -54,6 +54,7 @@ echo '```'
 echo -n "Date: "
 date
 echo "Version: ${VERSION}"
+id
 echo -n "Hash: "
 
 check_cmd shasum

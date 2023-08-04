@@ -1259,6 +1259,7 @@ up_keyrock_mysql() {
   logging_info "${FUNCNAME[0]}"
 
   mkdir -p "${CONFIG_DIR}"/keyrock/certs/applications
+  "${SUDO}" chown -R 1000:1000 "${CONFIG_DIR}"/keyrock/certs
 
   cp -a "${TEMPLEATE}"/docker/setup-keyrock-mysql.yml ./docker-idm.yml
   cp "${CONTRIB_DIR}/keyrock/applications.js" "${CONFIG_DIR}/keyrock"
@@ -1310,6 +1311,7 @@ up_keyrock_postgres() {
   logging_info "${FUNCNAME[0]}"
 
   mkdir -p "${CONFIG_DIR}"/keyrock/certs/applications
+  "${SUDO}" chown -R 1000:1000 "${CONFIG_DIR}"/keyrock/certs
 
   cp "${CONTRIB_DIR}/keyrock/20210603073911-hashed-access-tokens.js" "${CONFIG_DIR}/keyrock"
   cp "${CONTRIB_DIR}/keyrock/applications.js" "${CONFIG_DIR}/keyrock"
@@ -3071,10 +3073,8 @@ setup_grafana() {
   # Create application for Grafana
   GF_SERVER_ROOT_URL=https://${GRAFANA}/
   GF_SERVER_REDIRECT_URL=https://${GRAFANA}/login/generic_oauth
-  set +e
   GRAFANA_CLIENT_ID=$(${NGSI_GO} applications --host "${IDM}" create --name "Grafana" --description "Grafana application (${HOST_NAME})" --url "${GF_SERVER_ROOT_URL}" --redirectUri "${GF_SERVER_REDIRECT_URL}" --openid)
   GRAFANA_CLIENT_SECRET=$(${NGSI_GO} applications --host "${IDM}" get --aid "${GRAFANA_CLIENT_ID}" | jq -r .application.secret )
-  set -e
 
   mkdir -p "${DATA_DIR}"/grafana
   ${SUDO} chown 472:472 "${DATA_DIR}"/grafana
@@ -3141,7 +3141,6 @@ setup_zeppelin() {
   ZEPPELIN_URL=https://${ZEPPELIN}/
   ZEPPELIN_CALLBACK_URL="https://${ZEPPELIN}/api/callback?client_name=KeyrockOidcClient"
 
-  set +e
   # Create application for Zeppelin
   ZEPPELIN_CLIENT_ID=$(${NGSI_GO} applications --host "${IDM}" create --name "Zeppelin" --description "Zeppelin application (${HOST_NAME})" --url "${ZEPPELIN_URL}" --redirectUri "${ZEPPELIN_CALLBACK_URL}" --openid)
   ZEPPELIN_CLIENT_SECRET=$(${NGSI_GO} applications --host "${IDM}" get --aid "${ZEPPELIN_CLIENT_ID}" | jq -r .application.secret )
@@ -3152,7 +3151,6 @@ setup_zeppelin() {
 
   # Create user role
   ${NGSI_GO} applications --host "${IDM}" roles --aid "${ZEPPELIN_CLIENT_ID}" create --name "user"
-  set -e
 
   mkdir -p "${DATA_DIR}"/zeppelin/conf
 
