@@ -1,4 +1,4 @@
-## FIWARE Big Bang v0.29.0-next
+## FIWARE Big Bang v0.30.0 - 04 August, 2023
 
 -   Fix issue that Keyrock fails to create application with openid (#292)
 
