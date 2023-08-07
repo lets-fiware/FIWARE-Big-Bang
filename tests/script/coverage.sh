@@ -236,6 +236,9 @@ fibb_down() {
 install_test1() {
   logging "user.info" "${FUNCNAME[0]}"
 
+  sudo apt remove -y rsyslog
+  sudo rm /etc/rsyslog.conf
+
   sed -i -e "s/^\(ORION_EXPOSE_PORT=\).*/\1local/" config.sh
   sed -i -e "s/^\(CYGNUS=\).*/\1cygnus/" config.sh
   sed -i -e "s/^\(COMET=\).*/\1comet/" config.sh
