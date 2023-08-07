@@ -32,3 +32,7 @@ Add any other information, diagrams or screenshots about the feature request her
 - [ ] Yes, I have the knowledge to implement this new feature.
 - [ ] Yes, but I will need help.
 - [ ] No, I do not have the skills.
+
+**Other information**
+
+- [ ] I have provided a Github Star to this repository.

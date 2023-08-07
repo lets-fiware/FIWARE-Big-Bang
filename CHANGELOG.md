@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.30.0-next
 
+-   Update issue template (#299)
 -   Improve rsyslog existence check (#298)
 -   Avoid waiting for operator intervention at apt install on Ubuntu 22.04 (#297)
 -   Fix command not found on Ubuntu 22.04 Minimal Server Installation (#296)
