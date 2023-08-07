@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.30.0-next
 
+-   Fix command not found on Ubuntu 22.04 Minimal Server Installation (#296)
 -   Fix nifi.properties not found (#295)
 
 ## FIWARE Big Bang v0.30.0 - 04 August, 2023
