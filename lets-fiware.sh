@@ -714,18 +714,12 @@ install_commands() {
   logging_info "${FUNCNAME[0]}"
 
   update=false
-  for cmd in curl pwgen jq zip host
+  for cmd in curl pwgen jq zip host rsyslogd
   do
     if ! type "${cmd}" >/dev/null 2>&1; then
         update=true
     fi
   done
-
-  if [ "${DISTRO}" == "Ubuntu" ]; then
-    if ! [ -e /etc/rsyslog.conf ]; then
-        update=true
-    fi
-  fi
 
   if "${update}"; then
     case "${DISTRO}" in
