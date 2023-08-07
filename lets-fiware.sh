@@ -690,6 +690,9 @@ check_machine() {
 install_commands_ubuntu() {
   logging_info "${FUNCNAME[0]}"
 
+  if [ -e /etc/needrestart/conf.d ]; then
+    echo "\$nrconf{restart} = 'a';" | ${SUDO} tee /etc/needrestart/conf.d/50local.conf > /dev/null
+  fi
   ${APT} update
   ${APT} install -y curl pwgen jq make zip rsyslog host
 }

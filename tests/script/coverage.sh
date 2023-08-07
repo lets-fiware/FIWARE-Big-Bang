@@ -290,6 +290,8 @@ install_test3() {
 
   sleep 5
 
+  sudo mkdir -p /etc/needrestart/conf.d
+
   git checkout config.sh
 
   sed -i -e "s/^\(CERT_REVOKE=\).*/\1true/" config.sh
