@@ -16,6 +16,7 @@ _Put an `x` in the boxes that apply_
 -   [ ] I have inspected all error messages.
 -   [ ] I have inspected the log files in the /var/log/fiware directory.
 -   [ ] I have run the `make collect` command.
+-   [ ] I have provided a Github Star to this repository.
 
 **Describe the bug**
 A clear and concise description of what the bug is.
@@ -36,7 +37,8 @@ If applicable, add screenshots to help explain your problem.
 **Server (please complete the following information):**
 - OS and OS version:
 - Docker version:
-- Docker-compose version:
+- Docker Compose version:
 
 **Additional context**
 Add any other context about the problem here.
+To resolve this issue, you need to provide complete information about your scenario.
