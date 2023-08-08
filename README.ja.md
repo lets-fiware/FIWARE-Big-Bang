@@ -83,13 +83,13 @@ FI-BB は FIWARE Big Bang の略名です。
 FIWARE Big Bang の tar.gz ファイルをダウンロードします。
 
 ```bash
-curl -sL https://github.com/lets-fiware/FIWARE-Big-Bang/archive/refs/tags/v0.30.0.tar.gz | tar zxf -
+curl -sL https://github.com/lets-fiware/FIWARE-Big-Bang/archive/refs/tags/v0.31.0.tar.gz | tar zxf -
 ```
 
-`FIWARE-Big-Bang-0.30.0` ディレクトリに移動します。
+`FIWARE-Big-Bang-0.31.0` ディレクトリに移動します。
 
 ```bash
-cd FIWARE-Big-Bang-0.30.0/
+cd FIWARE-Big-Bang-0.31.0/
 ```
 
 独自のドメイン名とパブリック IP アドレスを指定して、`lets-fiware.sh` スクリプトを実行します。

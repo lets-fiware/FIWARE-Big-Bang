@@ -1,4 +1,4 @@
-## FIWARE Big Bang v0.30.0-next
+## FIWARE Big Bang v0.31.0 - 08 August, 2023
 
 -   Improve collect.sh script (#300)
 -   Update issue template (#299)
