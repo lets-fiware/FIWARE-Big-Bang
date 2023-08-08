@@ -40,6 +40,46 @@ check_cmd() {
   fi
 }
 
+check_distro() {
+  DISTRO=
+
+  if [ -e /etc/redhat-release ]; then
+    DISTRO=$(cat /etc/redhat-release)
+  elif [ -e /etc/debian_version ] || [ -e /etc/debian_release ]; then
+
+    if [ -e /etc/lsb-release ]; then
+      ver="$(sed -n -e "/DISTRIB_RELEASE=/s/DISTRIB_RELEASE=\(.*\)/\1/p" /etc/lsb-release | awk -F. '{printf "%2d%02d", $1,$2}')"
+      DISTRO="Ubuntu ${ver}"
+    else
+      DISTRO="not Ubuntu"
+    fi
+  else
+    DISTRO="Unknown distro"
+  fi
+
+  echo "OS: ${DISTRO}"
+}
+
+check_docker() {
+  echo -n "Docker: "
+  if type docker >/dev/null 2>&1; then
+    sudo docker --version
+  else
+    echo "not found"
+  fi
+
+  echo -n "Docker compose: "
+  set +e
+  found=$(sudo docker info --format '{{json . }}' | jq -r '.ClientInfo.Plugins | .[].Name' | grep -ic compose)
+  set -e
+
+  if [ "${found}" -eq 1 ]; then
+    sudo docker compose version
+  else
+    echo "not found"
+  fi
+}
+
 cd "$(dirname "$0")"
 cd ../..
 
@@ -54,6 +94,8 @@ echo '```'
 echo -n "Date: "
 date
 echo "Version: ${VERSION}"
+check_distro
+check_docker
 id
 echo -n "Hash: "
 
