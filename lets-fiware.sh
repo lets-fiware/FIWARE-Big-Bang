@@ -694,7 +694,7 @@ install_commands_ubuntu() {
     echo "\$nrconf{restart} = 'a';" | ${SUDO} tee /etc/needrestart/conf.d/50local.conf > /dev/null
   fi
   ${APT} update
-  ${APT} install -y curl pwgen jq make zip rsyslog host
+  ${APT} install -y curl pwgen jq make zip rsyslog host anacron
 }
 
 #
@@ -714,7 +714,7 @@ install_commands() {
   logging_info "${FUNCNAME[0]}"
 
   update=false
-  for cmd in curl pwgen jq zip host rsyslogd
+  for cmd in curl pwgen jq zip rsyslogd host anacron
   do
     if ! type "${cmd}" >/dev/null 2>&1; then
         update=true
@@ -1168,23 +1168,10 @@ setup_cert() {
 
   ${DOCKER_COMPOSE} -f docker-cert.yml down
 
-  RND=$(od -An -tu1 -N1 /dev/urandom)
-  HOUR=$(( "${RND}" % 5 ))
-  RND=$(od -An -tu1 -N1 /dev/urandom)
-  MINUTE=$(( "${RND}" % 60 ))
+  CRON_FILE=/etc/cron.daily/fi-bb-cert-renew
 
-  CRON_FILE=/etc/cron.d/fiware-big-bang
-
-  if [ -e "${CRON_FILE}" ]; then
-    ${SUDO} rm -f "${CRON_FILE}"
-  fi
-
-  CRON_SH="${MINUTE} ${HOUR} \* \* \* root ${PWD}/config/script/renew.sh > /dev/null 2>&1"
-  ${SUDO} sh -c "echo ${CRON_SH} > ${CRON_FILE}"
-
-  local msg
-  msg=$(echo "${CRON_FILE}: $CRON_SH" | sed -e "s/\\\\//g")
-  logging_info "${msg}"
+  echo -e "#!/bin/sh\n${PWD}/config/script/renew.sh" | "${SUDO}" tee "${CRON_FILE}"
+  "${SUDO}" chmod 755 "${CRON_FILE}"
 }
 
 #
