@@ -29,7 +29,7 @@ The following files and directories will be created.
 | ./data                           | A directory which has persistent data for running Docker containers.                                                                                                                                         |
 | /etc/letsencrypt                 | A directory which has server certificate files.                                                                                                                                                              |
 | /var/log/fiware                  | A directory which has log files.                                                                                                                                                                             |
-| /etc/rsyslog.d/10-fiware.conf    | A config file for rsyslog. In the case of CentOS, the filename is 'fiware.conf'.                                                                                                                             |
+| /etc/rsyslog.d/10-fiware.conf    | A config file for rsyslog. In the case of Rocky Linux or AlmaLinux, the filename is 'fiware.conf'.                                                                                                           |
 | /etc/logrotate.d/fiware          | A config file for logroate.                                                                                                                                                                                  |
 | /etc/cron.daily/fi-bb-cert-renew | A config file for cron                                                                                                                                                                                       |
 

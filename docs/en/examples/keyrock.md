@@ -138,7 +138,7 @@ apt update
 apt install -y pwgen
 ```
 
--   CentOS
+-   Rocky Linux or AlmaLinux
 
 ```bash
 yum install -y epel-release

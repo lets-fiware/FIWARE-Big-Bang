@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.31.0-next
 
+-   Update supported Linux distribution (#309)
 -   Improve cert renew job (#303)
 
 ## FIWARE Big Bang v0.31.0 - 08 August, 2023

@@ -142,7 +142,7 @@ apt update
 apt install -y pwgen
 ```
 
--   CentOS
+-   Rocky Linux または AlmaLinux
 
 ```bash
 yum install -y epel-release
