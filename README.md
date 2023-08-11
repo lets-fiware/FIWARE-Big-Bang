@@ -68,9 +68,12 @@ FI-BB stands for FIWARE Big Bang.
     -   1883 when enabling MQTT
     -   8883 when enabling MQTT TLS
 -   Supported Linux distribution
-    -   Ubuntu 22.04 (Recommended Linux distribution)
-    -   Ubuntu 20.04
-    -   CentOS 7, 8
+    -   [Ubuntu 22.04 LTS](https://github.com/lets-fiware/FIWARE-Big-Bang/discussions/304) (Recommended Linux distribution)
+    -   [Ubuntu 20.04](https://github.com/lets-fiware/FIWARE-Big-Bang/discussions/305)
+    -   [Rocky Linux 9](https://github.com/lets-fiware/FIWARE-Big-Bang/discussions/306)
+    -   [Rocky Linux 8](https://github.com/lets-fiware/FIWARE-Big-Bang/discussions/309)
+    -   [AlmaLinux 9](https://github.com/lets-fiware/FIWARE-Big-Bang/discussions/307)
+    -   [AlmaLinux 8](https://github.com/lets-fiware/FIWARE-Big-Bang/discussions/308)
 
 ## Prerequisite
 

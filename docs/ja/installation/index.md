@@ -56,12 +56,15 @@
 
 ### サポートしている Linux ディストリビューション
 
-FIWARE Big Bang は、Linux ディストリビューションとして Ubuntu と CentOS をサポートしています。
+FIWARE Big Bang は、Linux ディストリビューションとして Ubuntu, Rocky Linux および AlmaLinux をサポートしています。
 推奨の Linux ディストリビューションは Ubuntu 22.04 です。
 
--   Ubuntu 22.04 (推奨 Linux ディストリビューション)
--   Ubuntu 20.04
--   CentOS 7, 8
+-   [Ubuntu 22.04 LTS](https://github.com/lets-fiware/FIWARE-Big-Bang/discussions/304) (推奨 Linux ディストリビューション)
+-   [Ubuntu 20.04](https://github.com/lets-fiware/FIWARE-Big-Bang/discussions/305)
+-   [Rocky Linux 9](https://github.com/lets-fiware/FIWARE-Big-Bang/discussions/306)
+-   [Rocky Linux 8](https://github.com/lets-fiware/FIWARE-Big-Bang/discussions/309)
+-   [AlmaLinux 9](https://github.com/lets-fiware/FIWARE-Big-Bang/discussions/307)
+-   [AlmaLinux 8](https://github.com/lets-fiware/FIWARE-Big-Bang/discussions/308)
 
 ### ドメイン名 
 
