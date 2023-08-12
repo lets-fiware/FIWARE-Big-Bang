@@ -36,7 +36,7 @@ IMAGE_POSTFIX=letsfiware/postfix:0.31.0-next
 # Wilma
 #
 # Docker image for Wilma
-IMAGE_WILMA=letsfiware/pep-proxy:8.1.0
+IMAGE_WILMA=letsfiware/fiware-pep-proxy:8.4.0
 
 #
 # Orion
