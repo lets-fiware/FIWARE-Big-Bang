@@ -46,6 +46,17 @@ build_certmock() {
 # Reset env
 #
 reset_env() {
+  for file in docker-compose.yml docker-cert.yml docker-idm.yml
+  do
+    if [ -e "${file}" ]; then
+      set +e
+      sudo docker compose -f "${file}" down --remove-orphans
+      set -e
+      sleep 10
+      rm -f "${file}"
+    fi
+  done
+
   sudo rm -fr config/ data/
   git checkout config.sh
 }
@@ -237,7 +248,6 @@ install_test1() {
   logging "user.info" "${FUNCNAME[0]}"
 
   sudo apt remove -y rsyslog
-  sudo rm /etc/rsyslog.conf
 
   sed -i -e "s/^\(ORION_EXPOSE_PORT=\).*/\1local/" config.sh
   sed -i -e "s/^\(CYGNUS=\).*/\1cygnus/" config.sh
@@ -307,6 +317,9 @@ install_test3() {
   sed -i -e "s/^\(DRACO_EXPOSE_PORT=\).*/\1all/" config.sh
   sed -i -e "s/^\(DRACO_DISABLE_NIFI_DOCS=\).*/\1true/" config.sh
 
+  sed -i -e "s/^\(WIRECLOUD=\).*/\1wirecloud/" config.sh
+  sed -i -e "s/^\(NGSIPROXY=\).*/\1ngsiproxy/" config.sh
+
   sed -i -e "s/^\(ORION=\).*/\1/" config.sh
   sed -i -e "s/^\(ORION_LD=\).*/\1orion-ld/" config.sh
 
@@ -325,9 +338,6 @@ install_test4() {
 
   mkdir .work
 
-  sed -i -e "s/^\(KEYROCK_POSTGRES=\).*/\1true/" config.sh
-  sed -i -e "s/^\(WIRECLOUD=\).*/\1wirecloud/" config.sh
-  sed -i -e "s/^\(NGSIPROXY=\).*/\1ngsiproxy/" config.sh
   sed -i -e "s/^\(NODE_RED=\).*/\1node-red/" config.sh
   sed -i -e "s/^\(NODE_RED_INSTANCE_NUMBER=\).*/\13/" config.sh
   sed -i -e "s/^\(IOTAGENT_UL=\).*/\1iotagent-ul/" config.sh

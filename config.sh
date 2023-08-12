@@ -18,9 +18,6 @@ IDM_ADMIN_PASS=
 # Use Postfix (local delivery). (true or false) Default: false
 POSTFIX=
 
-# Use PostgreSQL as back-end database for Keyrock. (true or false) Default: false
-KEYROCK_POSTGRES=
-
 # Logging level for Keyrock
 #   https://github.com/ging/fiware-idm/blob/master/doc/installation_and_administration_guide/environment_variables.md
 #   true and false
