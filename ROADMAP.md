@@ -18,10 +18,9 @@ any time.
 ## Short term
 
 The following list of features are planned to be addressed in the short term,
-and incorporated in the next release of the product planned for March 2023:
+and incorporated in the next release of the product planned for December 2023:
 
 -   Support latest version of FIWARE GE
--   Support FIWARE Keyrock and PEP proxy 8.3
 
 ## Medium term
 
