@@ -174,10 +174,6 @@ set_default_values() {
     REGPROXY=false
   fi
 
-  if [ -z "${KEYROCK_POSTGRES}" ]; then
-    KEYROCK_POSTGRES=false
-  fi
-
   if [ -z "${IDM_ADMIN_USER}" ]; then
     IDM_ADMIN_USER="admin"
   fi
@@ -510,8 +506,6 @@ CURL="${CURL}"
 NGSI_GO="${NGSI_GO}"
 
 FIREWALL=${FIREWALL}
-
-KEYROCK_POSTGRES=${KEYROCK_POSTGRES}
 
 CERT_DIR=${CERT_DIR}
 IMAGE_CERTBOT=${IMAGE_CERTBOT}
@@ -1252,9 +1246,7 @@ up_keyrock_mysql() {
   "${SUDO}" chown -R 1000:1000 "${CONFIG_DIR}"/keyrock/certs
 
   cp -a "${TEMPLEATE}"/docker/setup-keyrock-mysql.yml ./docker-idm.yml
-  cp "${CONTRIB_DIR}/keyrock/applications.js" "${CONFIG_DIR}/keyrock"
   add_to_docker_idm_yml "__KEYROCK_VOLUMES__" "     - ${CONFIG_DIR}/keyrock/certs/applications:/opt/fiware-idm/certs/applications"
-  add_to_docker_idm_yml "__KEYROCK_VOLUMES__" "     - ${CONFIG_DIR}/keyrock/applications.js:/opt/fiware-idm/controllers/api/applications.js"
 
   MYSQL_ROOT_PASSWORD=$(pwgen -s 16 1)
 
@@ -1291,63 +1283,7 @@ EOF
 CREATE USER '${IDM_DB_USER}'@'%' IDENTIFIED BY '${IDM_DB_PASS}';
 GRANT ALL PRIVILEGES ON ${IDM_DB_NAME}.* TO '${IDM_DB_USER}'@'%';
 flush PRIVILEGES;
-EOF
-}
-
-#
-# UP keyrock with PostgreSQL
-#
-up_keyrock_postgres() {
-  logging_info "${FUNCNAME[0]}"
-
-  mkdir -p "${CONFIG_DIR}"/keyrock/certs/applications
-  "${SUDO}" chown -R 1000:1000 "${CONFIG_DIR}"/keyrock/certs
-
-  cp "${CONTRIB_DIR}/keyrock/20210603073911-hashed-access-tokens.js" "${CONFIG_DIR}/keyrock"
-  cp "${CONTRIB_DIR}/keyrock/applications.js" "${CONFIG_DIR}/keyrock"
-  cp -a "${TEMPLEATE}"/docker/setup-keyrock-postgres.yml ./docker-idm.yml
-
-  add_to_docker_idm_yml "__KEYROCK_VOLUMES__" "     - ${CONFIG_DIR}/keyrock/20210603073911-hashed-access-tokens.js:/opt/fiware-idm/migrations/20210603073911-hashed-access-tokens.js"
-  add_to_docker_idm_yml "__KEYROCK_VOLUMES__" "     - ${CONFIG_DIR}/keyrock/certs/applications:/opt/fiware-idm/certs/applications"
-  add_to_docker_idm_yml "__KEYROCK_VOLUMES__" "     - ${CONFIG_DIR}/keyrock/applications.js:/opt/fiware-idm/controllers/api/applications.js"
-
-  POSTGRES_PASSWORD=$(pwgen -s 16 1)
-
-  IDM_HOST=https://${KEYROCK}
-
-  IDM_DB_DIALECT=postgres
-  IDM_DB_HOST=postgres
-  IDM_DB_PORT=5432
-  IDM_DB_NAME=idm
-  IDM_DB_USER=idm
-  IDM_DB_PASS=$(pwgen -s 16 1)
-
-  cat <<EOF >> .env
-IDM_HOST=${IDM_HOST}
-
-# PostgreSQL
-
-POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-
-IDM_DB_DIALECT=${IDM_DB_DIALECT}
-IDM_DB_HOST=${IDM_DB_HOST}
-IDM_DB_PORT=${IDM_DB_PORT}
-IDM_DB_NAME=${IDM_DB_NAME}
-IDM_DB_USER=${IDM_DB_USER}
-IDM_DB_PASS=${IDM_DB_PASS}
-
-# Keyrock
-
-IDM_ADMIN_UID=${IDM_ADMIN_UID}
-IDM_ADMIN_USER=${IDM_ADMIN_USER}
-IDM_ADMIN_EMAIL=${IDM_ADMIN_EMAIL}
-IDM_ADMIN_PASS=${IDM_ADMIN_PASS}
-IDM_SESSION_SECRET=$(pwgen -s 16 1)
-IDM_ENCRYPTION_KEY=$(pwgen -s 16 1)
-EOF
-
-  cat <<EOF > "${POSTGRES_DIR}"/init.sql
-create role ${IDM_DB_USER} with SUPERUSER CREATEDB login password '${IDM_DB_PASS}';
+SET PERSIST default_password_lifetime = 1;
 EOF
 }
 
@@ -1368,11 +1304,7 @@ IDM_ADMIN_EMAIL=${MULTI_SERVER_ADMIN_EMAIL}
 IDM_ADMIN_PASS=${MULTI_SERVER_ADMIN_PASS}
 EOF
   else
-    if "${KEYROCK_POSTGRES}"; then
-      up_keyrock_postgres
-    else
-      up_keyrock_mysql
-    fi
+    up_keyrock_mysql
     ${DOCKER_COMPOSE} -f docker-idm.yml up -d
     SERVER_HOST="http://localhost:3000"
   fi
@@ -1601,13 +1533,7 @@ setup_postgres() {
 
   add_exposed_ports "${POSTGRES_EXPOSE_PORT}" "__POSTGRES_PORTS__" "5432"
 
-  sed -i -e "/ __KEYROCK_DEPENDS_ON__/s/^.*/      - postgres/" ${DOCKER_COMPOSE_YML}
-
   add_rsyslog_conf "postgres"
-
-  if [ -n "${POSTGRES_PASSWORD}" ]; then
-    return
-  fi
 
   POSTGRES_PASSWORD=$(pwgen -s 16 1)
 
@@ -1779,23 +1705,17 @@ setup_keyrock() {
 
   echo "${DOMAIN_NAME}" > "${CONFIG_DIR}"/keyrock/whitelist.txt
 
-  cp "${CONTRIB_DIR}/keyrock/list_users.js" "${CONFIG_DIR}/keyrock"
-  cp "${CONTRIB_DIR}/keyrock/users.js" "${CONFIG_DIR}/keyrock"
-  cp "${CONTRIB_DIR}/keyrock/applications.js" "${CONFIG_DIR}/keyrock"
   cp "${CONTRIB_DIR}/keyrock/version.json" "${CONFIG_DIR}/keyrock"
+  cp "${CONTRIB_DIR}/keyrock/package.json" "${CONFIG_DIR}/keyrock"
+  cp "${CONTRIB_DIR}/keyrock/model_oauth_server.js" "${CONFIG_DIR}/keyrock"
 
   add_to_docker_compose_yml "__KEYROCK_VOLUMES__" "     - ${CONFIG_DIR}/keyrock/whitelist.txt:/opt/fiware-idm/etc/email_list/whitelist.txt"
-  add_to_docker_compose_yml "__KEYROCK_VOLUMES__" "     - ${CONFIG_DIR}/keyrock/list_users.js:/opt/fiware-idm/controllers/web/list_users.js"
-  add_to_docker_compose_yml "__KEYROCK_VOLUMES__" "     - ${CONFIG_DIR}/keyrock/users.js:/opt/fiware-idm/controllers/web/users.js"
-  add_to_docker_compose_yml "__KEYROCK_VOLUMES__" "     - ${CONFIG_DIR}/keyrock/applications.js:/opt/fiware-idm/controllers/api/applications.js"
   add_to_docker_compose_yml "__KEYROCK_VOLUMES__" "     - ${CONFIG_DIR}/keyrock/version.json:/opt/fiware-idm/version.json"
+  add_to_docker_compose_yml "__KEYROCK_VOLUMES__" "     - ${CONFIG_DIR}/keyrock/package.json:/opt/fiware-idm/package.json"
+  add_to_docker_compose_yml "__KEYROCK_VOLUMES__" "     - ${CONFIG_DIR}/keyrock/model_oauth_server.js:/opt/fiware-idm/models/model_oauth_server.js"
   add_to_docker_compose_yml "__KEYROCK_ENVIRONMENT__" "     - IDM_EMAIL_LIST=whitelist"
 
-  if ${KEYROCK_POSTGRES}; then
-    setup_postgres
-  else
-    setup_mysql
-  fi
+  setup_mysql
 
   setup_wilma
 

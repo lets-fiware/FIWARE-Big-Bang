@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.31.0-next
 
+-   Update Keyrock and wilma to 8.4.0 (#310)
 -   Update supported Linux distribution (#309)
 -   Improve cert renew job (#303)
 

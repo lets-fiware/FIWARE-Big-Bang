@@ -22,7 +22,6 @@ You can specify configurations by editing the `config.sh` file.
 | IDM\_ADMIN\_EMAIL | An email address of an admin user for Keyrock                    | IDM\_ADMIN\_USER @ DOMAIN\_NAME |
 | IDM\_ADMIN\_PASS  | A password of an admin user for Keyrock                          | (Automatically generated)       |
 | IDM\_DEBUG        | Use logging for Keyrock (true or false)                          | false                           |
-| KEYROCK\_POSTGRES | Use PostgreSQL as backend database for Keyrock. (true or false)  | false                           |
 | POSTFIX           | Use Postfix (local delivery). (true or false)                    | false                           |
 
 ## How to setup

@@ -18,16 +18,13 @@ IDM_ADMIN_PASS=
 # Use Postfix (local delivery). (true or false) Default: false
 POSTFIX=
 
-# Use PostgreSQL as back-end database for Keyrock. (true or false) Default: false
-KEYROCK_POSTGRES=
-
 # Logging level for Keyrock
 #   https://github.com/ging/fiware-idm/blob/master/doc/installation_and_administration_guide/environment_variables.md
 #   true and false
 IDM_DEBUG=false
 
 # Docker image for Keyrock
-IMAGE_KEYROCK=letsfiware/idm:8.1.0
+IMAGE_KEYROCK=letsfiware/fiware-idm:8.4.0
 
 # Docker image for Postfix
 IMAGE_POSTFIX=letsfiware/postfix:0.31.0-next
@@ -36,7 +33,7 @@ IMAGE_POSTFIX=letsfiware/postfix:0.31.0-next
 # Wilma
 #
 # Docker image for Wilma
-IMAGE_WILMA=letsfiware/pep-proxy:8.1.0
+IMAGE_WILMA=letsfiware/fiware-pep-proxy:8.4.0
 
 #
 # Orion
@@ -432,7 +429,7 @@ IMAGE_MONGO=mongo:4.4
 MYSQL_EXPOSE_PORT=
 
 # Docker images for MySQL
-IMAGE_MYSQL=mysql:5.7
+IMAGE_MYSQL=mysql:8.1
 
 #
 # PostgreSQL

@@ -24,7 +24,6 @@
 | IDM\_ADMIN\_EMAIL | Keyrock の管理者ユーザのメールアドレス                                            | IDM\_ADMIN\_USER @ DOMAIN\_NAME |
 | IDM\_ADMIN\_PASS  | Keyrock の管理者ユーザのパスワード                                                | (自動生成)                      |
 | IDM\_DEBUG        | Keyrock のロギングを使用。(true または false)                                     | false                           |
-| KEYROCK\_POSTGRES | Keyrock のバックエンド データベースとして PostgreSQL を使用。(true または false)  | false                           |
 | POSTFIX           | Postfix を使用 (ローカル配信)。(true または false)                                | false                           |
 
 <a name="how-to-setup"></a>
