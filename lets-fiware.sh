@@ -1283,7 +1283,7 @@ EOF
 CREATE USER '${IDM_DB_USER}'@'%' IDENTIFIED BY '${IDM_DB_PASS}';
 GRANT ALL PRIVILEGES ON ${IDM_DB_NAME}.* TO '${IDM_DB_USER}'@'%';
 flush PRIVILEGES;
-SET PERSIST default_password_lifetime = 1;
+SET PERSIST default_password_lifetime = 0;
 EOF
 }
 
