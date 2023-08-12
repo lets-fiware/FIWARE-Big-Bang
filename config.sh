@@ -27,7 +27,7 @@ KEYROCK_POSTGRES=
 IDM_DEBUG=false
 
 # Docker image for Keyrock
-IMAGE_KEYROCK=letsfiware/idm:8.1.0
+IMAGE_KEYROCK=letsfiware/fiware-idm:8.4.0
 
 # Docker image for Postfix
 IMAGE_POSTFIX=letsfiware/postfix:0.31.0-next

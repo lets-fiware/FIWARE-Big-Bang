@@ -1252,9 +1252,7 @@ up_keyrock_mysql() {
   "${SUDO}" chown -R 1000:1000 "${CONFIG_DIR}"/keyrock/certs
 
   cp -a "${TEMPLEATE}"/docker/setup-keyrock-mysql.yml ./docker-idm.yml
-  cp "${CONTRIB_DIR}/keyrock/applications.js" "${CONFIG_DIR}/keyrock"
   add_to_docker_idm_yml "__KEYROCK_VOLUMES__" "     - ${CONFIG_DIR}/keyrock/certs/applications:/opt/fiware-idm/certs/applications"
-  add_to_docker_idm_yml "__KEYROCK_VOLUMES__" "     - ${CONFIG_DIR}/keyrock/applications.js:/opt/fiware-idm/controllers/api/applications.js"
 
   MYSQL_ROOT_PASSWORD=$(pwgen -s 16 1)
 
@@ -1305,12 +1303,10 @@ up_keyrock_postgres() {
   "${SUDO}" chown -R 1000:1000 "${CONFIG_DIR}"/keyrock/certs
 
   cp "${CONTRIB_DIR}/keyrock/20210603073911-hashed-access-tokens.js" "${CONFIG_DIR}/keyrock"
-  cp "${CONTRIB_DIR}/keyrock/applications.js" "${CONFIG_DIR}/keyrock"
   cp -a "${TEMPLEATE}"/docker/setup-keyrock-postgres.yml ./docker-idm.yml
 
   add_to_docker_idm_yml "__KEYROCK_VOLUMES__" "     - ${CONFIG_DIR}/keyrock/20210603073911-hashed-access-tokens.js:/opt/fiware-idm/migrations/20210603073911-hashed-access-tokens.js"
   add_to_docker_idm_yml "__KEYROCK_VOLUMES__" "     - ${CONFIG_DIR}/keyrock/certs/applications:/opt/fiware-idm/certs/applications"
-  add_to_docker_idm_yml "__KEYROCK_VOLUMES__" "     - ${CONFIG_DIR}/keyrock/applications.js:/opt/fiware-idm/controllers/api/applications.js"
 
   POSTGRES_PASSWORD=$(pwgen -s 16 1)
 
@@ -1780,16 +1776,14 @@ setup_keyrock() {
 
   echo "${DOMAIN_NAME}" > "${CONFIG_DIR}"/keyrock/whitelist.txt
 
-  cp "${CONTRIB_DIR}/keyrock/list_users.js" "${CONFIG_DIR}/keyrock"
-  cp "${CONTRIB_DIR}/keyrock/users.js" "${CONFIG_DIR}/keyrock"
-  cp "${CONTRIB_DIR}/keyrock/applications.js" "${CONFIG_DIR}/keyrock"
   cp "${CONTRIB_DIR}/keyrock/version.json" "${CONFIG_DIR}/keyrock"
+  cp "${CONTRIB_DIR}/keyrock/package.json" "${CONFIG_DIR}/keyrock"
+  cp "${CONTRIB_DIR}/keyrock/model_oauth_server.js" "${CONFIG_DIR}/keyrock"
 
   add_to_docker_compose_yml "__KEYROCK_VOLUMES__" "     - ${CONFIG_DIR}/keyrock/whitelist.txt:/opt/fiware-idm/etc/email_list/whitelist.txt"
-  add_to_docker_compose_yml "__KEYROCK_VOLUMES__" "     - ${CONFIG_DIR}/keyrock/list_users.js:/opt/fiware-idm/controllers/web/list_users.js"
-  add_to_docker_compose_yml "__KEYROCK_VOLUMES__" "     - ${CONFIG_DIR}/keyrock/users.js:/opt/fiware-idm/controllers/web/users.js"
-  add_to_docker_compose_yml "__KEYROCK_VOLUMES__" "     - ${CONFIG_DIR}/keyrock/applications.js:/opt/fiware-idm/controllers/api/applications.js"
   add_to_docker_compose_yml "__KEYROCK_VOLUMES__" "     - ${CONFIG_DIR}/keyrock/version.json:/opt/fiware-idm/version.json"
+  add_to_docker_compose_yml "__KEYROCK_VOLUMES__" "     - ${CONFIG_DIR}/keyrock/package.json:/opt/fiware-idm/package.json"
+  add_to_docker_compose_yml "__KEYROCK_VOLUMES__" "     - ${CONFIG_DIR}/keyrock/model_oauth_server.js:/opt/fiware-idm/models/model_oauth_server.js"
   add_to_docker_compose_yml "__KEYROCK_ENVIRONMENT__" "     - IDM_EMAIL_LIST=whitelist"
 
   if ${KEYROCK_POSTGRES}; then
