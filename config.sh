@@ -432,7 +432,7 @@ IMAGE_MONGO=mongo:4.4
 MYSQL_EXPOSE_PORT=
 
 # Docker images for MySQL
-IMAGE_MYSQL=mysql:5.7
+IMAGE_MYSQL=mysql:8.1
 
 #
 # PostgreSQL
