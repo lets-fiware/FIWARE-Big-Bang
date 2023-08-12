@@ -1,3 +1,5 @@
+## FIWARE Big Bang v0.32.0-next
+
 ## FIWARE Big Bang v0.32.0 - 13 August, 2023
 
 -   Update Keyrock and wilma to 8.4.0 (#310)
