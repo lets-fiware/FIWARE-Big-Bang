@@ -56,6 +56,12 @@ ORION_LD=
 # Expose port 1026 (none, local, all) Default: none
 ORION_LD_EXPOSE_PORT=
 
+# ORIONLD_MULTI_SERVICE (FALSE, TRUE) Default: TRUE
+ORION_LD_MULTI_SERVICE=
+
+# ORIONLD_DISABLE_FILE_LOG (FALSE, TRUE) Default: TRUE
+ORION_LD_DISABLE_FILE_LOG=
+
 # Docker image for Orion
 IMAGE_ORION_LD=quay.io/fiware/orion-ld:1.3.0
 

@@ -124,6 +124,14 @@ set_default_values() {
     ORION_LD_EXPOSE_PORT=none
   fi
 
+  if [ -z "${ORION_LD_MULTI_SERVICE}" ]; then
+    ORION_LD_MULTI_SERVICE=TRUE
+  fi
+
+  if [ -z "${ORION_LD_DISABLE_FILE_LOG}" ]; then
+    ORION_LD_DISABLE_FILE_LOG=TRUE
+  fi
+
   if [ -z "${MINTAKA_EXPOSE_PORT}" ]; then
     MINTAKA_EXPOSE_PORT=none
   fi
@@ -1871,6 +1879,8 @@ setup_orion_ld() {
 # Orion-LD Context Broker host
 
 CB_LD_URL=${CB_LD_URL}
+ORION_LD_MULTI_SERVICE=${ORION_LD_MULTI_SERVICE}
+ORION_LD_DISABLE_FILE_LOG=${ORION_LD_DISABLE_FILE_LOG}
 EOF
 
   if ${MINTAKA}; then

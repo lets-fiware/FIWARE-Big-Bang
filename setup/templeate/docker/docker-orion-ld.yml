@@ -6,6 +6,11 @@ services:
     depends_on:
       - mongo
     command: -dbhost mongo
+    environment:
+      - ORIONLD_MONGO_HOST=mongo
+      - ORIONLD_MULTI_SERVICE=${ORION_LD_MULTI_SERVICE}
+      - ORIONLD_DISABLE_FILE_LOG=${ORION_LD_DISABLE_FILE_LOG}
+      # __ORION_LD_ENVIRONMENT__
     restart: always
     logging:
       driver: syslog

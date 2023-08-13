@@ -15,14 +15,16 @@
 
 You can specify configurations by editing the `config.sh` file.
 
-| Variable name           | Description                                          | Default value             |
-| ----------------------- | ---------------------------------------------------- | ------------------------- |
-| ORION\_LD               | A sub-domain name of Orion-LD.                       | orion                     |
-| ORION\_LD\_EXPOSE\_PORT | Expose port 1026 for Orion-LD. (none, local or all)  | none                      |
-| MINTAKA                 | Enable Mintaka (false, true)                         | true                      |
-| MINTAKA\_EXPOSE\_PORT   | Expose port 8080 for Mintaka. (none, local or all)   | none                      |
-| TIMESCALE\_PASS         | Set a password for Timescale DB.                     | (automatically generated) |
-| TIMESCALE\_EXPOSE\_PORT | Expose port 5432 for Timescale. (none, local or all) | none                      |
+| Variable name                 | Description                                             | Default value             |
+| ----------------------------- | ------------------------------------------------------- | ------------------------- |
+| ORION\_LD                     | A sub-domain name of Orion-LD.                          | orion                     |
+| ORION\_LD\_EXPOSE\_PORT       | Expose port 1026 for Orion-LD. (none, local or all)     | none                      |
+| ORION\_LD\_MULTI\_SERVICE     | Whether to enable multitenancy (FALSE, TRUE)            | TRUE                      |
+| ORION\_LD\_DISABLE\_FILE\_LOG | The file log is disabled to improve speed (FALSE, TRUE) | TRUE                      |
+| MINTAKA                       | Enable Mintaka (false, true)                            | true                      |
+| MINTAKA\_EXPOSE\_PORT         | Expose port 8080 for Mintaka. (none, local or all)      | none                      |
+| TIMESCALE\_PASS               | Set a password for Timescale DB.                        | (automatically generated) |
+| TIMESCALE\_EXPOSE\_PORT       | Expose port 5432 for Timescale. (none, local or all)    | none                      |
 
 ## How to setup
 

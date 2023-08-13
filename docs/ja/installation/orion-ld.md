@@ -17,14 +17,16 @@
 
 `config.sh` ファイルを編集して構成を指定できます。
 
-| 変数名                  | 説明                                                         | 既定値     |
-| ----------------------- | ------------------------------------------------------------ | ---------- |
-| ORION\_LD               | Orion-LD のサブドメイン名                                    | orion      |
-| ORION\_LD\_EXPOSE\_PORT | Orion-LD のポート 1026 を公開。 (none, local または all)     | none       |
-| MINTAKA                 | Mintaka を有効化。(false, true)                              | true       |
-| MINTAKA\_EXPOSE\_PORT   | Mintaka のポート 8080 を公開。 (none, local または all)      | none       |
-| TIMESCALE\_PASS         | Timescale DB のパスワード                                    | (自動生成) |
-| TIMESCALE\_EXPOSE\_PORT | Timescale DB のポート 5432 を公開。 (none, local または all) | none       |
+| 変数名                        | 説明                                                         | 既定値     |
+| ----------------------------- | ------------------------------------------------------------ | ---------- |
+| ORION\_LD                     | Orion-LD のサブドメイン名                                    | orion      |
+| ORION\_LD\_EXPOSE\_PORT       | Orion-LD のポート 1026 を公開。 (none, local または all)     | none       |
+| ORION\_LD\_MULTI\_SERVICE     | マルチテナンシーを有効にするかどうか (FALSE, TRUE)           | TRUE       |
+| ORION\_LD\_DISABLE\_FILE\_LOG | 速度向上のためファイルログを無効にするかどうか (FALSE, TRUE) | TRUE       |
+| MINTAKA                       | Mintaka を有効化。(false, true)                              | true       |
+| MINTAKA\_EXPOSE\_PORT         | Mintaka のポート 8080 を公開。 (none, local または all)      | none       |
+| TIMESCALE\_PASS               | Timescale DB のパスワード                                    | (自動生成) |
+| TIMESCALE\_EXPOSE\_PORT       | Timescale DB のポート 5432 を公開。 (none, local または all) | none       |
 
 <a name="how-to-setup"></a>
 
