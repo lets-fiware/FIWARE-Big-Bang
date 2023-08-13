@@ -1,5 +1,7 @@
 ## FIWARE Big Bang v0.33.0-next
 
+-   Update IoT Agent for UltraLight to 2.2.0 (#317)
+
 ## FIWARE Big Bang v0.33.0 - 13 August, 2023
 
 -   Fix default_password_lifetime for MySQL (#314)
