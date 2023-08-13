@@ -1,5 +1,7 @@
 ## FIWARE Big Bang v0.32.0-next
 
+-   Fix default_password_lifetime for MySQL (#314)
+
 ## FIWARE Big Bang v0.32.0 - 13 August, 2023
 
 -   Update Keyrock and wilma to 8.4.0 (#310)
