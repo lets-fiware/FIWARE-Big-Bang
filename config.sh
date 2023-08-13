@@ -292,7 +292,7 @@ IOTA_JSON_AUTOCAST=true
 IOTA_JSON_LOG_LEVEL=INFO
 
 # Docker image for IoT Agent for JSON
-IMAGE_IOTAGENT_JSON=telefonicaiot/iotagent-json:1.25.0
+IMAGE_IOTAGENT_JSON=telefonicaiot/iotagent-json:2.2.0
 
 #
 # Node-RED
