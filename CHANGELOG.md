@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.33.0-next
 
+-   Add environment variables for Orion-LD (#319)
 -   Update IoT Agent for JSON to 2.2.0 (#318)
 -   Update IoT Agent for UltraLight to 2.2.0 (#317)
 
