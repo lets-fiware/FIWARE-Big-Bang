@@ -214,10 +214,10 @@ NGSIPROXY=
 WIRECLOUD_LOGLEVEL=INFO
 
 # Docker image for WireCloud
-IMAGE_WIRECLOUD=fiware/wirecloud:1.3.1
+IMAGE_WIRECLOUD=quay.io/fiware/wirecloud:1.3.1
 
 # Docker image for Ngsiproxy
-IMAGE_NGSIPROXY=fiware/ngsiproxy:1.2.2
+IMAGE_NGSIPROXY=quay.io/fiware/ngsiproxy:1.2.2
 
 # Docker image for Redis
 IMAGE_REDIS=redis:6
