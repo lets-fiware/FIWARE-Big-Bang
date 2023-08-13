@@ -1,3 +1,5 @@
+## FIWARE Big Bang v0.33.0-next
+
 ## FIWARE Big Bang v0.33.0 - 13 August, 2023
 
 -   Fix default_password_lifetime for MySQL (#314)

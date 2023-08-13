@@ -27,7 +27,7 @@ IDM_DEBUG=false
 IMAGE_KEYROCK=letsfiware/fiware-idm:8.4.0
 
 # Docker image for Postfix
-IMAGE_POSTFIX=letsfiware/postfix:0.33.0
+IMAGE_POSTFIX=letsfiware/postfix:0.33.0-next
 
 #
 # Wilma
@@ -322,7 +322,7 @@ NODE_RED_LOGGING_METRICS=
 NODE_RED_LOGGING_AUDIT=
 
 # Docker image for Node-RED
-IMAGE_NODE_RED=letsfiware/node-red:0.33.0
+IMAGE_NODE_RED=letsfiware/node-red:0.33.0-next
 
 #
 # Grafana
@@ -348,7 +348,7 @@ ZEPPELIN=
 ZEPPELIN_DEBUG=
 
 # Docker image for Zeppelin
-IMAGE_ZEPPELIN=letsfiware/zeppelin:0.33.0
+IMAGE_ZEPPELIN=letsfiware/zeppelin:0.33.0-next
 
 #
 # Queryproxy
@@ -360,7 +360,7 @@ QUERYPROXY=
 QUERYPROXY_LOGLEVEL=info
 
 # Docker image for Queryproxy
-IMAGE_QUERYPROXY=letsfiware/queryproxy:0.33.0
+IMAGE_QUERYPROXY=letsfiware/queryproxy:0.33.0-next
 
 #
 # Tokenproxy
@@ -372,7 +372,7 @@ TOKENPROXY_LOGLEVEL=info
 TOKENPROXY_VERBOSE=
 
 # Docker image for Tokenproxy
-IMAGE_TOKENPROXY=letsfiware/tokenproxy:0.33.0
+IMAGE_TOKENPROXY=letsfiware/tokenproxy:0.33.0-next
 
 #
 # Regproxy
@@ -411,7 +411,7 @@ REGPROXY_LOGLEVEL=info
 REGPROXY_VERBOSE=false
 
 # Docker image for Regproxy
-IMAGE_REGPROXY=letsfiware/regproxy:0.33.0
+IMAGE_REGPROXY=letsfiware/regproxy:0.33.0-next
 
 #
 # MongoDB
