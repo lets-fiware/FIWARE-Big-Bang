@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.33.0-next
 
+-   Switch Docker registry for WireCloud and Ngsiproxy to quay.io (#322)
 -   Update Perseo FE to 1.27.0 (#321)
 -   Improve Mintaka integration with Orion-LD (#320)
 -   Add environment variables for Orion-LD (#319)
