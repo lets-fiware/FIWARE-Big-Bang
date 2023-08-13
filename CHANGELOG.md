@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.33.0-next
 
+-   Update Perseo FE to 1.27.0 (#321)
 -   Improve Mintaka integration with Orion-LD (#320)
 -   Add environment variables for Orion-LD (#319)
 -   Update IoT Agent for JSON to 2.2.0 (#318)
