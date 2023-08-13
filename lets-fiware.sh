@@ -1311,13 +1311,24 @@ IDM_HOST=${KEYROCK_HOST}
 IDM_ADMIN_EMAIL=${MULTI_SERVER_ADMIN_EMAIL}
 IDM_ADMIN_PASS=${MULTI_SERVER_ADMIN_PASS}
 EOF
+    wait "${SERVER_HOST}" "200"
   else
     up_keyrock_mysql
     ${DOCKER_COMPOSE} -f docker-idm.yml up -d
     SERVER_HOST="http://localhost:3000"
-  fi
 
-  wait "${SERVER_HOST}" "200"
+    wait "${SERVER_HOST}" "200"
+
+    ${DOCKER_COMPOSE} -f docker-idm.yml cp -a keyrock:/opt/fiware-idm/version.json "${CONFIG_DIR}/keyrock/version.json"
+
+    ${DOCKER_COMPOSE} -f docker-idm.yml cp -a keyrock:/opt/fiware-idm/package.json "${CONFIG_DIR}/keyrock/package.json"
+    cp -a "${CONFIG_DIR}/keyrock/package.json" "${WORK_DIR}/_package.json"
+    sed -i "3s/3/4/" ${CONFIG_DIR}/keyrock/package.json
+    touch --reference="${WORK_DIR}/_package.json" "${CONFIG_DIR}/keyrock/package.json"
+
+    ${DOCKER_COMPOSE} -f docker-idm.yml cp -a keyrock:/opt/fiware-idm/models/model_oauth_server.js "${CONFIG_DIR}/keyrock/model_oauth_server.js"
+    sed -i "930s/requested_scopes/scope.includes(' ') ? scope: requested_scopes/" "${CONFIG_DIR}/keyrock/model_oauth_server.js"
+  fi
 
   ${NGSI_GO} server add --host "${IDM}" --serverType keyrock --serverHost "${SERVER_HOST}" --idmType idm --username "${IDM_ADMIN_EMAIL}" --password "${IDM_ADMIN_PASS}"
 }
@@ -1712,10 +1723,6 @@ setup_keyrock() {
   add_rsyslog_conf "keyrock"
 
   echo "${DOMAIN_NAME}" > "${CONFIG_DIR}"/keyrock/whitelist.txt
-
-  cp "${CONTRIB_DIR}/keyrock/version.json" "${CONFIG_DIR}/keyrock"
-  cp "${CONTRIB_DIR}/keyrock/package.json" "${CONFIG_DIR}/keyrock"
-  cp "${CONTRIB_DIR}/keyrock/model_oauth_server.js" "${CONFIG_DIR}/keyrock"
 
   add_to_docker_compose_yml "__KEYROCK_VOLUMES__" "     - ${CONFIG_DIR}/keyrock/whitelist.txt:/opt/fiware-idm/etc/email_list/whitelist.txt"
   add_to_docker_compose_yml "__KEYROCK_VOLUMES__" "     - ${CONFIG_DIR}/keyrock/version.json:/opt/fiware-idm/version.json"

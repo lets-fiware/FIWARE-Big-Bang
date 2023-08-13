@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.33.0-next
 
+-   Improve Keyrock installation (#324)
 -   Update Cygnus to 3.2.0 (#323)
 -   Switch Docker registry for WireCloud and Ngsiproxy to quay.io (#322)
 -   Update Perseo FE to 1.27.0 (#321)
