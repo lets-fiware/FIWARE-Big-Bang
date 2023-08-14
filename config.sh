@@ -452,6 +452,9 @@ IMAGE_POSTGRES=postgres:15
 # Docker images for Nginx
 IMAGE_NGINX=nginx:1.25
 
+# Docker image for pwgen
+IMAGE_PWGEN=letsfiware/pwgen:0.33.0-next
+
 #
 # Firewall (firewalld)
 #
