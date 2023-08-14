@@ -39,7 +39,7 @@ main() {
 
   docker pull hadolint/hadolint
 
-  for name in node-red tokenproxy queryproxy regproxy postfix zeppelin
+  for name in node-red tokenproxy queryproxy regproxy postfix zeppelin pwgen
   do
     lint "./setup/docker/${name}/Dockerfile"
   done

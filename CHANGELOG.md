@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.34.0-next
 
+-   Improve password generation process (#328)
 -   Fix lint error (#327)
 
 ## FIWARE Big Bang v0.34.0 - 14 August, 2023

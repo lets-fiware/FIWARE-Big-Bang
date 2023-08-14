@@ -359,26 +359,6 @@ check_iot_agent_values() {
         exit "${ERR_CODE}"
       fi
     fi
-    if [ "${IOTAGENT_HTTP}" != "" ]; then
-      if [ -z "${IOTA_HTTP_AUTH}" ]; then
-        IOTA_HTTP_AUTH=bearer
-      fi
-      if [ "${IOTA_HTTP_AUTH}" != "none" ] && [ "${IOTA_HTTP_AUTH}" != "basic" ] && [ "${IOTA_HTTP_AUTH}" != "bearer" ]; then
-        logging_err "error: IOTA_HTTP_AUTH is unknwon value. (none, basic or bearer)"
-        exit "${ERR_CODE}"
-      fi
-      if [ "${IOTA_HTTP_AUTH}" = "basic" ]; then
-        if [ -z "${IOTA_HTTP_BASIC_USER}" ]; then
-          IOTA_HTTP_BASIC_USER=fiware
-        fi
-        if [ -z "${IOTA_HTTP_BASIC_PASS}" ]; then
-          IOTA_HTTP_BASIC_PASS=$(pwgen -s 16 1)
-        fi
-      else
-        IOTA_HTTP_BASIC_USER=
-        IOTA_HTTP_BASIC_PASS=
-      fi
-    fi
   fi
 }
 
@@ -486,7 +466,7 @@ add_env() {
   logging_info "${FUNCNAME[0]}"
 
   if [ -z "${IDM_ADMIN_PASS}" ]; then
-    IDM_ADMIN_PASS=$(pwgen -s 16 1)
+    IDM_ADMIN_PASS=$(${DOCKER} run -t --rm "${IMAGE_PWGEN}" | sed -z 's/[\x0d\x0a]//g')
   fi
 
   cat <<EOF >> .env
@@ -696,7 +676,7 @@ install_commands_ubuntu() {
     echo "\$nrconf{restart} = 'a';" | ${SUDO} tee /etc/needrestart/conf.d/50local.conf > /dev/null
   fi
   ${APT} update
-  ${APT} install -y curl pwgen jq make zip rsyslog host anacron
+  ${APT} install -y curl jq make zip rsyslog host anacron
 }
 
 #
@@ -705,8 +685,7 @@ install_commands_ubuntu() {
 install_commands_centos() {
   logging_info "${FUNCNAME[0]}"
 
-  ${YUM} install -y epel-release
-  ${YUM} install -y curl pwgen jq bind-utils make zip
+  ${YUM} install -y curl jq bind-utils make zip
 }
 
 #
@@ -716,7 +695,7 @@ install_commands() {
   logging_info "${FUNCNAME[0]}"
 
   update=false
-  for cmd in curl pwgen jq zip rsyslogd host anacron
+  for cmd in curl jq zip rsyslogd host anacron
   do
     if ! type "${cmd}" >/dev/null 2>&1; then
         update=true
@@ -734,6 +713,14 @@ install_commands() {
   if $FIBB_TEST; then
     CURL="${CURL} --insecure"
   fi
+}
+
+#
+# Build pwgen container
+#
+build_pwgen_container()
+{
+  ${DOCKER} build -t "${IMAGE_PWGEN}" "${SETUP_DIR}/docker/pwgen/"
 }
 
 #
@@ -1256,14 +1243,14 @@ up_keyrock_mysql() {
   cp -a "${TEMPLEATE}"/docker/setup-keyrock-mysql.yml ./docker-idm.yml
   add_to_docker_idm_yml "__KEYROCK_VOLUMES__" "     - ${CONFIG_DIR}/keyrock/certs/applications:/opt/fiware-idm/certs/applications"
 
-  MYSQL_ROOT_PASSWORD=$(pwgen -s 16 1)
+  MYSQL_ROOT_PASSWORD=$(${DOCKER} run -t --rm "${IMAGE_PWGEN}" | sed -z 's/[\x0d\x0a]//g')
 
   IDM_HOST=https://${KEYROCK}
 
   IDM_DB_HOST=mysql
   IDM_DB_NAME=idm
   IDM_DB_USER=idm
-  IDM_DB_PASS=$(pwgen -s 16 1)
+  IDM_DB_PASS=$(${DOCKER} run -t --rm "${IMAGE_PWGEN}" | sed -z 's/[\x0d\x0a]//g')
 
   cat <<EOF >> .env
 IDM_HOST=${IDM_HOST}
@@ -1283,8 +1270,8 @@ IDM_ADMIN_UID=${IDM_ADMIN_UID}
 IDM_ADMIN_USER=${IDM_ADMIN_USER}
 IDM_ADMIN_EMAIL=${IDM_ADMIN_EMAIL}
 IDM_ADMIN_PASS=${IDM_ADMIN_PASS}
-IDM_SESSION_SECRET=$(pwgen -s 16 1)
-IDM_ENCRYPTION_KEY=$(pwgen -s 16 1)
+IDM_SESSION_SECRET=$(${DOCKER} run -t --rm "${IMAGE_PWGEN}" | sed -z 's/[\x0d\x0a]//g')
+IDM_ENCRYPTION_KEY=$(${DOCKER} run -t --rm "${IMAGE_PWGEN}" | sed -z 's/[\x0d\x0a]//g')
 EOF
 
   cat <<EOF > "${MYSQL_DIR}"/init.sql
@@ -1554,7 +1541,7 @@ setup_postgres() {
 
   add_rsyslog_conf "postgres"
 
-  POSTGRES_PASSWORD=$(pwgen -s 16 1)
+  POSTGRES_PASSWORD=$(${DOCKER} run -t --rm "${IMAGE_PWGEN}" | sed -z 's/[\x0d\x0a]//g')
 
   cat <<EOF >> .env
 
@@ -1580,7 +1567,7 @@ setup_elasticsearch() {
 
   add_rsyslog_conf "elasticsearch-db"
 
-  ELASTICSEARCH_PASSWORD=$(pwgen -s 16 1)
+  ELASTICSEARCH_PASSWORD=$(${DOCKER} run -t --rm "${IMAGE_PWGEN}" | sed -z 's/[\x0d\x0a]//g')
 
   mkdir -p "${DATA_DIR}"/elasticsearch-db
 
@@ -1823,7 +1810,7 @@ setup_mintaka() {
   logging_info "${FUNCNAME[0]}"
 
   TIMESCALE_USER=orion
-  TIMESCALE_PASS=$(pwgen -s 16 1)
+  TIMESCALE_PASS=$(${DOCKER} run -t --rm "${IMAGE_PWGEN}" | sed -z 's/[\x0d\x0a]//g')
 
   add_docker_compose_yml "docker-mintaka.yml"
 
@@ -2417,7 +2404,7 @@ setup_mosquitto() {
     MQTT_USERNAME=fiware
   fi
   if [ -z "${MQTT_PASSWORD}" ]; then
-    MQTT_PASSWORD=$(pwgen -s 16 1)
+    MQTT_PASSWORD=$(${DOCKER} run -t --rm "${IMAGE_PWGEN}" | sed -z 's/[\x0d\x0a]//g')
   fi
   echo "${MQTT_USERNAME}:${MQTT_PASSWORD}" > "${dir}"/password.txt
 
@@ -2514,28 +2501,46 @@ echo "}" >> "${nginx_conf}"
 setup_iotagent_over_http() {
   if ! ${IOTAGENT_HTTP_INSTALLED}; then
     IOTAGENT_HTTP_INSTALLED=true
+    if [ -z "${IOTA_HTTP_AUTH}" ]; then
+      IOTA_HTTP_AUTH=bearer
+    fi
+    if [ "${IOTA_HTTP_AUTH}" != "none" ] && [ "${IOTA_HTTP_AUTH}" != "basic" ] && [ "${IOTA_HTTP_AUTH}" != "bearer" ]; then
+      logging_err "error: IOTA_HTTP_AUTH is unknwon value. (none, basic or bearer)"
+      exit "${ERR_CODE}"
+    fi
+    if [ "${IOTA_HTTP_AUTH}" = "basic" ]; then
+      if [ -z "${IOTA_HTTP_BASIC_USER}" ]; then
+        IOTA_HTTP_BASIC_USER=fiware
+      fi
+      if [ -z "${IOTA_HTTP_BASIC_PASS}" ]; then
+        IOTA_HTTP_BASIC_PASS=$(${DOCKER} run -t --rm "${IMAGE_PWGEN}" | sed -z 's/[\x0d\x0a]//g')
+      fi
+    else
+      IOTA_HTTP_BASIC_USER=
+      IOTA_HTTP_BASIC_PASS=
+    fi
     create_nginx_conf "${IOTAGENT_HTTP}" "nginx-iotagent-http"
-  cat <<EOF >> .env
+    cat <<EOF >> .env
 
 # IoT Agent over HTTP
 
 IOTA_HTTP_AUTH=${IOTA_HTTP_AUTH}
 EOF
-  if [ "${IOTA_HTTP_AUTH}" = "basic" ]; then
-    echo "${IOTA_HTTP_BASIC_USER}":"$(openssl passwd -6 "${IOTA_HTTP_BASIC_PASS}")" >> "${CONFIG_NGINX}"/.htpasswd
-    add_nginx_volumes "${CONFIG_NGINX}/.htpasswd:/etc/nginx/.htpasswd:ro"
-    cat <<EOF >> .env
+    if [ "${IOTA_HTTP_AUTH}" = "basic" ]; then
+      echo "${IOTA_HTTP_BASIC_USER}":"$(openssl passwd -6 "${IOTA_HTTP_BASIC_PASS}")" >> "${CONFIG_NGINX}"/.htpasswd
+      add_nginx_volumes "${CONFIG_NGINX}/.htpasswd:/etc/nginx/.htpasswd:ro"
+      cat <<EOF >> .env
 IOTA_HTTP_BASIC_USER=${IOTA_HTTP_BASIC_USER}
 IOTA_HTTP_BASIC_PASS=${IOTA_HTTP_BASIC_PASS}
 EOF
     fi
-  fi
 
-  case "${IOTA_HTTP_AUTH}" in
-    "none" ) sed -i -e "/__NGINX_IOTAGENT_HTTP__/i \  location $1 {\n    proxy_pass $2$1;\n  }" "${NGINX_SITES}/${IOTAGENT_HTTP}" ;;
-    "basic" ) sed -i -e "/__NGINX_IOTAGENT_HTTP__/i \  location $1 {\n    auth_basic \"Restricted\";\n    auth_basic_user_file /etc/nginx/.htpasswd;\n\n    proxy_pass $2$1;\n  }" "${NGINX_SITES}/${IOTAGENT_HTTP}" ;;
-    * ) sed -i -e "/__NGINX_IOTAGENT_HTTP__/i \  location $1 {\n    set \$req_uri \"\$uri\";\n    auth_request /_check_oauth2_token;\n\n    proxy_pass $2$1;\n  }" "${NGINX_SITES}/${IOTAGENT_HTTP}" ;;
-  esac
+    case "${IOTA_HTTP_AUTH}" in
+      "none" ) sed -i -e "/__NGINX_IOTAGENT_HTTP__/i \  location $1 {\n    proxy_pass $2$1;\n  }" "${NGINX_SITES}/${IOTAGENT_HTTP}" ;;
+      "basic" ) sed -i -e "/__NGINX_IOTAGENT_HTTP__/i \  location $1 {\n    auth_basic \"Restricted\";\n    auth_basic_user_file /etc/nginx/.htpasswd;\n\n    proxy_pass $2$1;\n  }" "${NGINX_SITES}/${IOTAGENT_HTTP}" ;;
+      * ) sed -i -e "/__NGINX_IOTAGENT_HTTP__/i \  location $1 {\n    set \$req_uri \"\$uri\";\n    auth_request /_check_oauth2_token;\n\n    proxy_pass $2$1;\n  }" "${NGINX_SITES}/${IOTAGENT_HTTP}" ;;
+    esac
+  fi
 }
 
 #
@@ -2892,7 +2897,7 @@ EOF
     ${NGSI_GO} applications --host "${IDM}" trusted --aid "${NODE_RED_CLIENT_ID}" add --tid "${ORION_CLIENT_ID}"  > /dev/null
     ${NGSI_GO} applications --host "${IDM}" users --aid "${ORION_CLIENT_ID}" assign --rid "${ORION_RID_API}" --uid "${IDM_ADMIN_UID}" > /dev/null
 
-    password=$(pwgen -s 16 1)
+    password=$(${DOCKER} run -t --rm "${IMAGE_PWGEN}" | sed -z 's/[\x0d\x0a]//g')
     NODE_RED_UID=$(${NGSI_GO} users --host "${IDM}" create --username "${username}" --password "${password}" --email "${username}@${DOMAIN_NAME}")
     ${NGSI_GO} applications --host "${IDM}" users --aid "${NODE_RED_CLIENT_ID}" assign --rid "${RID_FULL}" --uid "${NODE_RED_UID}" > /dev/null
     ${NGSI_GO} applications --host "${IDM}" users --aid "${NODE_RED_CLIENT_ID}" assign --rid "${RID_API}" --uid "${NODE_RED_UID}" > /dev/null
@@ -3550,6 +3555,8 @@ main() {
   check_docker
   check_docker_compose
   check_ngsi_go
+
+  build_pwgen_container
 
   add_env
 
