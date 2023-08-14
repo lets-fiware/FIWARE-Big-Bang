@@ -1,8 +1,9 @@
-#!/bin/sh
+#!/bin/bash
 FORCE_CLEAN=${FORCE_CLEAN:-false}
 
 if [ "${FORCE_CLEAN}" != "true" ]; then
   echo "!CAUTION! This command cleans up your FIWARE instance including your all data."
+  # shellcheck disable=SC2162
   read -p "Are you sure you want to run it? (Y/n): " ans
 
   if [ "${ans}" != "Y" ]; then

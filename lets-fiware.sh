@@ -1323,7 +1323,7 @@ EOF
 
     ${DOCKER_COMPOSE} -f docker-idm.yml cp -a keyrock:/opt/fiware-idm/package.json "${CONFIG_DIR}/keyrock/package.json"
     cp -a "${CONFIG_DIR}/keyrock/package.json" "${WORK_DIR}/_package.json"
-    sed -i "3s/3/4/" ${CONFIG_DIR}/keyrock/package.json
+    sed -i "3s/3/4/" "${CONFIG_DIR}/keyrock/package.json"
     touch --reference="${WORK_DIR}/_package.json" "${CONFIG_DIR}/keyrock/package.json"
 
     ${DOCKER_COMPOSE} -f docker-idm.yml cp -a keyrock:/opt/fiware-idm/models/model_oauth_server.js "${CONFIG_DIR}/keyrock/model_oauth_server.js"

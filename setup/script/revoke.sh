@@ -29,6 +29,7 @@
 set -ue
 
 echo "!CAUTION! This command revokes server certificates for your FIWARE instance"
+# shellcheck disable=SC2162
 read -p "Are you sure you want to run it? (Y/n): " ans
 
 if [ "${ans}" != "Y" ]; then
