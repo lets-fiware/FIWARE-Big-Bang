@@ -24,7 +24,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-FROM alpine:3.14
+FROM alpine:3.18
 
 COPY ./ngsi /usr/local/bin/ngsi
 COPY ./docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
