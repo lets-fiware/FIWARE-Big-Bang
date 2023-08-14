@@ -1,4 +1,6 @@
-## FIWARE Big Bang v0.34.0 - 14 8月, 2023
+## FIWARE Big Bang v0.34.0-next
+
+## FIWARE Big Bang v0.34.0 - 14 August, 2023
 
 -   Improve Keyrock installation (#324)
 -   Update Cygnus to 3.2.0 (#323)
