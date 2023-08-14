@@ -1,5 +1,7 @@
 ## FIWARE Big Bang v0.34.0-next
 
+-   Fix lint error (#327)
+
 ## FIWARE Big Bang v0.34.0 - 14 August, 2023
 
 -   Improve Keyrock installation (#324)
