@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.34.0-next
 
+-   Update supported Linux distribution (#332)
 -   Update alpine docker image to 3.18 (#329)
 -   Improve password generation process (#328)
 -   Fix lint error (#327)

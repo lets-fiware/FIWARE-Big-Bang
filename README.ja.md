@@ -67,7 +67,9 @@ FI-BB は FIWARE Big Bang の略名です。
     -   MQTT TLS を有効にしたとき、8883
 -   サポートしている Linux ディストリビューション
     -   [Ubuntu 22.04 LTS](https://github.com/lets-fiware/FIWARE-Big-Bang/discussions/304) (推奨 Linux ディストリビューション)
-    -   [Ubuntu 20.04](https://github.com/lets-fiware/FIWARE-Big-Bang/discussions/305)
+    -   [Ubuntu 20.04 LTS](https://github.com/lets-fiware/FIWARE-Big-Bang/discussions/305)
+    -   [CentOS Stream release 9](https://github.com/lets-fiware/FIWARE-Big-Bang/discussions/330)
+    -   [CentOS Stream release 8](https://github.com/lets-fiware/FIWARE-Big-Bang/discussions/331)
     -   [Rocky Linux 9](https://github.com/lets-fiware/FIWARE-Big-Bang/discussions/306)
     -   [Rocky Linux 8](https://github.com/lets-fiware/FIWARE-Big-Bang/discussions/309)
     -   [AlmaLinux 9](https://github.com/lets-fiware/FIWARE-Big-Bang/discussions/307)
