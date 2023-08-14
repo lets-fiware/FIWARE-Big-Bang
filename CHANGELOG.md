@@ -1,4 +1,4 @@
-## FIWARE Big Bang v0.34.0-next
+## FIWARE Big Bang v0.35.0 - 14 August, 2023
 
 -   Update supported Linux distribution (#332)
 -   Update alpine docker image to 3.18 (#329)
