@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.35.0-next
 
+-   Switch yum to dnf, the CentOS package manager (#336)
 -   Support node-rednode-red-contrib-ngsi-ld for Node-RED (#335)
 
 ## FIWARE Big Bang v0.35.0 - 14 August, 2023

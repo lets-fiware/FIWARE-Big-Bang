@@ -199,21 +199,21 @@ sudo apt-get install -y curl pwgen jq make zip
 EOF
   chmod +x "${MOCK_DIR}/apt"
 
-  cat <<EOF > "${MOCK_DIR}/yum"
+  cat <<EOF > "${MOCK_DIR}/dnf"
 #!/bin/sh
 while [ "\$1" ]
 do
-  if [ "\$1" = "epel-release" ] || [ "\$1" = "firewalld" ] || [ "\$1" = "yum-utils" ] || [ "\$1" = "docker-ce" ]; then
+  if [ "\$1" = "firewalld" ] || [ "\$1" = "config-manager" ] || [ "\$1" = "config-manager" ] || [ "\$1" = "docker-compose-plugin" ]; then
     exit 0
   fi
   shift
 done
 apt-get update 
-sudo apt-get install -y curl pwgen jq make zip
+sudo apt-get install -y curl jq make zip
 EOF
-  chmod +x "${MOCK_DIR}/yum"
+  chmod +x "${MOCK_DIR}/dnf"
 
-  for cmd in systemctl fiware-cmd add-apt-repository apt-key apt-get yum-config-manager
+  for cmd in systemctl fiware-cmd add-apt-repository apt-key apt-get
   do
     echo "#!/bin/sh" > "${MOCK_DIR}/${cmd}"
     chmod +x "${MOCK_DIR}/${cmd}"

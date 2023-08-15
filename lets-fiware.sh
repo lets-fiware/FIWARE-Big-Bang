@@ -685,7 +685,7 @@ install_commands_ubuntu() {
 install_commands_centos() {
   logging_info "${FUNCNAME[0]}"
 
-  ${YUM} install -y curl jq bind-utils make zip
+  ${DNF} install -y curl jq bind-utils make zip
 }
 
 #
@@ -736,7 +736,7 @@ setup_firewall() {
   if "${FIREWALL}"; then
     case "${DISTRO}" in
       "Ubuntu" ) ${APT} install -y firewalld ;;
-      "CentOS" ) ${YUM} -y install firewalld ;;
+      "CentOS" ) ${DNF} install -y firewalld ;;
     esac
     ${SYSTEMCTL} start firewalld
     ${SYSTEMCTL} enable firewalld
@@ -777,9 +777,8 @@ install_docker_ubuntu() {
 install_docker_centos() {
   logging_info "${FUNCNAME[0]}"
 
-  ${YUM} install -y yum-utils
-  ${YUM_CONFIG_MANAGER} --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-  ${YUM} install -y docker-ce docker-ce-cli containerd.io
+  ${DNF} config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+  ${DNF} install -y docker-ce docker-ce-cli containerd.io
   ${SYSTEMCTL} start docker
   ${SYSTEMCTL} enable docker
 }
@@ -831,7 +830,7 @@ install_docker_compose_ubuntu() {
 install_docker_compose_centos() {
   logging_info "${FUNCNAME[0]}"
 
-  ${YUM} install -y docker-compose-plugin
+  ${DNF} install -y docker-compose-plugin
 }
 
 #
@@ -3461,8 +3460,7 @@ init_cmd() {
   APT_KEY="${SUDO} ${MOCK_PATH}apt-key"
   ADD_APT_REPOSITORY="${SUDO} ${MOCK_PATH}add-apt-repository"
   SYSTEMCTL="${SUDO} ${MOCK_PATH}systemctl"
-  YUM="${SUDO} ${MOCK_PATH}yum"
-  YUM_CONFIG_MANAGER="${SUDO} ${MOCK_PATH}yum-config-manager"
+  DNF="${SUDO} ${MOCK_PATH}dnf"
   FIREWALL_CMD="${SUDO} ${MOCK_PATH}firewall-cmd"
   UNAME="${FIBB_TEST_UNAME_CMD:-uname}"
   GREP_CMD="${FIBB_TEST_GREP_CMD:-grep}"
