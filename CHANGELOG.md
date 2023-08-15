@@ -1,5 +1,7 @@
 ## FIWARE Big Bang v0.35.0-next
 
+-   Support node-rednode-red-contrib-ngsi-ld for Node-RED (#335)
+
 ## FIWARE Big Bang v0.35.0 - 14 August, 2023
 
 -   Update supported Linux distribution (#332)
