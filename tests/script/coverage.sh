@@ -323,6 +323,8 @@ install_test3() {
   sed -i -e "s/^\(ORION=\).*/\1/" config.sh
   sed -i -e "s/^\(ORION_LD=\).*/\1orion-ld/" config.sh
 
+  sed -i -e "s/^\(NODE_RED=\).*/\1node-red/" config.sh
+
   sed -i -e "s/^\(ORION_LD_MULTI_SERVICE=\).*/\1TRUE/" config.sh
   sed -i -e "s/^\(ORION_LD_DISABLE_FILE_LOG=\).*/\1TRUE/" config.sh
 

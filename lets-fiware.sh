@@ -2932,6 +2932,10 @@ setup_node_red() {
 
   cp -r "${SETUP_DIR}"/docker/node-red "${CONFIG_DIR}"/
 
+  if [ -n "${ORION_LD}" ]; then
+    sed -i "s/node-red-contrib-letsfiware-ngsi/node-red-contrib-ngsi-ld/" "${CONFIG_DIR}"/node-red/Dockerfile
+  fi
+
   cd "${CONFIG_DIR}"/node-red > /dev/null
   ${DOCKER} build -t "${IMAGE_NODE_RED}" .
   cd - > /dev/null
