@@ -1,3 +1,5 @@
+## FIWARE Big Bang v0.36.0-next
+
 ## FIWARE Big Bang v0.36.0 - 16 August, 2023
 
 -   Switch yum to dnf, the CentOS package manager (#336)
