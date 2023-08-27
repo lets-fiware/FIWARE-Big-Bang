@@ -1,5 +1,7 @@
 ## FIWARE Big Bang v0.36.0-next
 
+-   Update Orion-LD to 1.4.0 (#339)
+
 ## FIWARE Big Bang v0.36.0 - 16 August, 2023
 
 -   Switch yum to dnf, the CentOS package manager (#336)
