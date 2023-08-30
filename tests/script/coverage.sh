@@ -58,6 +58,7 @@ reset_env() {
   done
 
   sudo rm -fr config/ data/
+  rm -f Makefile
   git checkout config.sh
 }
 
@@ -418,6 +419,8 @@ install_wilma_auth_enabled() {
   sleep 5
 
   reset_env
+
+  touch Makefile
 
   sed -i -e "s/^\(WILMA_AUTH_ENABLED=\).*/\1true/" config.sh
   sed -i -e "s/^\(IOTAGENT_UL=\).*/\1iotagent-ul/" config.sh

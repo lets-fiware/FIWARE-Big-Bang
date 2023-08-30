@@ -3794,7 +3794,10 @@ copy_makefile() {
   logging_info "${FUNCNAME[0]}"
 
   SETUP_DIR=./setup
-  cp "${SETUP_DIR}/_Makefile.setup" ./Makefile
+
+  if ! [ -e Makefile ]; then
+    cp "${SETUP_DIR}/_Makefile.setup" ./Makefile
+  fi
 }
 
 #
