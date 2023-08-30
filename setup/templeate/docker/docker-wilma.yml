@@ -5,7 +5,7 @@ services:
     init: true
     # __WILMA_DEPENDS_ON__
     environment:
-      - PEP_PROXY_DEBUG=true
+      - PEP_PROXY_DEBUG=false
       - PEP_PROXY_PORT=1027
       - PEP_PROXY_IDM_HOST=${PEP_PROXY_IDM_HOST}
       - PEP_PROXY_IDM_PORT=${PEP_PROXY_IDM_PORT}

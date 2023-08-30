@@ -17,14 +17,15 @@
 
 `config.sh` ファイルを編集して構成を指定できます。
 
-| 変数名            | 説明                                                                              | 既定値                          |
-| ----------------- | --------------------------------------------------------------------------------- | ------------------------------- |
-| KEYROCK           | Keyrock のサブドメイン名 (必須)                                                   | keyrock                         |
-| IDM\_ADMIN\_USER  | Keyrock の管理者ユーザの名前                                                      | admin                           |
-| IDM\_ADMIN\_EMAIL | Keyrock の管理者ユーザのメールアドレス                                            | IDM\_ADMIN\_USER @ DOMAIN\_NAME |
-| IDM\_ADMIN\_PASS  | Keyrock の管理者ユーザのパスワード                                                | (自動生成)                      |
-| IDM\_DEBUG        | Keyrock のロギングを使用。(true または false)                                     | false                           |
-| POSTFIX           | Postfix を使用 (ローカル配信)。(true または false)                                | false                           |
+| 変数名               | 説明                                                          | 既定値                          |
+| -------------------- | ------------------------------------------------------------- | ------------------------------- |
+| KEYROCK              | Keyrock のサブドメイン名 (必須)                               | keyrock                         |
+| IDM\_ADMIN\_USER     | Keyrock の管理者ユーザの名前                                  | admin                           |
+| IDM\_ADMIN\_EMAIL    | Keyrock の管理者ユーザのメールアドレス                        | IDM\_ADMIN\_USER @ DOMAIN\_NAME |
+| IDM\_ADMIN\_PASS     | Keyrock の管理者ユーザのパスワード                            | (自動生成)                      |
+| IDM\_DEBUG           | Keyrock のロギングを使用。(true または false)                 | false                           |
+| POSTFIX              | Postfix を使用 (ローカル配信)。(true または false)            | false                           |
+| WILMA\_AUTH\_ENABLED | PEP proxy で基本認証を有効にするかどうか。(true または false) | false                           |
 
 <a name="how-to-setup"></a>
 

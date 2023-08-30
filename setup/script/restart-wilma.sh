@@ -36,31 +36,4 @@ if [ ! -e .env ]; then
   exit 1
 fi
 
-. ./.env
-
-if ${MULTI_SERVER}; then
-  echo "This command shoud be run on a base VM."
-  exit 1
-fi
-
-echo "MULTI_SERVER_KEYROCK=https://${KEYROCK}"
-echo "MULTI_SERVER_ADMIN_EMAIL=${IDM_ADMIN_EMAIL}"
-printf "MULTI_SERVER_ADMIN_PASS=%s\n\n" "${IDM_ADMIN_PASS}"
-
-echo "MULTI_SERVER_PEP_PROXY_USERNAME=${PEP_PROXY_USERNAME}"
-printf "MULTI_SERVER_PEP_PASSWORD=%s\n\n" "${PEP_PASSWORD}"
-
-echo "MULTI_SERVER_CLIENT_ID=${TOKENPROXY_CLIENT_ID}"
-echo "MULTI_SERVER_CLIENT_SECRET=${TOKENPROXY_CLIENT_SECRET}"
-
-if [ -n "${ORION}" ]; then
-  printf "\nMULTI_SERVER_ORION_HOST=%s\n" "${ORION}"
-elif [ -n "${ORION_LD}" ]; then
-  printf "\nMULTI_SERVER_ORION_HOST=%s\n" "${ORION_LD}"
-fi
-
-if [ -n "${QUANTUMLEAP}" ]; then
-  printf "\nMULTI_SERVER_QUANTUMLEAP_HOST=%s/\n" "${QUANTUMLEAP}"
-fi
-
-printf "\nWILMA_AUTH_ENABLED=%s\n" "${WILMA_AUTH_ENABLED}"
+docker compose ps --format json | jq -r .[].Service | sed -n /.*-wilma/p | xargs -L 1 docker compose restart
