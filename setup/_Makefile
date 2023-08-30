@@ -36,3 +36,5 @@ mqtt:
 	./config/script/mqtt.sh
 subdomains:
 	./config/script/subdomains.sh
+restart-wilma:
+	./config/script/restart-wilma.sh

@@ -32,6 +32,10 @@ IMAGE_POSTFIX=letsfiware/postfix:0.36.0-next
 #
 # Wilma
 #
+#
+# Enable basic authorization. (true or false) Default: false
+WILMA_AUTH_ENABLED=
+
 # Docker image for Wilma
 IMAGE_WILMA=letsfiware/fiware-pep-proxy:8.4.0
 

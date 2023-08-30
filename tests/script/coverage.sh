@@ -65,6 +65,8 @@ reset_env() {
 # Remove example com from hosts
 #
 remove_example_com_from_hosts() {
+  logging "user.info" "${FUNCNAME[0]}"
+
   sudo sed -i -e "/example.com/d" /etc/hosts
 }
 
@@ -410,6 +412,56 @@ install_on_centos() {
   fibb_down
 }
 
+install_wilma_auth_enabled() {
+  logging "user.info" "${FUNCNAME[0]}"
+
+  sleep 5
+
+  reset_env
+
+  sed -i -e "s/^\(WILMA_AUTH_ENABLED=\).*/\1true/" config.sh
+  sed -i -e "s/^\(IOTAGENT_UL=\).*/\1iotagent-ul/" config.sh
+  sed -i -e "s/^\(IOTAGENT_JSON=\).*/\1iotagent-json/" config.sh
+  sed -i -e "s/^\(IOTAGENT_HTTP=\).*/\1iotagent-http/" config.sh
+  sed -i -e "s/^\(IOTA_HTTP_AUTH=\).*/\1bearer/" config.sh
+  sed -i -e "s/^\(CYGNUS=\).*/\1cygnus/" config.sh
+  sed -i -e "s/^\(COMET=\).*/\1comet/" config.sh
+  sed -i -e "s/^\(PERSEO=\).*/\1perseo/" config.sh
+  sed -i -e "s/^\(QUANTUMLEAP=\).*/\1quantumleap/" config.sh
+
+  ${KCOV} ./coverage ./lets-fiware.sh example.com
+
+  sleep 5
+
+  fibb_down
+
+  reset_env
+
+  sleep 5
+}
+
+install_wilma_auth_enabled2() {
+  logging "user.info" "${FUNCNAME[0]}"
+
+  sleep 5
+
+  reset_env
+
+  sed -i -e "s/^\(WILMA_AUTH_ENABLED=\).*/\1true/" config.sh
+  sed -i -e "s/^\(ORION=\).*/\1/" config.sh
+  sed -i -e "s/^\(ORION_LD=\).*/\1orion-ld/" config.sh
+
+  ${KCOV} ./coverage ./lets-fiware.sh example.com
+
+  sleep 5
+
+  fibb_down
+
+  reset_env
+
+  sleep 5
+}
+
 #
 # Test multi server installation
 #
@@ -736,6 +788,10 @@ main() {
   multi_server_test1
 
   multi_server_test2
+
+  install_wilma_auth_enabled
+
+  install_wilma_auth_enabled2
 
   remove_example_com_from_hosts
 }

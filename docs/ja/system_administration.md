@@ -42,27 +42,28 @@
 You can manage your FIWARE instance with make command. Run the make command in a directory where you ran
 the lets-fiware.sh script.
 
-| Command      | Description                                                     |
-| ------------ | --------------------------------------------------------------- |
-| admin        | 管理者ユーザのユーザ名とパスワードを表示                        |
-| get-token    | OAuth2 アクセス トークンを取得                                  |
-| multi-server | マルチサーバ・インストール用の変数を表示                        |
-| mqtt         | MQTT 関連の変数を表示                                           |
-| subdomains   | サブドメインのリストを表示                                      |
-| collect      | システム情報の収集                                              |
-| log          | FIWARE Big Bang のログを出力 (/var/log/fiware/fi-bb.log)        |
-| log-dir      | ログ・ディレクトリ (/var/log/fiware) 内のファイルを一覧表示     |
-| logrotation  | ログ・ファイルをローテーション                                  |
-| ps           | FIWARE インスタンスの Docker コンテナを一覧表示                 |
-| build        | FIWARE インスタンス用の Docker コンテナをビルド                 |
-| up           | FIWARE インスタンスの Docker コンテナを作成して起動             |
-| down         | FIWARE インスタンスの Docker コンテナを停止して削除             |
-| clean        | !注意! すべてのデータを含む FIWARE インスタンスをクリーンアップ |
-| nginx-test   | nginx の設定をリテスト                                          |
-| nginx-reload | nginx の設定をリロード                                          |
-| cert-renew   | すべてのサーバ証明書を更新                                      |
-| cert-revoke  | !注意! FIWARE インスタンスのすべてのサーバ証明書を取り消す      |
-| cert-list    | FIWARE インスタンスのサーバ証明書ファイルを一覧表示             |
+| Command       | Description                                                     |
+| ------------- | --------------------------------------------------------------- |
+| admin         | 管理者ユーザのユーザ名とパスワードを表示                        |
+| get-token     | OAuth2 アクセス トークンを取得                                  |
+| multi-server  | マルチサーバ・インストール用の変数を表示                        |
+| mqtt          | MQTT 関連の変数を表示                                           |
+| subdomains    | サブドメインのリストを表示                                      |
+| collect       | システム情報の収集                                              |
+| log           | FIWARE Big Bang のログを出力 (/var/log/fiware/fi-bb.log)        |
+| log-dir       | ログ・ディレクトリ (/var/log/fiware) 内のファイルを一覧表示     |
+| logrotation   | ログ・ファイルをローテーション                                  |
+| ps            | FIWARE インスタンスの Docker コンテナを一覧表示                 |
+| build         | FIWARE インスタンス用の Docker コンテナをビルド                 |
+| up            | FIWARE インスタンスの Docker コンテナを作成して起動             |
+| down          | FIWARE インスタンスの Docker コンテナを停止して削除             |
+| clean         | !注意! すべてのデータを含む FIWARE インスタンスをクリーンアップ |
+| restart-wilma | Wilma コンテナを再起動                                          |
+| nginx-test    | nginx の設定をリテスト                                          |
+| nginx-reload  | nginx の設定をリロード                                          |
+| cert-renew    | すべてのサーバ証明書を更新                                      |
+| cert-revoke   | !注意! FIWARE インスタンスのすべてのサーバ証明書を取り消す      |
+| cert-list     | FIWARE インスタンスのサーバ証明書ファイルを一覧表示             |
 
 <a name="log-files"></a>
 
