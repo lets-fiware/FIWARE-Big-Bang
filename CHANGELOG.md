@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.36.0-next
 
+-   Update Node-RED to 3.1.0 (#342)
 -   Fix Makefile overwrite (#341)
 -   Support basic authorization for Wilma (#340)
 -   Update Orion-LD to 1.4.0 (#339)
