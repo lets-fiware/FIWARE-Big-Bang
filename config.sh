@@ -286,7 +286,7 @@ IOTA_UL_AUTOCAST=true
 IOTA_UL_LOG_LEVEL=INFO
 
 # Docker image for IoT Agent for UltraLight 2.0
-IMAGE_IOTAGENT_UL=telefonicaiot/iotagent-ul:2.2.0
+IMAGE_IOTAGENT_UL=telefonicaiot/iotagent-ul:2.3.0
 
 #
 # IoT Agent for JSON
