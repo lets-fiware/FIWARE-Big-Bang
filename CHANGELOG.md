@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.36.0-next
 
+-   ADD Release actions (#345)
 -   Update IoT Agent for JSON to 2.3.0 (#344)
 -   Update IoT Agent for UltraLight to 2.3.0 (#343)
 -   Update Node-RED to 3.1.0 (#342)

@@ -99,7 +99,7 @@ FIWARE Big Bang によってインストールされた Web アプリケーシ�
 FIWARE Big Bang の tar.gz ファイルをダウンロードします。
 
 ```bash
-curl -sL https://github.com/lets-fiware/FIWARE-Big-Bang/archive/refs/tags/v0.36.0.tar.gz | tar zxf -
+curl -sL https://github.com/lets-fiware/FIWARE-Big-Bang/releases/download/v0.36.0/FIWARE-Big-Bang-0.36.0.tar.gz | tar zxf -
 ```
 
 `FIWARE-Big-Bang-0.36.0` ディレクトリに移動します。
