@@ -91,7 +91,7 @@ or CNAME records.
 Download a tar.gz file for the FIWARE Big Bang.
 
 ```bash
-curl -sL https://github.com/lets-fiware/FIWARE-Big-Bang/archive/refs/tags/v0.36.0.tar.gz | tar zxf -
+curl -sL https://github.com/lets-fiware/FIWARE-Big-Bang/releases/download/v0.36.0/FIWARE-Big-Bang-0.36.0.tar.gz | tar zxf -
 ```
 
 Move to the `FIWARE-Big-Bang-0.36.0` directory.

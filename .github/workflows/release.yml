@@ -1,0 +1,21 @@
+on:
+  push:
+    branches:
+      - 'main'
+    tags:
+      - 'v*'
+
+jobs:
+   create-release-tag:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      REPO: ${{ github.repository }}
+      REF: ${{ github.ref }}
+      TZ: 'Asia/Tokyo'
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v3
+
+      - name: Run release
+        run: ./maintenance/release.sh
