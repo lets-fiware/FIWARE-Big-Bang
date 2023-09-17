@@ -1,9 +1,7 @@
 on:
-  push:
-    branches:
-      - 'main'
-    tags:
-      - 'v*'
+  pull_request:
+    branches: [main]
+    types: [closed]
 
 jobs:
    create-release-tag:
@@ -11,7 +9,6 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       REPO: ${{ github.repository }}
-      REF: ${{ github.ref }}
       TZ: 'Asia/Tokyo'
     steps:
       - name: Git checkout
