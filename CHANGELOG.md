@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.36.0-next
 
+-   FIX release action (#347)
 -   Improve release action (#346)
 -   ADD release action (#345)
 -   Update IoT Agent for JSON to 2.3.0 (#344)
