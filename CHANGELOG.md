@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.36.0-next
 
+-   Update IoT Agent for JSON to 2.4.2 (#349)
 -   Update IoT Agent for UltraLight to 2.4.2 (#348)
 -   FIX release action (#347)
 -   Improve release action (#346)
