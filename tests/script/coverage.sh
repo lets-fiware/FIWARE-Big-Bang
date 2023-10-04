@@ -296,6 +296,8 @@ install_test2() {
   sleep 5
 
   ${KCOV} ./coverage ./lets-fiware.sh example.com
+
+  fibb_down
 }
 
 install_test3() {
@@ -332,6 +334,8 @@ install_test3() {
   sed -i -e "s/^\(ORION_LD_DISABLE_FILE_LOG=\).*/\1TRUE/" config.sh
 
   ${KCOV} ./coverage ./lets-fiware.sh example.com
+
+  fibb_down
 }
 
 install_test4() {
@@ -352,8 +356,6 @@ install_test4() {
   sed -i -e "s/^\(IOTAGENT_HTTP=\).*/\1iotagent-http/" config.sh
   sed -i -e "s/^\(IOTA_HTTP_AUTH=\).*/\1basic/" config.sh
   sed -i -e "s/^\(MOSQUITTO=\).*/\1mosquitto/" config.sh
-  sed -i -e "s/^\(ZEPPELIN=\).*/\1zeppelin/" config.sh
-  sed -i -e "s/^\(ZEPPELIN_DEBUG=\).*/\1true/" config.sh
 
   export FIBB_TEST_DOCKER_CMD=rekcod
   export FIBB_TEST_SKIP_INSTALL_WIDGET=true
@@ -364,9 +366,41 @@ install_test4() {
   ${KCOV} ./coverage ./lets-fiware.sh example.com "${IPS[0]}"
 
   export FIBB_TEST_DOCKER_CMD=
+
+  fibb_down
 }
 
 install_test5() {
+  logging "user.info" "${FUNCNAME[0]}"
+
+  sleep 5
+
+  git checkout config.sh
+
+  for i in $(cat config.sh | sed -n "/^IMAGE_/s/.*=\(.*\)/\1/p")
+  do
+    if docker images --format "{{.Repository}}:{{.Tag}}" | grep -qs $i; then
+      docker rmi $i
+    fi
+  done
+
+  mkdir .work
+
+  sed -i -e "s/^\(ZEPPELIN=\).*/\1zeppelin/" config.sh
+  sed -i -e "s/^\(ZEPPELIN_DEBUG=\).*/\1true/" config.sh
+
+  ${KCOV} ./coverage ./lets-fiware.sh example.com
+
+  fibb_down
+}
+
+install_test6() {
+  logging "user.info" "${FUNCNAME[0]}"
+
+  sleep 5
+
+  git checkout config.sh
+
   echo "*** Timeout was reached ***" 1>&2
   export FIBB_WAIT_TIME=1
   ${KCOV} ./coverage ./lets-fiware.sh example.com
@@ -774,19 +808,15 @@ main() {
 
   install_test2
 
-  fibb_down
-
   install_test3
 
-  fibb_down
-
   install_test4
-
-  fibb_down
 
   install_on_centos
 
   install_test5
+
+  install_test6
 
   multi_server_test1
 
