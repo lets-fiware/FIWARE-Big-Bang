@@ -1601,6 +1601,17 @@ setup_elasticsearch() {
 
   add_rsyslog_conf "elasticsearch-db"
 
+  setup_wilma "elasticsearch" "${ELASTICSEARCH}"
+
+  if ${WILMA_AUTH_ENABLED}; then
+    local RID
+    RID=$(${NGSI_GO} applications --host "${IDM}" roles create --aid "${AID}" --name "Full access")
+    assign_permission_to_rol "${AID}" "${RID}" "GET" "^/.*$"
+    assign_permission_to_rol "${AID}" "${RID}" "POST" "^/.*$"
+    ${NGSI_GO} applications --host "${IDM}" users --aid "${AID}" assign --rid "${RID}" --uid "${IDM_ADMIN_UID}" > /dev/null
+    ${NGSI_GO} applications --host "${IDM}" trusted --aid "${AID}" add --tid "${ORION_CLIENT_ID}"  > /dev/null
+  fi
+
   ELASTICSEARCH_PASSWORD=$(${DOCKER} run -t --rm "${IMAGE_PWGEN}" | sed -z 's/[\x0d\x0a]//g')
 
   mkdir -p "${DATA_DIR}"/elasticsearch-db
