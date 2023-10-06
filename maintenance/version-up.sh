@@ -79,10 +79,10 @@ main() {
   set -e
 
   if [ "${RESULT}" -eq 1 ]; then
-    version_up ${VERSION}
+    version_up "${VERSION}"
   else
     echo "next version"
-    next_version ${VERSION}
+    next_version "${VERSION}"
   fi
 }
 

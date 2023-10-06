@@ -377,10 +377,10 @@ install_test5() {
 
   git checkout config.sh
 
-  for i in $(cat config.sh | sed -n "/^IMAGE_/s/.*=\(.*\)/\1/p")
+  sed -n "/^IMAGE_/s/.*=\(.*\)/\1/p" config.sh | while IFS= read -r line
   do
-    if docker images --format "{{.Repository}}:{{.Tag}}" | grep -qs $i; then
-      docker rmi $i
+    if docker images --format "{{.Repository}}:{{.Tag}}" | grep -qs "${line}"; then
+      docker rmi "${line}"
     fi
   done
 
