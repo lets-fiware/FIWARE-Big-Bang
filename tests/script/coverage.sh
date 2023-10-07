@@ -462,6 +462,8 @@ install_wilma_auth_enabled() {
   sed -i -e "s/^\(IOTAGENT_HTTP=\).*/\1iotagent-http/" config.sh
   sed -i -e "s/^\(IOTA_HTTP_AUTH=\).*/\1bearer/" config.sh
   sed -i -e "s/^\(CYGNUS=\).*/\1cygnus/" config.sh
+  sed -i -e "s/^\(CYGNUS_ELASTICSEARCH=\).*/\1true/" config.sh
+  sed -i -e "s/^\(ELASTICSEARCH=\).*/\1elasticsearch/" config.sh
   sed -i -e "s/^\(COMET=\).*/\1comet/" config.sh
   sed -i -e "s/^\(PERSEO=\).*/\1perseo/" config.sh
   sed -i -e "s/^\(QUANTUMLEAP=\).*/\1quantumleap/" config.sh

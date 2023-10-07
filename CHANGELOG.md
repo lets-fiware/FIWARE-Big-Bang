@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.36.0-next
 
+-   Fix basic authorization for Wilma (#351)
 -   Fix warnings by lint (#350)
 -   Update IoT Agent for JSON to 2.4.2 (#349)
 -   Update IoT Agent for UltraLight to 2.4.2 (#348)
