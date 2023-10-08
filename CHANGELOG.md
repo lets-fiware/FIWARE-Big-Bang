@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.36.0-next
 
+-   Fix maintenance script (#353)
 -   Update node.js dependencies (#352)
 -   Fix basic authorization for Wilma (#351)
 -   Fix warnings by lint (#350)

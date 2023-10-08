@@ -20,7 +20,7 @@ version_up() {
   do
     file="${FIBB_HOME}/${file}"
     ls -l "${file}"
-    sed -i -e "s/v${OLD}.tar.gz/v${NEW}.tar.gz/" "${file}"
+    sed -i -e "s/v${OLD}/v${NEW}/" "${file}"
     sed -i -e "s/FIWARE-Big-Bang-${OLD}/FIWARE-Big-Bang-${NEW}/" "${file}"
     sed -i -e "s/${OLD}-next/${NEW}/" "${file}"
   done
