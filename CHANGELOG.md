@@ -1,4 +1,4 @@
-## FIWARE Big Bang v0.36.0-next
+## FIWARE Big Bang v0.37.0 - 09 October, 2023
 
 -   Fix maintenance script (#353)
 -   Update node.js dependencies (#352)
