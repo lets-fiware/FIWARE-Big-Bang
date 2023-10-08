@@ -24,13 +24,12 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-FROM node:14
+FROM node:18
 
-WORKDIR /
-COPY package.json .
-COPY package-lock.json .
+WORKDIR /lint
+COPY package.json package-lock.json /lint/
 RUN npm ci && \
-    ln -s /node_modules/textlint/bin/textlint.js /usr/local/bin/textlint
+    ln -s /lint/node_modules/textlint/bin/textlint.js /usr/local/bin/textlint
 
 WORKDIR /work
 

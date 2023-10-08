@@ -10,13 +10,13 @@ assignees: ''
 **Checklist**
 _Put an `x` in the boxes that apply_
 
--   [ ] I have run the latest release.
--   [ ] I have inspeced the status of docker containers.
--   [ ] I have run the sanity check described in after-installation.md.
--   [ ] I have inspected all error messages.
--   [ ] I have inspected the log files in the /var/log/fiware directory.
--   [ ] I have run the `make collect` command.
--   [ ] I have provided a Github Star to this repository.
+-   \[ \] I have run the latest release.
+-   \[ \] I have inspeced the status of docker containers.
+-   \[ \] I have run the sanity check described in after-installation.md.
+-   \[ \] I have inspected all error messages.
+-   \[ \] I have inspected the log files in the /var/log/fiware directory.
+-   \[ \] I have run the `make collect` command.
+-   \[ \] I have provided a Github Star to this repository.
 
 **Describe the bug**
 A clear and concise description of what the bug is.
@@ -35,9 +35,9 @@ A clear and concise description of what you expected to happen.
 If applicable, add screenshots to help explain your problem.
 
 **Server (please complete the following information):**
-- OS and OS version:
-- Docker version:
-- Docker Compose version:
+-   OS and OS version:
+-   Docker version:
+-   Docker Compose version:
 
 **Additional context**
 Add any other context about the problem here.

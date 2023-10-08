@@ -8,11 +8,11 @@ the `v0.36.0-next` branch.
 
 What types of changes does your code introduce to the project: _Put an `x` in the boxes that apply_
 
--   [ ] Bugfix (non-breaking change which fixes an issue)
--   [ ] New feature (non-breaking change which adds functionality)
--   [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
--   [ ] Update docker image version of FIWARE GE.
--   [ ] Update only documentation, not any source code.
+-   \[ \] Bugfix (non-breaking change which fixes an issue)
+-   \[ \] New feature (non-breaking change which adds functionality)
+-   \[ \] Breaking change (fix or feature that would cause existing functionality to not work as expected)
+-   \[ \] Update docker image version of FIWARE GE.
+-   \[ \] Update only documentation, not any source code.
 
 ## Checklist
 
@@ -20,13 +20,13 @@ _Put an `x` in the boxes that apply. You can also fill these out after creating 
 them, don't hesitate to ask. We're here to help! This is simply a reminder of what we are going to look for before
 merging your code._
 
--   [ ] I have read the [CONTRIBUTING](https://github.com/lets-fiware/FIWARE-Big-Bang/blob/main/CONTRIBUTING.md) doc
--   [ ] I have signed the [CLA](https://github.com/lets-fiware/FIWARE-Big-Bang/blob/main/FIWARE-Big-Bang-individual-cla.pdf)
--   [ ] I have updated the change log (CHANGELOG.md)
--   [ ] I send this pull request to the `v0.36.0-next` branch.
--   [ ] I have added tests that prove my fix is effective or that my feature works
--   [ ] I have added necessary documentation (if appropriate)
--   [ ] Any dependent changes have been merged and published in downstream modules
+-   \[ \] I have read the [CONTRIBUTING](https://github.com/lets-fiware/FIWARE-Big-Bang/blob/main/CONTRIBUTING.md) doc
+-   \[ \] I have signed the [CLA](https://github.com/lets-fiware/FIWARE-Big-Bang/blob/main/FIWARE-Big-Bang-individual-cla.pdf)
+-   \[ \] I have updated the change log (CHANGELOG.md)
+-   \[ \] I send this pull request to the `v0.36.0-next` branch.
+-   \[ \] I have added tests that prove my fix is effective or that my feature works
+-   \[ \] I have added necessary documentation (if appropriate)
+-   \[ \] Any dependent changes have been merged and published in downstream modules
 
 ## Further comments
 
