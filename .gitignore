@@ -24,3 +24,4 @@ ngsi-go-token-cache.json
 setup_ngsi_go.sh
 *.tar.gz
 *.tgz
+node_modules/
