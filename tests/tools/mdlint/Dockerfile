@@ -27,7 +27,7 @@
 FROM node:18
 
 WORKDIR /lint
-COPY package.json package-lock.json /lint
+COPY package.json package-lock.json /lint/
 RUN npm ci && \
     cp -r /lint/node_modules/* /usr/local/lib/node_modules && \
     ln -s /usr/local/lib/node_modules/remark-cli/cli.js /usr/local/bin/remark

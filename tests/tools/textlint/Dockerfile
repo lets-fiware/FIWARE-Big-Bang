@@ -27,7 +27,7 @@
 FROM node:18
 
 WORKDIR /lint
-COPY package.json package-lock.json /lint
+COPY package.json package-lock.json /lint/
 RUN npm ci && \
     ln -s /lint/node_modules/textlint/bin/textlint.js /usr/local/bin/textlint
 
