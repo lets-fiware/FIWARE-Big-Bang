@@ -18,10 +18,10 @@ A clear and concise description of what you want to happen.
 
 **Describe why you need this feature**
 
-- [ ] To approach a new use case.
-- [ ] To integrate a new Generic Enabler / othe open source component.
-- [ ] To improve or simplify an scenario.
-- [ ] Other reason (describe it)
+-   \[ \] To approach a new use case.
+-   \[ \] To integrate a new Generic Enabler / othe open source component.
+-   \[ \] To improve or simplify an scenario.
+-   \[ \] Other reason (describe it)
 
 **Additional information**
 
@@ -29,10 +29,10 @@ Add any other information, diagrams or screenshots about the feature request her
 
 **Do you have the intention to implement the solution**
 
-- [ ] Yes, I have the knowledge to implement this new feature.
-- [ ] Yes, but I will need help.
-- [ ] No, I do not have the skills.
+-   \[ \] Yes, I have the knowledge to implement this new feature.
+-   \[ \] Yes, but I will need help.
+-   \[ \] No, I do not have the skills.
 
 **Other information**
 
-- [ ] I have provided a Github Star to this repository.
+-   \[ \] I have provided a Github Star to this repository.

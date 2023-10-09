@@ -27,11 +27,15 @@ IDM_DEBUG=false
 IMAGE_KEYROCK=letsfiware/fiware-idm:8.4.0
 
 # Docker image for Postfix
-IMAGE_POSTFIX=letsfiware/postfix:0.36.0
+IMAGE_POSTFIX=letsfiware/postfix:0.37.0
 
 #
 # Wilma
 #
+#
+# Enable basic authorization. (true or false) Default: false
+WILMA_AUTH_ENABLED=
+
 # Docker image for Wilma
 IMAGE_WILMA=letsfiware/fiware-pep-proxy:8.4.0
 
@@ -63,7 +67,7 @@ ORION_LD_MULTI_SERVICE=
 ORION_LD_DISABLE_FILE_LOG=
 
 # Docker image for Orion
-IMAGE_ORION_LD=quay.io/fiware/orion-ld:1.3.0
+IMAGE_ORION_LD=quay.io/fiware/orion-ld:1.4.0
 
 #
 # Mintaka
@@ -282,7 +286,7 @@ IOTA_UL_AUTOCAST=true
 IOTA_UL_LOG_LEVEL=INFO
 
 # Docker image for IoT Agent for UltraLight 2.0
-IMAGE_IOTAGENT_UL=telefonicaiot/iotagent-ul:2.2.0
+IMAGE_IOTAGENT_UL=telefonicaiot/iotagent-ul:2.4.2
 
 #
 # IoT Agent for JSON
@@ -298,7 +302,7 @@ IOTA_JSON_AUTOCAST=true
 IOTA_JSON_LOG_LEVEL=INFO
 
 # Docker image for IoT Agent for JSON
-IMAGE_IOTAGENT_JSON=telefonicaiot/iotagent-json:2.2.0
+IMAGE_IOTAGENT_JSON=telefonicaiot/iotagent-json:2.4.2
 
 #
 # Node-RED
@@ -328,7 +332,7 @@ NODE_RED_LOGGING_METRICS=
 NODE_RED_LOGGING_AUDIT=
 
 # Docker image for Node-RED
-IMAGE_NODE_RED=letsfiware/node-red:0.36.0
+IMAGE_NODE_RED=letsfiware/node-red:0.37.0
 
 #
 # Grafana
@@ -354,7 +358,7 @@ ZEPPELIN=
 ZEPPELIN_DEBUG=
 
 # Docker image for Zeppelin
-IMAGE_ZEPPELIN=letsfiware/zeppelin:0.36.0
+IMAGE_ZEPPELIN=letsfiware/zeppelin:0.37.0
 
 #
 # Queryproxy
@@ -366,7 +370,7 @@ QUERYPROXY=
 QUERYPROXY_LOGLEVEL=info
 
 # Docker image for Queryproxy
-IMAGE_QUERYPROXY=letsfiware/queryproxy:0.36.0
+IMAGE_QUERYPROXY=letsfiware/queryproxy:0.37.0
 
 #
 # Tokenproxy
@@ -378,7 +382,7 @@ TOKENPROXY_LOGLEVEL=info
 TOKENPROXY_VERBOSE=
 
 # Docker image for Tokenproxy
-IMAGE_TOKENPROXY=letsfiware/tokenproxy:0.36.0
+IMAGE_TOKENPROXY=letsfiware/tokenproxy:0.37.0
 
 #
 # Regproxy
@@ -417,7 +421,7 @@ REGPROXY_LOGLEVEL=info
 REGPROXY_VERBOSE=false
 
 # Docker image for Regproxy
-IMAGE_REGPROXY=letsfiware/regproxy:0.36.0
+IMAGE_REGPROXY=letsfiware/regproxy:0.37.0
 
 #
 # MongoDB
@@ -453,7 +457,7 @@ IMAGE_POSTGRES=postgres:15
 IMAGE_NGINX=nginx:1.25
 
 # Docker image for pwgen
-IMAGE_PWGEN=letsfiware/pwgen:0.36.0
+IMAGE_PWGEN=letsfiware/pwgen:0.37.0
 
 #
 # Firewall (firewalld)

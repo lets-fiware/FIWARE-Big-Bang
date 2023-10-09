@@ -55,8 +55,12 @@ echo "MULTI_SERVER_CLIENT_SECRET=${TOKENPROXY_CLIENT_SECRET}"
 
 if [ -n "${ORION}" ]; then
   printf "\nMULTI_SERVER_ORION_HOST=%s\n" "${ORION}"
+elif [ -n "${ORION_LD}" ]; then
+  printf "\nMULTI_SERVER_ORION_HOST=%s\n" "${ORION_LD}"
 fi
 
 if [ -n "${QUANTUMLEAP}" ]; then
   printf "\nMULTI_SERVER_QUANTUMLEAP_HOST=%s/\n" "${QUANTUMLEAP}"
 fi
+
+printf "\nWILMA_AUTH_ENABLED=%s\n" "${WILMA_AUTH_ENABLED}"

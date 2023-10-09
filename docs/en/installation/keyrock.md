@@ -15,14 +15,15 @@
 
 You can specify configurations by editing the `config.sh` file.
 
-| Variable name     | Description                                                      | Default value                   |
-| ----------------- | ---------------------------------------------------------------- | ------------------------------- |
-| KEYROCK           | A sub-domain name of Keyrock (Required)                          | keyrock                         |
-| IDM\_ADMIN\_USER  | A name of an admin user for Keyrock                              | admin                           |
-| IDM\_ADMIN\_EMAIL | An email address of an admin user for Keyrock                    | IDM\_ADMIN\_USER @ DOMAIN\_NAME |
-| IDM\_ADMIN\_PASS  | A password of an admin user for Keyrock                          | (Automatically generated)       |
-| IDM\_DEBUG        | Use logging for Keyrock (true or false)                          | false                           |
-| POSTFIX           | Use Postfix (local delivery). (true or false)                    | false                           |
+| Variable name        | Description                                                              | Default value                   |
+| -------------------- | ------------------------------------------------------------------------ | ------------------------------- |
+| KEYROCK              | A sub-domain name of Keyrock (Required)                                  | keyrock                         |
+| IDM\_ADMIN\_USER     | A name of an admin user for Keyrock                                      | admin                           |
+| IDM\_ADMIN\_EMAIL    | An email address of an admin user for Keyrock                            | IDM\_ADMIN\_USER @ DOMAIN\_NAME |
+| IDM\_ADMIN\_PASS     | A password of an admin user for Keyrock                                  | (Automatically generated)       |
+| IDM\_DEBUG           | Use logging for Keyrock (true or false)                                  | false                           |
+| POSTFIX              | Use Postfix (local delivery). (true or false)                            | false                           |
+| WILMA\_AUTH\_ENABLED | Whether to enable basic authentication on the PEP proxy. (true or false) | false                           |
 
 ## How to setup
 

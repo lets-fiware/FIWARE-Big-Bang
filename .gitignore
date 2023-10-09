@@ -22,3 +22,6 @@ ngsi-go-token-cache.json
 !extras/node-red/docker-compose.yml
 *.jar
 setup_ngsi_go.sh
+*.tar.gz
+*.tgz
+node_modules/

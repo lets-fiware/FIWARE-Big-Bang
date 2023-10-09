@@ -29,21 +29,21 @@ do
 
   case "${IOTA_HTTP_AUTH}" in
     "none")
-      curl -X POST "https://${IOTAGENT_HTTP}${IOTA_UL_DEFAULT_RESOURCE}?k=Dk8A0vfwTkTiAY71QyyKzOv9CT&i=sensor003" \
+      curl -sX POST "https://${IOTAGENT_HTTP}${IOTA_UL_DEFAULT_RESOURCE}?k=Dk8A0vfwTkTiAY71QyyKzOv9CT&i=sensor003" \
       -H "Content-Type: text/plain" \
-      -d "${MSG}"
+      -d "${MSG}" > /dev/null
       ;;
     "basic")
-      curl -X POST "https://${IOTAGENT_HTTP}${IOTA_UL_DEFAULT_RESOURCE}?k=Dk8A0vfwTkTiAY71QyyKzOv9CT&i=sensor003" \
+      curl -sX POST "https://${IOTAGENT_HTTP}${IOTA_UL_DEFAULT_RESOURCE}?k=Dk8A0vfwTkTiAY71QyyKzOv9CT&i=sensor003" \
       -u "${IOTA_HTTP_BASIC_USER}:${IOTA_HTTP_BASIC_PASS}" \
       -H "Content-Type: text/plain" \
-      -d "${MSG}"
+      -d "${MSG}" > /dev/null
       ;;
     "bearer")
-      curl -X POST "https://${IOTAGENT_HTTP}${IOTA_UL_DEFAULT_RESOURCE}?k=Dk8A0vfwTkTiAY71QyyKzOv9CT&i=sensor003" \
+      curl -sX POST "https://${IOTAGENT_HTTP}${IOTA_UL_DEFAULT_RESOURCE}?k=Dk8A0vfwTkTiAY71QyyKzOv9CT&i=sensor003" \
       -H "Authorization: Bearer $(ngsi token --host "${ORION}")" \
       -H "Content-Type: text/plain" \
-      -d "${MSG}"
+      -d "${MSG}" > /dev/null
       ;;
   esac
   sleep 1

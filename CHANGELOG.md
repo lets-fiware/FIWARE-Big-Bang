@@ -1,3 +1,21 @@
+## FIWARE Big Bang v0.37.0 - 09 October, 2023
+
+-   Fix maintenance script (#353)
+-   Update node.js dependencies (#352)
+-   Fix basic authorization for Wilma (#351)
+-   Fix warnings by lint (#350)
+-   Update IoT Agent for JSON to 2.4.2 (#349)
+-   Update IoT Agent for UltraLight to 2.4.2 (#348)
+-   FIX release action (#347)
+-   Improve release action (#346)
+-   ADD release action (#345)
+-   Update IoT Agent for JSON to 2.3.0 (#344)
+-   Update IoT Agent for UltraLight to 2.3.0 (#343)
+-   Update Node-RED to 3.1.0 (#342)
+-   Fix Makefile overwrite (#341)
+-   Support basic authorization for Wilma (#340)
+-   Update Orion-LD to 1.4.0 (#339)
+
 ## FIWARE Big Bang v0.36.0 - 16 August, 2023
 
 -   Switch yum to dnf, the CentOS package manager (#336)

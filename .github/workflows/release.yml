@@ -1,0 +1,19 @@
+on:
+  pull_request_target:
+    branches: [main]
+    types: [closed]
+
+jobs:
+   create-release-tag:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      REPO: ${{ github.repository }}
+      TZ: 'Asia/Tokyo'
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v3
+
+      - name: Run release
+        if: github.event.pull_request.merged == true
+        run: ./maintenance/release.sh

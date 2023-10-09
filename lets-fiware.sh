@@ -28,7 +28,7 @@
 
 set -Ceuo pipefail
 
-VERSION=0.36.0
+VERSION=0.37.0
 
 #
 # Syslog info
@@ -115,6 +115,10 @@ get_config_sh() {
 #
 set_default_values() {
   logging_info "${FUNCNAME[0]}"
+
+  if [ -z "${WILMA_AUTH_ENABLED}" ]; then
+    WILMA_AUTH_ENABLED=false
+  fi
 
   if [ -z "${ORION_EXPOSE_PORT}" ]; then
     ORION_EXPOSE_PORT=none
@@ -488,6 +492,8 @@ NGINX_LOG_DIR=${NGINX_LOG_DIR}
 
 DOMAIN_NAME=${DOMAIN_NAME}
 
+WILMA_AUTH_ENABLED=${WILMA_AUTH_ENABLED}
+
 DOCKER_COMPOSE="${DOCKER_COMPOSE}"
 
 CURL="${CURL}"
@@ -857,14 +863,14 @@ check_ngsi_go() {
   logging_info "${FUNCNAME[0]}"
 
   local ngsi_go_version
-  ngsi_go_version=v0.12.0
+  ngsi_go_version=v0.13.0
 
   if [ -e /usr/local/bin/ngsi ]; then
     local ver
     ver=$(/usr/local/bin/ngsi --version)
     logging_info "${ver}"
     ver=$(/usr/local/bin/ngsi --version | sed -e "s/ngsi version \([^ ]*\) .*/\1/" | awk -F. '{printf "%2d%02d%02d", $1,$2,$3}')
-    if [ "${ver}" -ge 1200 ]; then
+    if [ "${ver}" -ge 1300 ]; then
         cp /usr/local/bin/ngsi "${WORK_DIR}"
         return
     fi
@@ -1231,6 +1237,33 @@ EOF
 }
 
 #
+# Create permission and assign it to role
+#  $1: aid
+#  $2: rid
+#  $3: action
+#  $4: resource
+assign_permission_to_rol()
+{
+
+  local found
+  set +e
+  found=$(echo "$4" | grep -ic "\.\*")
+  set -e
+
+  # Create permission
+  local pid
+  if [ "${found}" -eq 1 ]; then
+    pid=$(${NGSI_GO} applications --host "${IDM}" permissions create --aid "$1" --name "$3 $4" --description "$3 $4" --action "$3" --resource "$4" --regex)
+  else
+    pid=$(${NGSI_GO} applications --host "${IDM}" permissions create --aid "$1" --name "$3 $4" --description "$3 $4" --action "$3" --resource "$4")
+  fi
+
+  # Assign permission to role
+  ${NGSI_GO} applications --host "${IDM}" roles assign --aid "$1" --rid "$2" --pid "${pid}" > /dev/null
+}
+
+
+#
 # Up Keyrock with MySQL
 #
 up_keyrock_mysql() {
@@ -1313,6 +1346,8 @@ EOF
     touch --reference="${WORK_DIR}/_package.json" "${CONFIG_DIR}/keyrock/package.json"
 
     ${DOCKER_COMPOSE} -f docker-idm.yml cp -a keyrock:/opt/fiware-idm/models/model_oauth_server.js "${CONFIG_DIR}/keyrock/model_oauth_server.js"
+    sed -i "642s/user_info.app_id/req_app ? req_app : user_info.app_id/" "${CONFIG_DIR}/keyrock/model_oauth_server.js"
+    sed -i "648s/user_info.app_id/req_app ? req_app : user_info.app_id/" "${CONFIG_DIR}/keyrock/model_oauth_server.js"
     sed -i "930s/requested_scopes/scope.includes(' ') ? scope: requested_scopes/" "${CONFIG_DIR}/keyrock/model_oauth_server.js"
   fi
 
@@ -1566,6 +1601,17 @@ setup_elasticsearch() {
 
   add_rsyslog_conf "elasticsearch-db"
 
+  setup_wilma "elasticsearch" "${ELASTICSEARCH}"
+
+  if ${WILMA_AUTH_ENABLED}; then
+    local RID
+    RID=$(${NGSI_GO} applications --host "${IDM}" roles create --aid "${AID}" --name "Full access")
+    assign_permission_to_rol "${AID}" "${RID}" "GET" "^/.*$"
+    assign_permission_to_rol "${AID}" "${RID}" "POST" "^/.*$"
+    ${NGSI_GO} applications --host "${IDM}" users --aid "${AID}" assign --rid "${RID}" --uid "${IDM_ADMIN_UID}" > /dev/null
+    ${NGSI_GO} applications --host "${IDM}" trusted --aid "${AID}" add --tid "${ORION_CLIENT_ID}"  > /dev/null
+  fi
+
   ELASTICSEARCH_PASSWORD=$(${DOCKER} run -t --rm "${IMAGE_PWGEN}" | sed -z 's/[\x0d\x0a]//g')
 
   mkdir -p "${DATA_DIR}"/elasticsearch-db
@@ -1578,11 +1624,11 @@ ELASTICSEARCH_JAVA_OPTS="${ELASTICSEARCH_JAVA_OPTS}"
 ELASTICSEARCH_PASSWORD=${ELASTICSEARCH_PASSWORD}
 EOF
 }
-
+  
 #
-# Wilma
+# Wilma - Level1: Authentication
 #
-setup_wilma() {
+setup_wilma_authentication() {
   if ${WILMA_INSTALLED}; then
     return
   fi
@@ -1621,7 +1667,7 @@ setup_wilma() {
     PEP_ID=$(${NGSI_GO} applications --host "${IDM}" pep --aid "${AID}" list | jq -r .pep_proxy.id)
   fi
 
-  if  ${MULTI_SERVER}; then
+  if ${MULTI_SERVER}; then
     PEP_PROXY_IDM_HOST=${KEYROCK}
     PEP_PROXY_IDM_PORT=443
     PEP_PROXY_IDM_SSL_ENABLED=true
@@ -1630,6 +1676,128 @@ setup_wilma() {
     PEP_PROXY_IDM_PORT=3000
     PEP_PROXY_IDM_SSL_ENABLED=false
   fi
+  cat <<EOF >> .env
+
+# PEP Proxy
+
+PEP_PROXY_IDM_HOST=${PEP_PROXY_IDM_HOST}
+PEP_PROXY_IDM_PORT=${PEP_PROXY_IDM_PORT}
+PEP_PROXY_IDM_SSL_ENABLED=${PEP_PROXY_IDM_SSL_ENABLED}
+PEP_PROXY_APP_ID=${AID}
+PEP_PROXY_USERNAME=${PEP_ID}
+PEP_PASSWORD=${PEP_PASSWORD}
+EOF
+}
+
+#
+# Wilma - Level 2: Basic Authorization
+#
+setup_wilma_basic_authorization() {
+  logging_info "${FUNCNAME[0]} $1 $2"
+
+  local GE
+  GE=${1^^}
+  GE=${GE//-/_}
+
+  local GE_NAME
+  GE_NAME=${1^}
+
+  cp "${TEMPLEATE}"/docker/docker-wilma.yml "${WORK_DIR}"/
+
+  sed -i "s/{PEP_PROXY_/{${GE}_PEP_PROXY_/" "${WORK_DIR}"/docker-wilma.yml
+  sed -i "s/{PEP_PASSWORD/{${GE}_PEP_PASSWORD/" "${WORK_DIR}"/docker-wilma.yml
+
+  sed -i "s/\(PEP_PROXY_AUTH_FOR_NGINX=\).*/\1true/" "${WORK_DIR}"/docker-wilma.yml
+  sed -i "s/\(PEP_PROXY_AUTH_ENABLED=\).*/\1true/" "${WORK_DIR}"/docker-wilma.yml
+
+  sed -i "s/^  wilma:/  $1-wilma:/" "${WORK_DIR}"/docker-wilma.yml
+  sed -i "s/\[pep-proxy\]/[$1-pep-proxy]/" "${WORK_DIR}"/docker-wilma.yml
+
+  if ! ${MULTI_SERVER}; then
+    sed -i -e "/__WILMA_DEPENDS_ON__/i \    depends_on:\n      - keyrock" "${WORK_DIR}"/docker-wilma.yml
+  fi
+
+  sed -i "/__WILMA_DEPENDS_ON__/d" "${WORK_DIR}"/docker-wilma.yml
+
+  # add docker-compose.yml 
+  echo "" >> ${DOCKER_COMPOSE_YML}
+  sed -e '/^version:/,/services:/d' "${WORK_DIR}"/docker-wilma.yml >> ${DOCKER_COMPOSE_YML}
+
+  rm -f "${WORK_DIR}"/docker-wilma.yml
+
+  add_nginx_depends_on "$1-wilma"
+
+  add_rsyslog_conf "$1-pep-proxy"
+
+  sed -i "s/wilma:1027/$1-wilma:1027/" "${NGINX_SITES}/$2"
+
+  # Create Applicaton
+  AID=$(${NGSI_GO} applications --host "${IDM}" create --name "${GE_NAME}" --description "${GE_NAME} for PEP Proxy (${HOST_NAME})" --url "http://localhost/" --redirectUri "http://localhost/")
+  local SECRET
+  SECRET=$(${NGSI_GO} applications --host "${IDM}" get --aid "${AID}" | jq -r .application.secret )
+
+  PEP_PASSWORD=$(${NGSI_GO} applications --host "${IDM}" pep --aid "${AID}" create --run | jq -r .pep_proxy.password)
+  PEP_ID=$(${NGSI_GO} applications --host "${IDM}" pep --aid "${AID}" list | jq -r .pep_proxy.id)
+
+  PEP_PROXY_IDM_HOST=${KEYROCK}
+  PEP_PROXY_IDM_PORT=443
+  PEP_PROXY_IDM_SSL_ENABLED=true
+
+  if ! ${MULTI_SERVER}; then
+    PEP_PROXY_IDM_HOST=keyrock
+    PEP_PROXY_IDM_PORT=3000
+    PEP_PROXY_IDM_SSL_ENABLED=false
+  fi
+
+  cat <<EOF >> .env
+
+# ${GE_NAME} PEP Proxy
+
+${GE}_PEP_PROXY_IDM_HOST=${PEP_PROXY_IDM_HOST}
+${GE}_PEP_PROXY_IDM_PORT=${PEP_PROXY_IDM_PORT}
+${GE}_PEP_PROXY_IDM_SSL_ENABLED=${PEP_PROXY_IDM_SSL_ENABLED}
+${GE}_PEP_PROXY_APP_ID=${AID}
+${GE}_PEP_PROXY_USERNAME=${PEP_ID}
+${GE}_PEP_PASSWORD=${PEP_PASSWORD}
+EOF
+}
+
+#
+# Wilma
+#
+setup_wilma() {
+  logging_info "${FUNCNAME[0]}"
+
+  if ${WILMA_AUTH_ENABLED}; then
+    setup_wilma_basic_authorization "$@"
+  else
+    setup_wilma_authentication
+  fi
+}
+
+#
+# setup_wilma_for_basic_authorization
+#
+setup_wilma_for_basic_authorization() {
+  logging_info "${FUNCNAME[0]}"
+
+  # Create Applicaton for Orion
+  local AID
+  AID=$(${NGSI_GO} applications --host "${IDM}" create --name "Wilma" --description "Wilma application (${HOST_NAME})" --url "http://localhost/" --redirectUri "http://localhost/")
+  local SECRET
+  SECRET=$(${NGSI_GO} applications --host "${IDM}" get --aid "${AID}" | jq -r .application.secret )
+
+  ORION_CLIENT_ID=${AID}
+  ORION_CLIENT_SECRET=${SECRET}
+
+  # Create PEP Proxy for FIWARE Orion
+  PEP_PASSWORD=$(${NGSI_GO} applications --host "${IDM}" pep --aid "${AID}" create --run | jq -r .pep_proxy.password)
+  PEP_ID=$(${NGSI_GO} applications --host "${IDM}" pep --aid "${AID}" list | jq -r .pep_proxy.id)
+
+  PEP_PROXY_IDM_HOST=keyrock
+  PEP_PROXY_IDM_PORT=3000
+  PEP_PROXY_IDM_SSL_ENABLED=false
+
   cat <<EOF >> .env
 
 # PEP Proxy
@@ -1718,8 +1886,11 @@ setup_keyrock() {
 
   setup_mysql
 
-  setup_wilma
-
+  if "${WILMA_AUTH_ENABLED}"; then
+    setup_wilma_for_basic_authorization
+  else
+    setup_wilma
+  fi
   setup_tokenproxy
 
   if ${TOKENPROXY}; then
@@ -1754,6 +1925,8 @@ setup_mongo() {
 # Orion
 #
 setup_orion() {
+  logging_info "${FUNCNAME[0]}"
+
   if [ -z "${ORION}" ]; then
     if [ -n "${MULTI_SERVER_ORION_HOST}" ]; then
       if [ -n "${PERSEO}" ] || [ -n "${IOTAGENT_UL}" ] || [ -n "${IOTAGENT_JSON}" ] || [ -n "${WIRECLOUD}" ]; then
@@ -1769,8 +1942,6 @@ EOF
     return
   fi
 
-  logging_info "${FUNCNAME[0]}"
-
   add_docker_compose_yml "docker-orion.yml"
 
   add_exposed_ports "${ORION_EXPOSE_PORT}" "__ORION_PORTS__" "1026"
@@ -1784,7 +1955,20 @@ EOF
   setup_mongo
   cp "${TEMPLEATE}/mongo/orion.js" "${CONFIG_DIR}/mongo/mongo-init.js"
 
-  setup_wilma
+  setup_wilma "orion" "${ORION}"
+
+  if ${WILMA_AUTH_ENABLED}; then
+    local RID
+    RID=$(${NGSI_GO} applications --host "${IDM}" roles create --aid "${AID}" --name "Full access")
+    assign_permission_to_rol "${AID}" "${RID}" "GET" "/version"
+    assign_permission_to_rol "${AID}" "${RID}" "GET" "^/v2/.*$"
+    assign_permission_to_rol "${AID}" "${RID}" "POST" "^/v2/.*$"
+    assign_permission_to_rol "${AID}" "${RID}" "PUT" "^/v2/.*$"
+    assign_permission_to_rol "${AID}" "${RID}" "PATCH" "^/v2/.*$"
+    assign_permission_to_rol "${AID}" "${RID}" "DELETE" "^/v2/.*$"
+    ${NGSI_GO} applications --host "${IDM}" users --aid "${AID}" assign --rid "${RID}" --uid "${IDM_ADMIN_UID}" > /dev/null
+    ${NGSI_GO} applications --host "${IDM}" trusted --aid "${AID}" add --tid "${ORION_CLIENT_ID}"  > /dev/null
+  fi
 
   setup_tokenproxy
 
@@ -1862,7 +2046,21 @@ setup_orion_ld() {
   setup_mongo
   cp "${TEMPLEATE}/mongo/orion-ld.js" "${CONFIG_DIR}/mongo/mongo-init.js"
 
-  setup_wilma
+  setup_wilma "orion-ld" "${ORION_LD}"
+
+  if ${WILMA_AUTH_ENABLED}; then
+    local RID
+    RID=$(${NGSI_GO} applications --host "${IDM}" roles create --aid "${AID}" --name "Full access")
+    assign_permission_to_rol "${AID}" "${RID}" "GET" "/ngsi-ld/ex/v1/version"
+    assign_permission_to_rol "${AID}" "${RID}" "GET" "^/ngsi-ld/v1/.*$"
+    assign_permission_to_rol "${AID}" "${RID}" "POST" "^/ngsi-ld/v1/.*$"
+    assign_permission_to_rol "${AID}" "${RID}" "PUT" "^/ngsi-ld/v1/.*$"
+    assign_permission_to_rol "${AID}" "${RID}" "PATCH" "^/ngsi-ld/v1/.*$"
+    assign_permission_to_rol "${AID}" "${RID}" "DELETE" "^/ngsi-ld/v1/.*$"
+    assign_permission_to_rol "${AID}" "${RID}" "POST" "/ngsi-ld/ex/v1/notify"
+    ${NGSI_GO} applications --host "${IDM}" users --aid "${AID}" assign --rid "${RID}" --uid "${IDM_ADMIN_UID}" > /dev/null
+    ${NGSI_GO} applications --host "${IDM}" trusted --aid "${AID}" add --tid "${ORION_CLIENT_ID}"  > /dev/null
+  fi
 
   setup_tokenproxy
 
@@ -2060,7 +2258,20 @@ setup_cygnus() {
 
   add_rsyslog_conf "cygnus"
 
-  setup_wilma
+  setup_wilma "cygnus" "${CYGNUS}"
+
+  if ${WILMA_AUTH_ENABLED}; then
+    local RID
+    RID=$(${NGSI_GO} applications --host "${IDM}" roles create --aid "${AID}" --name "Full access")
+    assign_permission_to_rol "${AID}" "${RID}" "GET" "^/v1/.*$"
+    assign_permission_to_rol "${AID}" "${RID}" "PUT" "^/v1/.*$"
+    assign_permission_to_rol "${AID}" "${RID}" "DELETE" "^/v1/.*$"
+    assign_permission_to_rol "${AID}" "${RID}" "POST" "/notify"
+    assign_permission_to_rol "${AID}" "${RID}" "GET" "/admin/log"
+    assign_permission_to_rol "${AID}" "${RID}" "PUT" "/admin/log"
+    ${NGSI_GO} applications --host "${IDM}" users --aid "${AID}" assign --rid "${RID}" --uid "${IDM_ADMIN_UID}" > /dev/null
+    ${NGSI_GO} applications --host "${IDM}" trusted --aid "${AID}" add --tid "${ORION_CLIENT_ID}"  > /dev/null
+  fi
 }
 
 #
@@ -2087,7 +2298,17 @@ setup_comet() {
 
   add_rsyslog_conf "comet"
 
-  setup_wilma
+  setup_wilma "comet" "${COMET}"
+
+  if ${WILMA_AUTH_ENABLED}; then
+    local RID
+    RID=$(${NGSI_GO} applications --host "${IDM}" roles create --aid "${AID}" --name "Full access")
+    assign_permission_to_rol "${AID}" "${RID}" "GET" "/version"
+    assign_permission_to_rol "${AID}" "${RID}" "GET" "^/STH/v2/.*$"
+    assign_permission_to_rol "${AID}" "${RID}" "DELETE" "^/STH/v1/.*$"
+    ${NGSI_GO} applications --host "${IDM}" users --aid "${AID}" assign --rid "${RID}" --uid "${IDM_ADMIN_UID}" > /dev/null
+    ${NGSI_GO} applications --host "${IDM}" trusted --aid "${AID}" add --tid "${ORION_CLIENT_ID}"  > /dev/null
+  fi
 }
 
 #
@@ -2106,14 +2327,28 @@ setup_quantumleap() {
 
   create_nginx_conf "${QUANTUMLEAP}" "nginx-quantumleap"
 
-  add_nginx_depends_on  "quantumleap"
+  add_nginx_depends_on "quantumleap"
 
   add_rsyslog_conf "quantumleap" "redis" "crate"
 
   # Workaround for CrateDB. See https://crate.io/docs/crate/howtos/en/latest/deployment/containers/docker.html#troubleshooting
   ${SUDO} sysctl -w vm.max_map_count=262144
 
-  setup_wilma
+  setup_wilma "quantumleap" "${QUANTUMLEAP}"
+
+  if ${WILMA_AUTH_ENABLED}; then
+    local RID
+    RID=$(${NGSI_GO} applications --host "${IDM}" roles create --aid "${AID}" --name "Full access")
+    assign_permission_to_rol "${AID}" "${RID}" "GET" "/version"
+    assign_permission_to_rol "${AID}" "${RID}" "GET" "/health"
+    assign_permission_to_rol "${AID}" "${RID}" "GET" "^/v2/.*$"
+    assign_permission_to_rol "${AID}" "${RID}" "POST" "/config"
+    assign_permission_to_rol "${AID}" "${RID}" "POST" "/notify"
+    assign_permission_to_rol "${AID}" "${RID}" "POST" "/subscribe"
+    assign_permission_to_rol "${AID}" "${RID}" "DELETE" "^/v2/.*$"
+    ${NGSI_GO} applications --host "${IDM}" users --aid "${AID}" assign --rid "${RID}" --uid "${IDM_ADMIN_UID}" > /dev/null
+    ${NGSI_GO} applications --host "${IDM}" trusted --aid "${AID}" add --tid "${ORION_CLIENT_ID}"  > /dev/null
+  fi
 }
 
 #
@@ -2166,7 +2401,23 @@ EOF
 
   setup_mongo
 
-  setup_wilma
+  setup_wilma "perseo-fe" "${PERSEO}"
+
+  if ${WILMA_AUTH_ENABLED}; then
+    local RID
+    RID=$(${NGSI_GO} applications --host "${IDM}" roles create --aid "${AID}" --name "Full access")
+    assign_permission_to_rol "${AID}" "${RID}" "POST" "/notices"
+    assign_permission_to_rol "${AID}" "${RID}" "GET" "^/rules(/.*)?$"
+    assign_permission_to_rol "${AID}" "${RID}" "POST" "/rules"
+    assign_permission_to_rol "${AID}" "${RID}" "DELETE" "^/rules/.*$"
+    assign_permission_to_rol "${AID}" "${RID}" "GET" "/version"
+    assign_permission_to_rol "${AID}" "${RID}" "PUT" "/admin/log"
+    assign_permission_to_rol "${AID}" "${RID}" "GET" "^/admin(/.*)?$"
+    assign_permission_to_rol "${AID}" "${RID}" "DELETE" "/admin/metrics"
+    ${NGSI_GO} applications --host "${IDM}" users --aid "${AID}" assign --rid "${RID}" --uid "${IDM_ADMIN_UID}" > /dev/null
+    ${NGSI_GO} applications --host "${IDM}" trusted --aid "${AID}" add --tid "${ORION_CLIENT_ID}"  > /dev/null
+  fi
+
 }
 
 #
@@ -2537,8 +2788,15 @@ EOF
     case "${IOTA_HTTP_AUTH}" in
       "none" ) sed -i -e "/__NGINX_IOTAGENT_HTTP__/i \  location $1 {\n    proxy_pass $2$1;\n  }" "${NGINX_SITES}/${IOTAGENT_HTTP}" ;;
       "basic" ) sed -i -e "/__NGINX_IOTAGENT_HTTP__/i \  location $1 {\n    auth_basic \"Restricted\";\n    auth_basic_user_file /etc/nginx/.htpasswd;\n\n    proxy_pass $2$1;\n  }" "${NGINX_SITES}/${IOTAGENT_HTTP}" ;;
-      * ) sed -i -e "/__NGINX_IOTAGENT_HTTP__/i \  location $1 {\n    set \$req_uri \"\$uri\";\n    auth_request /_check_oauth2_token;\n\n    proxy_pass $2$1;\n  }" "${NGINX_SITES}/${IOTAGENT_HTTP}" ;;
+      * ) sed -i -e "/__NGINX_IOTAGENT_HTTP__/i \  location $1 {\n    set \$req_uri \"\$uri\";\n    auth_request /_check_oauth2_token;\n\n    proxy_pass $2$1;\n  }" "${NGINX_SITES}/${IOTAGENT_HTTP}" && setup_wilma "iotagent-http" "${IOTAGENT_HTTP}" ;;
     esac
+
+    if [ "${IOTA_HTTP_AUTH}" = "bearer" ] && ${WILMA_AUTH_ENABLED}; then
+      RID=$(${NGSI_GO} applications --host "${IDM}" roles create --aid "${AID}" --name "Full access")
+      assign_permission_to_rol "${AID}" "${RID}" "POST" "$1"
+      ${NGSI_GO} applications --host "${IDM}" users --aid "${AID}" assign --rid "${RID}" --uid "${IDM_ADMIN_UID}" > /dev/null
+      ${NGSI_GO} applications --host "${IDM}" trusted --aid "${AID}" add --tid "${ORION_CLIENT_ID}"  > /dev/null
+    fi 
   fi
 }
 
@@ -2600,7 +2858,23 @@ EOF
     add_to_docker_compose_yml "__IOTA_UL_ENVIRONMENT__" "     - IOTA_MQTT_PASSWORD=\${MQTT_PASSWORD}"
   fi
 
-  setup_wilma
+  setup_wilma "iotagent-ul" "${IOTAGENT_UL}"
+
+  if ${WILMA_AUTH_ENABLED}; then
+    local RID
+    RID=$(${NGSI_GO} applications --host "${IDM}" roles create --aid "${AID}" --name "Full access")
+    assign_permission_to_rol "${AID}" "${RID}" "GET" "/iot/about"
+    assign_permission_to_rol "${AID}" "${RID}" "GET" "/iot/services"
+    assign_permission_to_rol "${AID}" "${RID}" "POST" "/iot/services"
+    assign_permission_to_rol "${AID}" "${RID}" "PUT" "/iot/services"
+    assign_permission_to_rol "${AID}" "${RID}" "DELETE" "/iot/services"
+    assign_permission_to_rol "${AID}" "${RID}" "GET" "^/iot/devices(/.*)?$"
+    assign_permission_to_rol "${AID}" "${RID}" "POST" "/iot/devices"
+    assign_permission_to_rol "${AID}" "${RID}" "PUT" "^/iot/devices/.*$"
+    assign_permission_to_rol "${AID}" "${RID}" "DELETE" "^/iot/devices/.*$"
+    ${NGSI_GO} applications --host "${IDM}" users --aid "${AID}" assign --rid "${RID}" --uid "${IDM_ADMIN_UID}" > /dev/null
+    ${NGSI_GO} applications --host "${IDM}" trusted --aid "${AID}" add --tid "${ORION_CLIENT_ID}"  > /dev/null
+  fi
 }
 
 #
@@ -2650,7 +2924,23 @@ EOF
     add_to_docker_compose_yml "__IOTA_JSON_ENVIRONMENT__" "     - IOTA_MQTT_PASSWORD=\${MQTT_PASSWORD}"
   fi
 
-  setup_wilma
+  setup_wilma "iotagent-json" "${IOTAGENT_JSON}"
+
+  if ${WILMA_AUTH_ENABLED}; then
+    local RID
+    RID=$(${NGSI_GO} applications --host "${IDM}" roles create --aid "${AID}" --name "Full access")
+    assign_permission_to_rol "${AID}" "${RID}" "GET" "/iot/about"
+    assign_permission_to_rol "${AID}" "${RID}" "GET" "/iot/services"
+    assign_permission_to_rol "${AID}" "${RID}" "POST" "/iot/services"
+    assign_permission_to_rol "${AID}" "${RID}" "PUT" "/iot/services"
+    assign_permission_to_rol "${AID}" "${RID}" "DELETE" "/iot/services"
+    assign_permission_to_rol "${AID}" "${RID}" "GET" "^/iot/devices(/.*)?$"
+    assign_permission_to_rol "${AID}" "${RID}" "POST" "/iot/devices"
+    assign_permission_to_rol "${AID}" "${RID}" "PUT" "^/iot/devices/.*$"
+    assign_permission_to_rol "${AID}" "${RID}" "DELETE" "^/iot/devices/.*$"
+    ${NGSI_GO} applications --host "${IDM}" users --aid "${AID}" assign --rid "${RID}" --uid "${IDM_ADMIN_UID}" > /dev/null
+    ${NGSI_GO} applications --host "${IDM}" trusted --aid "${AID}" add --tid "${ORION_CLIENT_ID}"  > /dev/null
+  fi
 }
 
 #
@@ -3515,7 +3805,10 @@ copy_makefile() {
   logging_info "${FUNCNAME[0]}"
 
   SETUP_DIR=./setup
-  cp "${SETUP_DIR}/_Makefile.setup" ./Makefile
+
+  if ! [ -e Makefile ]; then
+    cp "${SETUP_DIR}/_Makefile.setup" ./Makefile
+  fi
 }
 
 #

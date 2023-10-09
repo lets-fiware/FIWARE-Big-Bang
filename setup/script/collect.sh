@@ -129,6 +129,8 @@ else
   echo "completed"
 fi
 
+echo "WILMA_AUTH_ENABLED: ${WILMA_AUTH_ENABLED}"
+
 echo "Docker containers: "
 
 make ps

@@ -38,27 +38,28 @@ The following files and directories will be created.
 You can manage your FIWARE instance with make command. Run the make command in a directory where you ran
 the lets-fiware.sh script.
 
-| Command      | Description                                                  |
-| ------------ | ------------------------------------------------------------ |
-| admin        | Print a username and a password for Admin user               |
-| get-token    | Get an OAuth2 access token                                   |
-| multi-server | Print variables for multi-server installation                |
-| mqtt         | Print variables for MQTT                                     |
-| subdomains   | Print list of subdomains                                     |
-| collect      | Collect system information                                   |
-| log          | Print log for FIWARE Big Bang (/var/log/fiware/fi-bb.log)    |
-| log-dir      | List files in the log directory (/var/log/fiware)            |
-| logrotation  | Rotate log files                                             |
-| ps           | List docker containers for FIWARE instance                   |
-| build        | Build docker containers for FIWARE instance                  |
-| up           | Create and start docker containers for FIWARE instance       |
-| down         | Stop and remove docker containers for FIWARE instance        |
-| clean        | !CAUTION! Clean up FIWARE instance including your all data   |
-| nginx-test   | Test configuration for nginx                                 |
-| nginx-reload | Reload configuration for nginx                               |
-| cert-renew   | Renew all server certificates                                |
-| cert-revoke  | !CAUTION! Revoke all server certificates for FIWARE instance |
-| cert-list    | List server certificate files for FIWARE instance            |
+| Command       | Description                                                  |
+| ------------- | ------------------------------------------------------------ |
+| admin         | Print a username and a password for Admin user               |
+| get-token     | Get an OAuth2 access token                                   |
+| multi-server  | Print variables for multi-server installation                |
+| mqtt          | Print variables for MQTT                                     |
+| subdomains    | Print list of subdomains                                     |
+| collect       | Collect system information                                   |
+| log           | Print log for FIWARE Big Bang (/var/log/fiware/fi-bb.log)    |
+| log-dir       | List files in the log directory (/var/log/fiware)            |
+| logrotation   | Rotate log files                                             |
+| ps            | List docker containers for FIWARE instance                   |
+| build         | Build docker containers for FIWARE instance                  |
+| up            | Create and start docker containers for FIWARE instance       |
+| down          | Stop and remove docker containers for FIWARE instance        |
+| clean         | !CAUTION! Clean up FIWARE instance including your all data   |
+| restart-wilma | Restart Wilma containers                                     |
+| nginx-test    | Test configuration for nginx                                 |
+| nginx-reload  | Reload configuration for nginx                               |
+| cert-renew    | Renew all server certificates                                |
+| cert-revoke   | !CAUTION! Revoke all server certificates for FIWARE instance |
+| cert-list     | List server certificate files for FIWARE instance            |
 
 ## Log files
 

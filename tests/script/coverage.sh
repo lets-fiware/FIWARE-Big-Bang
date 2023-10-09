@@ -58,6 +58,7 @@ reset_env() {
   done
 
   sudo rm -fr config/ data/
+  rm -f Makefile
   git checkout config.sh
 }
 
@@ -65,6 +66,8 @@ reset_env() {
 # Remove example com from hosts
 #
 remove_example_com_from_hosts() {
+  logging "user.info" "${FUNCNAME[0]}"
+
   sudo sed -i -e "/example.com/d" /etc/hosts
 }
 
@@ -175,7 +178,7 @@ setup() {
   sudo tar zxvf ngsi-${ngsi_go_version}-linux-amd64.tar.gz -C /usr/local/bin
   rm -f ngsi-${ngsi_go_version}-linux-amd64.tar.gz
 
-  KCOV="/usr/local/bin/kcov --exclude-path=tests,.git,setup,coverage,.github,.vscode,examples,docs,.mock"
+  KCOV="/usr/local/bin/kcov --exclude-path=tests,.git,setup,coverage,.github,.vscode,examples,docs,.mock,maintenance"
 
   SAVE_PATH=${PATH}
 
@@ -293,6 +296,8 @@ install_test2() {
   sleep 5
 
   ${KCOV} ./coverage ./lets-fiware.sh example.com
+
+  fibb_down
 }
 
 install_test3() {
@@ -329,6 +334,8 @@ install_test3() {
   sed -i -e "s/^\(ORION_LD_DISABLE_FILE_LOG=\).*/\1TRUE/" config.sh
 
   ${KCOV} ./coverage ./lets-fiware.sh example.com
+
+  fibb_down
 }
 
 install_test4() {
@@ -349,8 +356,6 @@ install_test4() {
   sed -i -e "s/^\(IOTAGENT_HTTP=\).*/\1iotagent-http/" config.sh
   sed -i -e "s/^\(IOTA_HTTP_AUTH=\).*/\1basic/" config.sh
   sed -i -e "s/^\(MOSQUITTO=\).*/\1mosquitto/" config.sh
-  sed -i -e "s/^\(ZEPPELIN=\).*/\1zeppelin/" config.sh
-  sed -i -e "s/^\(ZEPPELIN_DEBUG=\).*/\1true/" config.sh
 
   export FIBB_TEST_DOCKER_CMD=rekcod
   export FIBB_TEST_SKIP_INSTALL_WIDGET=true
@@ -361,9 +366,41 @@ install_test4() {
   ${KCOV} ./coverage ./lets-fiware.sh example.com "${IPS[0]}"
 
   export FIBB_TEST_DOCKER_CMD=
+
+  fibb_down
 }
 
 install_test5() {
+  logging "user.info" "${FUNCNAME[0]}"
+
+  sleep 5
+
+  git checkout config.sh
+
+  sed -n "/^IMAGE_/s/.*=\(.*\)/\1/p" config.sh | while IFS= read -r line
+  do
+    if docker images --format "{{.Repository}}:{{.Tag}}" | grep -qs "${line}"; then
+      docker rmi "${line}"
+    fi
+  done
+
+  mkdir .work
+
+  sed -i -e "s/^\(ZEPPELIN=\).*/\1zeppelin/" config.sh
+  sed -i -e "s/^\(ZEPPELIN_DEBUG=\).*/\1true/" config.sh
+
+  ${KCOV} ./coverage ./lets-fiware.sh example.com
+
+  fibb_down
+}
+
+install_test6() {
+  logging "user.info" "${FUNCNAME[0]}"
+
+  sleep 5
+
+  git checkout config.sh
+
   echo "*** Timeout was reached ***" 1>&2
   export FIBB_WAIT_TIME=1
   ${KCOV} ./coverage ./lets-fiware.sh example.com
@@ -408,6 +445,60 @@ install_on_centos() {
   sleep 5
 
   fibb_down
+}
+
+install_wilma_auth_enabled() {
+  logging "user.info" "${FUNCNAME[0]}"
+
+  sleep 5
+
+  reset_env
+
+  touch Makefile
+
+  sed -i -e "s/^\(WILMA_AUTH_ENABLED=\).*/\1true/" config.sh
+  sed -i -e "s/^\(IOTAGENT_UL=\).*/\1iotagent-ul/" config.sh
+  sed -i -e "s/^\(IOTAGENT_JSON=\).*/\1iotagent-json/" config.sh
+  sed -i -e "s/^\(IOTAGENT_HTTP=\).*/\1iotagent-http/" config.sh
+  sed -i -e "s/^\(IOTA_HTTP_AUTH=\).*/\1bearer/" config.sh
+  sed -i -e "s/^\(CYGNUS=\).*/\1cygnus/" config.sh
+  sed -i -e "s/^\(CYGNUS_ELASTICSEARCH=\).*/\1true/" config.sh
+  sed -i -e "s/^\(ELASTICSEARCH=\).*/\1elasticsearch/" config.sh
+  sed -i -e "s/^\(COMET=\).*/\1comet/" config.sh
+  sed -i -e "s/^\(PERSEO=\).*/\1perseo/" config.sh
+  sed -i -e "s/^\(QUANTUMLEAP=\).*/\1quantumleap/" config.sh
+
+  ${KCOV} ./coverage ./lets-fiware.sh example.com
+
+  sleep 5
+
+  fibb_down
+
+  reset_env
+
+  sleep 5
+}
+
+install_wilma_auth_enabled2() {
+  logging "user.info" "${FUNCNAME[0]}"
+
+  sleep 5
+
+  reset_env
+
+  sed -i -e "s/^\(WILMA_AUTH_ENABLED=\).*/\1true/" config.sh
+  sed -i -e "s/^\(ORION=\).*/\1/" config.sh
+  sed -i -e "s/^\(ORION_LD=\).*/\1orion-ld/" config.sh
+
+  ${KCOV} ./coverage ./lets-fiware.sh example.com
+
+  sleep 5
+
+  fibb_down
+
+  reset_env
+
+  sleep 5
 }
 
 #
@@ -719,23 +810,23 @@ main() {
 
   install_test2
 
-  fibb_down
-
   install_test3
 
-  fibb_down
-
   install_test4
-
-  fibb_down
 
   install_on_centos
 
   install_test5
 
+  install_test6
+
   multi_server_test1
 
   multi_server_test2
+
+  install_wilma_auth_enabled
+
+  install_wilma_auth_enabled2
 
   remove_example_com_from_hosts
 }

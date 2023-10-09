@@ -1,3 +1,5 @@
+#!/bin/sh
+
 # MIT License
 #
 # Copyright (c) 2021-2023 Kazuhito Suda
@@ -24,13 +26,14 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-FROM node:18
+set -ue
 
-WORKDIR /lint
-COPY package.json package-lock.json /lint/
-RUN npm ci && \
-    ln -s /lint/node_modules/textlint/bin/textlint.js /usr/local/bin/textlint
+cd "$(dirname "$0")"
+cd ../..
 
-WORKDIR /work
+if [ ! -e .env ]; then
+  echo ".env file not fuond"
+  exit 1
+fi
 
-ENTRYPOINT ["/usr/local/bin/textlint"]
+docker compose ps --format json | jq -r .[].Service | sed -n /.*-wilma/p | xargs -L 1 docker compose restart
