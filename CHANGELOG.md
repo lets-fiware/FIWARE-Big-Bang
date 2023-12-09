@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.37.0-next
 
+-   Update Mintaka to 0.6.0 (#357)
 -   Update Node-RED to 3.1.3 (#356)
 
 ## FIWARE Big Bang v0.37.0 - 09 October, 2023
