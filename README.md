@@ -115,5 +115,5 @@ universe in which different FIWARE GEs run.
 
 ## Copyright and License
 
-Copyright (c) 2021-2023 Kazuhito Suda<br>
+Copyright (c) 2021-2024 Kazuhito Suda<br>
 Licensed under the [MIT License](./LICENSE).

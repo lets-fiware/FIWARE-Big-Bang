@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2021-2023 Kazuhito Suda
+ * Copyright (c) 2021-2024 Kazuhito Suda
  *
  * This file is part of FIWARE Big Bang
  *

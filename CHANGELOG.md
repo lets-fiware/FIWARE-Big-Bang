@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.37.0-next
 
+-   Update copyright date (#358)
 -   Update Mintaka to 0.6.0 (#357)
 -   Update Node-RED to 3.1.3 (#356)
 
