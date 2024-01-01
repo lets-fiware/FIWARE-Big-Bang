@@ -113,5 +113,5 @@ FIWARE generic enablers は星座の名前を持ち、このプロダクトは�
 
 ## Copyright and License
 
-Copyright (c) 2021-2023 Kazuhito Suda<br>
+Copyright (c) 2021-2024 Kazuhito Suda<br>
 Licensed under the [MIT License](./LICENSE).
