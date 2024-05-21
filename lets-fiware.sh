@@ -399,7 +399,7 @@ set_and_check_values() {
 
   IDM_ADMIN_UID="admin"
 
-  TEMPLEATE=${SETUP_DIR}/templeate
+  TEMPLATE=${SETUP_DIR}/template
 
   set_default_values
 
@@ -485,7 +485,7 @@ NGINX_SITES=${NGINX_SITES}
 SETUP_DIR=${SETUP_DIR}
 WORK_DIR=${WORK_DIR}
 CONTRIB_DIR=${CONTRIB_DIR}
-TEMPLEATE=${TEMPLEATE}
+TEMPLATE=${TEMPLATE}
 
 LOG_DIR=${LOG_DIR}
 NGINX_LOG_DIR=${NGINX_LOG_DIR}
@@ -1140,12 +1140,12 @@ setup_cert() {
       if [ ! -d "${CERTBOT_DIR}"/"${val}" ]; then
         mkdir "${CERTBOT_DIR}"/"${val}"
       fi
-      sed -e "s/HOST/${val}/" "${TEMPLEATE}"/nginx/nginx-cert > "${NGINX_SITES}"/"${val}"
+      sed -e "s/HOST/${val}/" "${TEMPLATE}"/nginx/nginx-cert > "${NGINX_SITES}"/"${val}"
     fi 
   done
 
-  cp "${TEMPLEATE}"/docker/setup-cert.yml ./docker-cert.yml
-  cp "${TEMPLEATE}"/nginx/nginx.conf "${CONFIG_DIR}"/nginx/
+  cp "${TEMPLATE}"/docker/setup-cert.yml ./docker-cert.yml
+  cp "${TEMPLATE}"/nginx/nginx.conf "${CONFIG_DIR}"/nginx/
 
   ${DOCKER_COMPOSE} -f docker-cert.yml up -d
 
@@ -1272,7 +1272,7 @@ up_keyrock_mysql() {
   mkdir -p "${CONFIG_DIR}"/keyrock/certs/applications
   "${SUDO}" chown -R 1000:1000 "${CONFIG_DIR}"/keyrock/certs
 
-  cp -a "${TEMPLEATE}"/docker/setup-keyrock-mysql.yml ./docker-idm.yml
+  cp -a "${TEMPLATE}"/docker/setup-keyrock-mysql.yml ./docker-idm.yml
   add_to_docker_idm_yml "__KEYROCK_VOLUMES__" "     - ${CONFIG_DIR}/keyrock/certs/applications:/opt/fiware-idm/certs/applications"
 
   MYSQL_ROOT_PASSWORD=$(${DOCKER} run -t --rm "${IMAGE_PWGEN}" | sed -z 's/[\x0d\x0a]//g')
@@ -1374,14 +1374,14 @@ add_docker_compose_yml() {
   logging_info "${FUNCNAME[0]} $1"
 
   echo "" >> ${DOCKER_COMPOSE_YML}
-  sed -e '/^version:/,/services:/d' "${TEMPLEATE}"/docker/"$1" >> ${DOCKER_COMPOSE_YML}
+  sed -e '/^version:/,/services:/d' "${TEMPLATE}"/docker/"$1" >> ${DOCKER_COMPOSE_YML}
 }
 
 #
 # Create nginx conf
 #
 create_nginx_conf() {
-  sed -e "s/HOST/$1/" "${TEMPLEATE}/nginx/$2" > "${NGINX_SITES}/$1"
+  sed -e "s/HOST/$1/" "${TEMPLATE}/nginx/$2" > "${NGINX_SITES}/$1"
 }
 
 #
@@ -1524,9 +1524,9 @@ setup_nginx() {
   rm -fr "${NGINX_SITES}"
   mkdir -p "${NGINX_SITES}"
 
-  cp "${TEMPLEATE}"/docker/docker-nginx.yml "${DOCKER_COMPOSE_YML}"
+  cp "${TEMPLATE}"/docker/docker-nginx.yml "${DOCKER_COMPOSE_YML}"
 
-  cp "${TEMPLEATE}"/nginx/default_server "${NGINX_SITES}"
+  cp "${TEMPLATE}"/nginx/default_server "${NGINX_SITES}"
 
   create_dummy_cert
 
@@ -1702,7 +1702,7 @@ setup_wilma_basic_authorization() {
   local GE_NAME
   GE_NAME=${1^}
 
-  cp "${TEMPLEATE}"/docker/docker-wilma.yml "${WORK_DIR}"/
+  cp "${TEMPLATE}"/docker/docker-wilma.yml "${WORK_DIR}"/
 
   sed -i "s/{PEP_PROXY_/{${GE}_PEP_PROXY_/" "${WORK_DIR}"/docker-wilma.yml
   sed -i "s/{PEP_PASSWORD/{${GE}_PEP_PASSWORD/" "${WORK_DIR}"/docker-wilma.yml
@@ -1953,7 +1953,7 @@ EOF
   add_rsyslog_conf "orion"
 
   setup_mongo
-  cp "${TEMPLEATE}/mongo/orion.js" "${CONFIG_DIR}/mongo/mongo-init.js"
+  cp "${TEMPLATE}/mongo/orion.js" "${CONFIG_DIR}/mongo/mongo-init.js"
 
   setup_wilma "orion" "${ORION}"
 
@@ -2001,7 +2001,7 @@ setup_mintaka() {
 
   add_exposed_ports "${TIMESCALE_EXPOSE_PORT}" "__TIMESCALE_PORTS__" "5432"
 
-  sed -i "/__NGINX_ORION_LD__/r ${SETUP_DIR}/templeate/nginx/nginx-mintaka" "${NGINX_SITES}/${ORION_LD}"
+  sed -i "/__NGINX_ORION_LD__/r ${SETUP_DIR}/template/nginx/nginx-mintaka" "${NGINX_SITES}/${ORION_LD}"
 
   add_nginx_depends_on "mintaka"
 
@@ -2044,7 +2044,7 @@ setup_orion_ld() {
   add_rsyslog_conf "orion-ld"
 
   setup_mongo
-  cp "${TEMPLEATE}/mongo/orion-ld.js" "${CONFIG_DIR}/mongo/mongo-init.js"
+  cp "${TEMPLATE}/mongo/orion-ld.js" "${CONFIG_DIR}/mongo/mongo-init.js"
 
   setup_wilma "orion-ld" "${ORION_LD}"
 
@@ -2808,7 +2808,7 @@ create_openiot_mongo_index() {
     return
   fi
   OPENIOT_MONGO_INDEX=true
-  cat "${TEMPLEATE}/mongo/orion-openiot.js" >> "${CONFIG_DIR}/mongo/mongo-init.js"
+  cat "${TEMPLATE}/mongo/orion-openiot.js" >> "${CONFIG_DIR}/mongo/mongo-init.js"
 }
 
 #
@@ -2831,7 +2831,7 @@ setup_iotagent_ul() {
 
   setup_mongo
   create_openiot_mongo_index
-  cat "${TEMPLEATE}/mongo/iotagentul.js" >> "${CONFIG_DIR}/mongo/mongo-init.js"
+  cat "${TEMPLATE}/mongo/iotagentul.js" >> "${CONFIG_DIR}/mongo/mongo-init.js"
 
   cat <<EOF >> .env
 
@@ -2897,7 +2897,7 @@ setup_iotagent_json() {
 
   setup_mongo
   create_openiot_mongo_index
-  cat "${TEMPLEATE}/mongo/iotagentjson.js" >> "${CONFIG_DIR}/mongo/mongo-init.js"
+  cat "${TEMPLATE}/mongo/iotagentjson.js" >> "${CONFIG_DIR}/mongo/mongo-init.js"
 
   cat <<EOF >> .env
 
@@ -3127,7 +3127,7 @@ setup_node_red_multi_instance() {
   local node_red_yml
   local node_red_nginx
 
-  node_red_yaml="${TEMPLEATE}"/docker/docker-node-red.yml
+  node_red_yaml="${TEMPLATE}"/docker/docker-node-red.yml
 
   create_nginx_conf "${NODE_RED}" "nginx-node-red"
 

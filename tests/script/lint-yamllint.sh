@@ -31,4 +31,4 @@ set -ue
 cd "$(dirname "$0")"
 cd ../..
 
-yamllint setup/templeate/docker/
+yamllint setup/template/docker/

@@ -264,7 +264,7 @@
 -   Remove duplicate environment variables (#96)
 -   Improve coverage (#94)
 -   Improve mongodb index (#93)
--   Fix nginx-orion templeate (#92)
+-   Fix nginx-orion template (#92)
 -   Improve Tokenproxy (#91)
 -   Fix comet depends\_on in docker-compose.yml (#90)
 -   Add authorization feature for IoT Agent over HTTP (#89)
