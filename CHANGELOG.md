@@ -1,5 +1,7 @@
 ## FIWARE Big Bang v0.37.0-next
 
+-   Update Orion to 3.11.0 (#361)
+-   Fixes spelling of "template" folder (#360)
 -   Update copyright date (#358)
 -   Update Mintaka to 0.6.0 (#357)
 -   Update Node-RED to 3.1.3 (#356)
