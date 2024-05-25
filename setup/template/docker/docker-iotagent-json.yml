@@ -1,4 +1,3 @@
-version: "3"
 services:
   iotagent-json:
     image: ${IMAGE_IOTAGENT_JSON}

@@ -1,4 +1,3 @@
-version: "3"
 services:
   mintaka:
     image: ${IMAGE_MINTAKA}

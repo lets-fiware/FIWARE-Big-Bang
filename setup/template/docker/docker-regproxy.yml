@@ -1,4 +1,3 @@
-version: "3"
 services:
   regproxy:
     image: ${IMAGE_REGPROXY}

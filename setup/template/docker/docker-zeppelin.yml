@@ -1,4 +1,3 @@
-version: "3"
 services:
   zeppelin:
     image: ${IMAGE_ZEPPELIN}

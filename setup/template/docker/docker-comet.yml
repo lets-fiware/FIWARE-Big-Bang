@@ -1,4 +1,3 @@
-version: "3"
 services:
   comet:
     image: ${IMAGE_COMET}
