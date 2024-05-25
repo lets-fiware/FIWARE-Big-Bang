@@ -49,7 +49,7 @@ ORION=orion
 ORION_EXPOSE_PORT=
 
 # Docker image for Orion
-IMAGE_ORION=telefonicaiot/fiware-orion:3.11.0
+IMAGE_ORION=telefonicaiot/fiware-orion:3.12.0
 
 #
 # Orion-LD

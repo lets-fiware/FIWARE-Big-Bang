@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.37.0-next
 
+-   Update Orion to 3.12.0 (#362)
 -   Update Orion to 3.11.0 (#361)
 -   Fixes spelling of "template" folder (#360)
 -   Update copyright date (#358)
