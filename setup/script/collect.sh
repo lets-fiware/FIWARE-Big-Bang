@@ -104,6 +104,14 @@ if "$FOUND"; then
   shasum -a 256 lets-fiware.sh
 fi
 
+if [ -e config.sh ] && [ -e .config.sh ]; then
+  echo -n "Hash: "
+  shasum -a 256 .config.sh
+  set +e
+  diff config.sh .config.sh | sed -e "/<.*_PASS/s/^\(.*\)=.*$/\1=\*\*\*\*\*/"
+  set -e
+fi
+
 check_cmd git
 if "$FOUND" && [ -e .git ]; then
   echo "git-hash: "
