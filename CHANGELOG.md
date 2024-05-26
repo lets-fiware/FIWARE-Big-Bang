@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.37.0-next
 
+-   Update Node-RED to 3.1.9 (#367)
 -   Support Ubuntu 24.04 (#366)
 -   Update docker installation procedure on Ubuntu (#365)
 -   Bump codecov/codecov-action from 1 to 4 (#364)
