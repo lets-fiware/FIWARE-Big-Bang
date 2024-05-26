@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.37.0-next
 
+-   Improve maintenance script (#368)
 -   Update Node-RED to 3.1.9 (#367)
 -   Support Ubuntu 24.04 (#366)
 -   Update docker installation procedure on Ubuntu (#365)
