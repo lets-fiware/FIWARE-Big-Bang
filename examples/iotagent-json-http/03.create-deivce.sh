@@ -20,6 +20,7 @@ ngsi devices --host "${IOTAGENT_JSON}" create --data '{
  "devices": [
    {
      "device_id":   "sensor004",
+     "apikey":      "XaEMQ86tTBHCwN0C9MjiHXcYFX",
      "entity_name": "urn:ngsi-ld:WeatherObserved:sensor004",
      "entity_type": "Sensor",
      "timezone":    "Asia/Tokyo",
