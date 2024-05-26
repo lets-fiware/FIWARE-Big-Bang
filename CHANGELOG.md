@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.37.0-next
 
+-   Support Ubuntu 24.04 (#366)
 -   Update docker installation procedure on Ubuntu (#365)
 -   Bump codecov/codecov-action from 1 to 4 (#364)
 -   Remove version property from docker compose files (#363)
