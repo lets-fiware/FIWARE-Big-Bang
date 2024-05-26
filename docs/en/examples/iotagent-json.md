@@ -110,6 +110,7 @@ ngsi devices \
   "devices": [
     {
       "device_id":   "sensor002",
+      "apikey":      "SMoCnNjlrAfeFOtlaC8XAhM8o1",
       "entity_name": "urn:ngsi-ld:WeatherObserved:sensor002",
       "entity_type": "Sensor",
       "timezone":    "Asia/Tokyo",
@@ -361,6 +362,7 @@ ngsi devices \
   "devices": [
     {
       "device_id":   "sensor004",
+      "apikey":      "XaEMQ86tTBHCwN0C9MjiHXcYFX",
       "entity_name": "urn:ngsi-ld:WeatherObserved:sensor004",
       "entity_type": "Sensor",
       "timezone":    "Asia/Tokyo",

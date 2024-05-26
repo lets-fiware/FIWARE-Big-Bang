@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.37.0-next
 
+-   Update IoT Agent for JSON to 3.4.0 (#371)
 -   Update IoT Agent for UltraLight to 3.4.0 (#370)
 -   Update STH Comet to 2.11.0 (#369)
 -   Improve maintenance script (#368)
