@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.37.0-next
 
+-   Bump codecov/codecov-action from 1 to 4 (#364)
 -   Remove version property from docker compose files (#363)
 -   Update Orion to 3.12.0 (#362)
 -   Update Orion to 3.11.0 (#361)
