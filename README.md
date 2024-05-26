@@ -12,6 +12,7 @@
 <br/>
 [![Ubuntu 20.04](https://github.com/lets-fiware/FIWARE-Big-Bang/actions/workflows/ubuntu-20.04.yml/badge.svg)](https://github.com/lets-fiware/FIWARE-Big-Bang/actions/workflows/ubuntu-20.04.yml)
 [![Ubuntu 22.04](https://github.com/lets-fiware/FIWARE-Big-Bang/actions/workflows/ubuntu-22.04.yml/badge.svg)](https://github.com/lets-fiware/FIWARE-Big-Bang/actions/workflows/ubuntu-22.04.yml)
+[![Ubuntu 24.04](https://github.com/lets-fiware/FIWARE-Big-Bang/actions/workflows/ubuntu-24.04.yml/badge.svg)](https://github.com/lets-fiware/FIWARE-Big-Bang/actions/workflows/ubuntu-24.04.yml)
 <br/>
 
 The FIWARE Big Bang is a turnkey solution for setting up a FIWARE instance in the cloud.
@@ -68,7 +69,8 @@ FI-BB stands for FIWARE Big Bang.
     -   1883 when enabling MQTT
     -   8883 when enabling MQTT TLS
 -   Supported Linux distribution
-    -   [Ubuntu 22.04 LTS](https://github.com/lets-fiware/FIWARE-Big-Bang/discussions/304) (Recommended Linux distribution)
+    -   Ubuntu 24.04 LTS (Recommended Linux distribution)
+    -   [Ubuntu 22.04 LTS](https://github.com/lets-fiware/FIWARE-Big-Bang/discussions/304)
     -   [Ubuntu 20.04 LTS](https://github.com/lets-fiware/FIWARE-Big-Bang/discussions/305)
     -   [CentOS Stream release 9](https://github.com/lets-fiware/FIWARE-Big-Bang/discussions/330)
     -   [CentOS Stream release 8](https://github.com/lets-fiware/FIWARE-Big-Bang/discussions/331)

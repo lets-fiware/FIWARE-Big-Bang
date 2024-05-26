@@ -12,6 +12,7 @@
 <br/>
 [![Ubuntu 20.04](https://github.com/lets-fiware/FIWARE-Big-Bang/actions/workflows/ubuntu-20.04.yml/badge.svg)](https://github.com/lets-fiware/FIWARE-Big-Bang/actions/workflows/ubuntu-20.04.yml)
 [![Ubuntu 22.04](https://github.com/lets-fiware/FIWARE-Big-Bang/actions/workflows/ubuntu-22.04.yml/badge.svg)](https://github.com/lets-fiware/FIWARE-Big-Bang/actions/workflows/ubuntu-22.04.yml)
+[![Ubuntu 24.04](https://github.com/lets-fiware/FIWARE-Big-Bang/actions/workflows/ubuntu-24.04.yml/badge.svg)](https://github.com/lets-fiware/FIWARE-Big-Bang/actions/workflows/ubuntu-24.04.yml)
 <br/>
 
 FIWARE Big Bang は、クラウドに FIWARE インスタンスをセットアップするためのターンキー・ソリューションです。

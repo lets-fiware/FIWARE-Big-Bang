@@ -53,9 +53,10 @@ from the Internet via a network equipment
 ### Supported Linux distribution
 
 The FIWARE Big Bang supports Ubuntu, Rocky Linux and AlmaLinux as Linux distribution.
-The recommended Linux distribution is Ubuntu 22.04.
+The recommended Linux distribution is Ubuntu 24.04.
 
--   [Ubuntu 22.04 LTS](https://github.com/lets-fiware/FIWARE-Big-Bang/discussions/304) (Recommended Linux distribution)
+-   Ubuntu 24.04 LTS (Recommended Linux distribution)
+-   [Ubuntu 22.04 LTS](https://github.com/lets-fiware/FIWARE-Big-Bang/discussions/304)
 -   [Ubuntu 20.04 LTS](https://github.com/lets-fiware/FIWARE-Big-Bang/discussions/305)
 -   [CentOS Stream release 9](https://github.com/lets-fiware/FIWARE-Big-Bang/discussions/330)
 -   [CentOS Stream release 8](https://github.com/lets-fiware/FIWARE-Big-Bang/discussions/331)

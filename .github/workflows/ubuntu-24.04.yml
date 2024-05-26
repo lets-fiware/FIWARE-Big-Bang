@@ -1,0 +1,23 @@
+name: Ubuntu 24.04
+on:
+  push:
+    branches:
+      - main
+      - "*-next"
+  pull_request:
+    branches:
+      - main
+      - "*-next"
+
+jobs:
+  setup-test:
+    name: setup test
+
+    runs-on: ubuntu-24.04
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Run setup test
+      run: ./tests/script/setup_test.sh
