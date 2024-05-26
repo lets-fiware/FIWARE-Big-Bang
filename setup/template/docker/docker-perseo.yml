@@ -1,4 +1,3 @@
-version: "3"
 services:
   perseo-core:
     image: ${IMAGE_PERSEO_CORE}

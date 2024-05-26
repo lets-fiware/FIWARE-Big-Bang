@@ -1,4 +1,3 @@
-version: "3"
 services:
   orion:
     image: ${IMAGE_ORION}

@@ -1,4 +1,3 @@
-version: "3"
 services:
   tokenproxy:
     image: ${IMAGE_TOKENPROXY}

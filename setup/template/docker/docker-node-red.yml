@@ -1,4 +1,3 @@
-version: "3"
 services:
   node-red:
     image: ${IMAGE_NODE_RED}

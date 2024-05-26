@@ -1374,7 +1374,7 @@ add_docker_compose_yml() {
   logging_info "${FUNCNAME[0]} $1"
 
   echo "" >> ${DOCKER_COMPOSE_YML}
-  sed -e '/^version:/,/services:/d' "${TEMPLATE}"/docker/"$1" >> ${DOCKER_COMPOSE_YML}
+  sed -e '/services:/d' "${TEMPLATE}"/docker/"$1" >> ${DOCKER_COMPOSE_YML}
 }
 
 #
@@ -1721,7 +1721,7 @@ setup_wilma_basic_authorization() {
 
   # add docker-compose.yml 
   echo "" >> ${DOCKER_COMPOSE_YML}
-  sed -e '/^version:/,/services:/d' "${WORK_DIR}"/docker-wilma.yml >> ${DOCKER_COMPOSE_YML}
+  sed -e '/services:/d' "${WORK_DIR}"/docker-wilma.yml >> ${DOCKER_COMPOSE_YML}
 
   rm -f "${WORK_DIR}"/docker-wilma.yml
 
@@ -3161,7 +3161,7 @@ EOF
     sed "s/${env_val}/NODE_RED_/" | \
     sed "/__NODE_RED_ENVIRONMENT__/i \      - NODE_RED_HTTP_NODE_ROOT=${http_node_root}" | \
     sed "/__NODE_RED_ENVIRONMENT__/i \      - NODE_RED_HTTP_ADMIN_ROOT=${http_admin_root}" | \
-    sed "/^version:/,/services:/d" >> ${DOCKER_COMPOSE_YML}
+    sed "/services:/d" >> ${DOCKER_COMPOSE_YML}
 
     sed -i -e "s/proxy_pass http:\/\/node-red:1880/return 404/" "${node_red_nginx}"
     sed -i -e "/__NODE_RED_SERVER__/i \  location ${http_admin_root} {\n    proxy_pass http:\/\/${username}:1880${http_admin_root};\n  }\n" "${node_red_nginx}"
