@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.37.0-next
 
+-   ADD COMET_FORMAL_MODE option in config.sh (#376)
 -   Fix NODE_RED_INSTANCE_NUMBER value checking (#375)
 -   Update Cygnus to 3.8.0 (#372)
 -   Update IoT Agent for JSON to 3.4.0 (#371)
