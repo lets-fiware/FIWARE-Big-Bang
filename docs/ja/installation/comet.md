@@ -19,12 +19,13 @@
 
 `config.sh` ファイルを編集して構成を指定できます。
 
-| 変数名               | 説明                                                                    | 既定値 |
-| -------------------- | ----------------------------------------------------------------------- | ------ |
-| COMET                | Comet のサブドメイン名                                                  | (なし) |
-| CYGNUS               | Cygnus のサブドメイン名                                                 | (なし) |
-| COMET\_EXPOSE\_PORT  | Comet のポート 8666 を公開。(none, local または all)                    | none   |
-| COMET\_LOGOPS\_LEVEL | Comet のロギング・レベルを設定。(DEBUG, INFO, WARN, ERROR または FATAL) | INFO   |
+| 変数名               | 説明                                                                                                                              | 既定値 |
+| -------------------- | --------------------------------------------------------------------------------------------------------------------------------- | ------ |
+| COMET                | Comet のサブドメイン名                                                                                                            | (なし) |
+| CYGNUS               | Cygnus のサブドメイン名                                                                                                           | (なし) |
+| COMET\_FORMAL\_MODE  | Cygnus が有効な場合に Comet の動作モードを設定。false: 最小モード (STH-Comet のみ)、true: フォーマル・モード (Cygnus + STH-Comet) | (true) |
+| COMET\_EXPOSE\_PORT  | Comet のポート 8666 を公開。(none, local または all)                                                                              | none   |
+| COMET\_LOGOPS\_LEVEL | Comet のロギング・レベルを設定。(DEBUG, INFO, WARN, ERROR または FATAL)                                                           | INFO   |
 
 <a name="how-to-setup"></a>
 
@@ -54,6 +55,9 @@ COMET=comet
 COMET=comet
 CYGNUS=cygnus
 ```
+
+Comet と Cygnus のサブドメイン名を `COMET=` と `CYGNUS=` に設定し、`COMET\_FORMAL\_MODE` に `false` に設定すると、
+Comet は最小モードで実行されます。
 
 <a name="related-information"></a>
 

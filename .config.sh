@@ -131,6 +131,11 @@ IMAGE_ELASTICSEARCH_DB=elasticsearch:7.6.2
 # Set a sub-domain name of Comet
 COMET=
 
+# Set comet mode when Cygnus is enabled (Default: true)
+#   false: minimal mode (STH-Comet only)
+#   true:  formal mode (Cygnus + STH-Comet)
+COMET_FORMAL_MODE=
+
 # Expose port (none, local, all) Default: none
 COMET_EXPOSE_PORT=
 

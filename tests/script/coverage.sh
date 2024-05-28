@@ -178,7 +178,7 @@ setup() {
   sudo tar zxvf ngsi-${ngsi_go_version}-linux-amd64.tar.gz -C /usr/local/bin
   rm -f ngsi-${ngsi_go_version}-linux-amd64.tar.gz
 
-  KCOV="/usr/local/bin/kcov --exclude-path=tests,.git,setup,coverage,.github,.vscode,examples,docs,.mock,maintenance"
+  KCOV="/usr/local/bin/kcov --exclude-path=tests,.git,setup,coverage,.github,.vscode,examples,docs,.mock,maintenance --exclude-pattern=.md"
 
   SAVE_PATH=${PATH}
 
