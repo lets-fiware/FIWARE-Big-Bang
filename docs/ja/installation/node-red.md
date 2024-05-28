@@ -22,7 +22,7 @@
 | 変数名                                 | 説明                                                          | 既定値                                    |
 | -------------------------------------- | ------------------------------------------------------------- | ----------------------------------------- |
 | NODE\_RED                              | Node-RED のサブドメイン名                                     | (なし)                                    |
-| NODE\_RED\_INSTANCE\_NUMBER            | Node-RED のインスタンス数                                     | 1                                         |
+| NODE\_RED\_INSTANCE\_NUMBER            | Node-RED のインスタンス数。1 から20 の間の数値を指定可能      | 1                                         |
 | NODE\_RED\_INSTANCE\_USERNAME          | Node-RED インスタンスのユーザ名                               | node-red                                  |
 | NODE\_RED\_INSTANCE\_HTTP\_ROOT        | Node-RED インスタンスの HTTP ルート。'/' で始まるパスを指定   | / (シングル) または /node-red??? (マルチ) |
 | NODE\_RED\_INSTANCE\_HTTP\_ADMIN\_ROOT | Node-RED インスタンスの httpAdminRoot。'/' で始まるパスを指定 | / (シングル) または /node-red??? (マルチ) |
