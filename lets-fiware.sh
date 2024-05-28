@@ -372,19 +372,20 @@ check_iot_agent_values() {
 check_node_red_values() {
   logging_info "${FUNCNAME[0]}"
 
-  if [ -n "${NODE_RED_INSTANCE_NUMBER}" ]; then
-    if [ "${NODE_RED_INSTANCE_NUMBER}" -lt 2 ] || [ "${NODE_RED_INSTANCE_NUMBER}" -gt 20 ]; then
-      echo "error: NODE_RED_INSTANCE_NUMBER out of range (2-20)"
-      exit "${ERR_CODE}"
-    fi
+  NODE_RED_INSTANCE_NUMBER=${NODE_RED_INSTANCE_NUMBER:-1}
+
+  if [ "${NODE_RED_INSTANCE_NUMBER}" -lt 1 ] || [ "${NODE_RED_INSTANCE_NUMBER}" -gt 20 ]; then
+    echo "error: NODE_RED_INSTANCE_NUMBER out of range (1-20)"
+    exit "${ERR_CODE}"
+  fi
+
+  if [ "${NODE_RED_INSTANCE_NUMBER}" -ge 2 ]; then
     if [ -z "${NODE_RED_INSTANCE_HTTP_ADMIN_ROOT}" ]; then
       NODE_RED_INSTANCE_HTTP_ADMIN_ROOT=/node-red
     fi
     if [ -z "${NODE_RED_INSTANCE_USERNAME}" ]; then
       NODE_RED_INSTANCE_USERNAME=node-red
     fi
-  else
-    NODE_RED_INSTANCE_NUMBER=1
   fi
 }
 
