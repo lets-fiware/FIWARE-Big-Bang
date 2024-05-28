@@ -17,12 +17,13 @@
 
 You can specify configurations by editing the `config.sh` file.
 
-| Variable name        | Description                                                      | Default value |
-| -------------------- | ---------------------------------------------------------------- | ------------- |
-| COMET                | A sub-domain name of Comet                                       | (empty)       |
-| CYGNUS               | A sub-domain name of Cygnus                                      | (empty)       |
-| COMET\_EXPOSE\_PORT  | Expose port for Comet. (none, local, all)                        | none          |
-| COMET\_LOGOPS\_LEVEL | Set logging level for Comet. (DEBUG, INFO, WARN, ERROR or FATAL) | INFO          |
+| Variable name        | Description                                                                                                         | Default value |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------- | ------------- |
+| COMET                | A sub-domain name of Comet                                                                                          | (empty)       |
+| CYGNUS               | A sub-domain name of Cygnus                                                                                         | (empty)       |
+| COMET\_FORMAL\_MODE  | Set comet mode when Cygnus is enabled. false: minimal mode (STH-Comet only), true: formal mode (Cygnus + STH-Comet) | (true)        |
+| COMET\_EXPOSE\_PORT  | Expose port for Comet. (none, local, all)                                                                           | none          |
+| COMET\_LOGOPS\_LEVEL | Set logging level for Comet. (DEBUG, INFO, WARN, ERROR or FATAL)                                                    | INFO          |
 
 ## How to setup
 
@@ -45,6 +46,9 @@ to `COMET=` and `CYGNUS=` as shown:
 COMET=comet
 CYGNUS=cygnus
 ```
+
+When set a sub-domain name for Comet and Cygnus to `COMET=` and `CYGNUS=` and set `COMET\_FORMAL\_MODE` to `false`,
+Comet runs in the minimal mode.
 
 ## Related information
 

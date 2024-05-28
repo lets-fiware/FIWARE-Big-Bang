@@ -436,7 +436,9 @@ set_and_check_values() {
     exit "${ERR_CODE}"
   fi
 
-  if [ "${COMET}" != "" ] && [ "${CYGNUS}" != "" ]; then
+  COMET_FORMAL_MODE=${COMET_FORMAL_MODE:-true}
+
+  if [ "${COMET}" != "" ] && [ "${CYGNUS}" != "" ] && $COMET_FORMAL_MODE; then
     CYGNUS_MONGO=true
   fi
 
