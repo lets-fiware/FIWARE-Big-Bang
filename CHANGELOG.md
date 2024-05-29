@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.37.0-next
 
+-   Update nginx to 1.26 (#379)
 -   Update Mintaka to 0.6.6 (#378)
 -   ADD COMET_FORMAL_MODE option in config.sh (#377)
 -   Fix NODE_RED_INSTANCE_NUMBER value checking (#375)
