@@ -169,7 +169,7 @@ PERSEO_LOG_LEVEL=
 
 # Docker images for Perseo
 IMAGE_PERSEO_CORE=telefonicaiot/perseo-core:1.13.0
-IMAGE_PERSEO_FE=telefonicaiot/perseo-fe:1.27.0
+IMAGE_PERSEO_FE=telefonicaiot/perseo-fe:1.30.0
 
 #
 # Draco
