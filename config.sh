@@ -67,7 +67,7 @@ ORION_LD_MULTI_SERVICE=
 ORION_LD_DISABLE_FILE_LOG=
 
 # Docker image for Orion
-IMAGE_ORION_LD=quay.io/fiware/orion-ld:1.4.0
+IMAGE_ORION_LD=quay.io/fiware/orion-ld:1.5.1
 
 #
 # Mintaka
