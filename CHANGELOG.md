@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.37.0-next
 
+-   Update Quantumleap to 1.0.0 (#382)
 -   Update Perseo FE to 1.30.0 (#381)
 -   Update Orion-LD to 1.5.1 (#380)
 -   Update nginx to 1.26 (#379)
