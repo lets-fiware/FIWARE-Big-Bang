@@ -1,4 +1,4 @@
-## FIWARE Big Bang v0.37.0-next
+## FIWARE Big Bang v0.38.0 - 01 June, 2024
 
 -   Update Quantumleap to 1.0.0 (#382)
 -   Update Perseo FE to 1.30.0 (#381)
