@@ -1,5 +1,7 @@
 ## FIWARE Big Bang v0.38.0-next
 
+-   Clarifies instance number variable for Node-RED (#385)
+
 ## FIWARE Big Bang v0.38.0 - 01 June, 2024
 
 -   Update Quantumleap to 1.0.0 (#382)
