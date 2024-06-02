@@ -317,6 +317,7 @@ NODE_RED=
 
 # Node-RED multi instance
 # Number of Node-RED instance. default: 1
+#   Must be between 1 and 20 when specified
 NODE_RED_INSTANCE_NUMBER=
 
 # username for Node-RED instance. default: node-red
