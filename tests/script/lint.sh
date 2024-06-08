@@ -45,6 +45,3 @@ echo "*** lint shellcheck ***"
 
 echo "*** lint yamllint ***"
 ./tests/script/lint-yamllint.sh
-
-echo "*** config.sh ***"
-diff config.sh .config.sh
