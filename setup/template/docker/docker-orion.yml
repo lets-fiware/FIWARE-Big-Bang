@@ -5,7 +5,7 @@ services:
     depends_on:
       - mongo
     # __ORION_DEPENDS_ON__
-    entrypoint: ["sh", "-c", "rm /tmp/contextBroker.pid; /usr/bin/contextBroker -fg -multiservice -dbhost mongo"]
+    entrypoint: ["sh", "-c", "if [ -e /tmp/contextBroker.pid ]; then rm /tmp/contextBroker.pid; fi; /usr/bin/contextBroker -fg -multiservice -ngsiv1Autocast -disableFileLog -dbURI mongodb://mongo"]
     restart: always
     logging:
       driver: syslog
