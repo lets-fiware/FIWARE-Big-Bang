@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.38.0-next
 
+-   Improve maintenance script (#387)
 -   Update Orion to 4.0.0 (#386)
 -   Clarifies instance number variable for Node-RED (#385)
 
