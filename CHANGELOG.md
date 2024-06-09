@@ -1,4 +1,4 @@
-## FIWARE Big Bang v0.38.0-next
+## FIWARE Big Bang v0.39.0 - 09 June, 2024
 
 -   Update Mongodb to 6.0 for Orion (#389)
 -   Update node.js dependencies (#388)

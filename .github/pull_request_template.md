@@ -2,7 +2,7 @@
 
 Describe the big picture of your changes here to communicate to the maintainers why we should accept this pull request.
 If it fixes a bug or resolves a feature request, be sure to link to that issue. Please send a pull request to
-the `v0.38.0-next` branch.
+the `v0.39.0-next` branch.
 
 ## Types of changes
 
@@ -23,7 +23,7 @@ merging your code._
 -   \[ \] I have read the [CONTRIBUTING](https://github.com/lets-fiware/FIWARE-Big-Bang/blob/main/CONTRIBUTING.md) doc
 -   \[ \] I have signed the [CLA](https://github.com/lets-fiware/FIWARE-Big-Bang/blob/main/FIWARE-Big-Bang-individual-cla.pdf)
 -   \[ \] I have updated the change log (CHANGELOG.md)
--   \[ \] I send this pull request to the `v0.38.0-next` branch.
+-   \[ \] I send this pull request to the `v0.39.0-next` branch.
 -   \[ \] I have added tests that prove my fix is effective or that my feature works
 -   \[ \] I have added necessary documentation (if appropriate)
 -   \[ \] Any dependent changes have been merged and published in downstream modules
