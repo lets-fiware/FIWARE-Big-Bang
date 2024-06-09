@@ -129,6 +129,8 @@ sed -i -e "s/postfix:${VER_SED}/postfix:${VER_SED}-next/" config.sh
 sed -i -e "s/zeppelin:${VER_SED}/zeppelin:${VER_SED}-next/" config.sh
 sed -i -e "s/pwgen:${VER_SED}/pwgen:${VER_SED}-next/" config.sh
 
+cp -a config.sh .config.sh
+
 git add .
 git commit -m "Bump: ${VER} -> ${VER}-next"
 git push origin "release/${VER}_next"
