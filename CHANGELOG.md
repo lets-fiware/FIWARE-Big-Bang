@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.38.0-next
 
+-   Update Mongodb to 6.0 for Orion (#389)
 -   Update node.js dependencies (#388)
 -   Improve maintenance script (#387)
 -   Update Orion to 4.0.0 (#386)

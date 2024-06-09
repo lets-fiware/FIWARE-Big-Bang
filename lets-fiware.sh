@@ -472,6 +472,10 @@ set_and_check_values() {
 add_env() {
   logging_info "${FUNCNAME[0]}"
 
+  if [ -n "${ORION}" ]; then
+    IMAGE_MONGO=mongo:6.0
+  fi
+
   if [ -z "${IDM_ADMIN_PASS}" ]; then
     IDM_ADMIN_PASS=$(${DOCKER} run -t --rm "${IMAGE_PWGEN}" | sed -z 's/[\x0d\x0a]//g')
   fi
