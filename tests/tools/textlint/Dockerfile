@@ -24,7 +24,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-FROM node:18
+FROM node:20
 
 WORKDIR /lint
 COPY package.json package-lock.json /lint/
