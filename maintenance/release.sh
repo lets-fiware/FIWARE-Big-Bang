@@ -75,7 +75,7 @@ RES=$(curl -X POST \
 DIR="${NAME}-${TAG//v/}"
 mkdir "${DIR}"
 
-for FILE in LICENSE README.md config.sh lets-fiware.sh
+for FILE in LICENSE README.md config.sh .config.sh lets-fiware.sh
 do
   cp -a "${FILE}" "${DIR}/"
 done

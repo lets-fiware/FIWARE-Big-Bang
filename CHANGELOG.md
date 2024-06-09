@@ -1,3 +1,11 @@
+## FIWARE Big Bang v0.39.0 - 09 June, 2024
+
+-   Update Mongodb to 6.0 for Orion (#389)
+-   Update node.js dependencies (#388)
+-   Improve maintenance script (#387)
+-   Update Orion to 4.0.0 (#386)
+-   Clarifies instance number variable for Node-RED (#385)
+
 ## FIWARE Big Bang v0.38.0 - 01 June, 2024
 
 -   Update Quantumleap to 1.0.0 (#382)

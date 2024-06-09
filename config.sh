@@ -27,7 +27,7 @@ IDM_DEBUG=false
 IMAGE_KEYROCK=letsfiware/fiware-idm:8.4.0
 
 # Docker image for Postfix
-IMAGE_POSTFIX=letsfiware/postfix:0.38.0
+IMAGE_POSTFIX=letsfiware/postfix:0.39.0
 
 #
 # Wilma
@@ -49,7 +49,7 @@ ORION=orion
 ORION_EXPOSE_PORT=
 
 # Docker image for Orion
-IMAGE_ORION=telefonicaiot/fiware-orion:3.12.0
+IMAGE_ORION=telefonicaiot/fiware-orion:4.0.0
 
 #
 # Orion-LD
@@ -317,6 +317,7 @@ NODE_RED=
 
 # Node-RED multi instance
 # Number of Node-RED instance. default: 1
+#   Must be between 1 and 20 when specified
 NODE_RED_INSTANCE_NUMBER=
 
 # username for Node-RED instance. default: node-red
@@ -337,7 +338,7 @@ NODE_RED_LOGGING_METRICS=
 NODE_RED_LOGGING_AUDIT=
 
 # Docker image for Node-RED
-IMAGE_NODE_RED=letsfiware/node-red:0.38.0
+IMAGE_NODE_RED=letsfiware/node-red:0.39.0
 
 #
 # Grafana
@@ -363,7 +364,7 @@ ZEPPELIN=
 ZEPPELIN_DEBUG=
 
 # Docker image for Zeppelin
-IMAGE_ZEPPELIN=letsfiware/zeppelin:0.38.0
+IMAGE_ZEPPELIN=letsfiware/zeppelin:0.39.0
 
 #
 # Queryproxy
@@ -375,7 +376,7 @@ QUERYPROXY=
 QUERYPROXY_LOGLEVEL=info
 
 # Docker image for Queryproxy
-IMAGE_QUERYPROXY=letsfiware/queryproxy:0.38.0
+IMAGE_QUERYPROXY=letsfiware/queryproxy:0.39.0
 
 #
 # Tokenproxy
@@ -387,7 +388,7 @@ TOKENPROXY_LOGLEVEL=info
 TOKENPROXY_VERBOSE=
 
 # Docker image for Tokenproxy
-IMAGE_TOKENPROXY=letsfiware/tokenproxy:0.38.0
+IMAGE_TOKENPROXY=letsfiware/tokenproxy:0.39.0
 
 #
 # Regproxy
@@ -426,7 +427,7 @@ REGPROXY_LOGLEVEL=info
 REGPROXY_VERBOSE=false
 
 # Docker image for Regproxy
-IMAGE_REGPROXY=letsfiware/regproxy:0.38.0
+IMAGE_REGPROXY=letsfiware/regproxy:0.39.0
 
 #
 # MongoDB
@@ -462,7 +463,7 @@ IMAGE_POSTGRES=postgres:15
 IMAGE_NGINX=nginx:1.26
 
 # Docker image for pwgen
-IMAGE_PWGEN=letsfiware/pwgen:0.38.0
+IMAGE_PWGEN=letsfiware/pwgen:0.39.0
 
 #
 # Firewall (firewalld)

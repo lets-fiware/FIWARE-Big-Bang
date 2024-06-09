@@ -31,6 +31,9 @@ set -ue
 cd "$(dirname "$0")"
 cd ../..
 
+echo "*** diff config.sh .config.sh ***"
+diff config.sh .config.sh
+
 . ./config.sh
 
 if [ "${ORION}" != "orion" ]; then

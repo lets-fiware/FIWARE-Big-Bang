@@ -4,6 +4,7 @@
     "paddedTable": true
   },
   "plugins": [
-    "remark-preset-lint-recommended"
+    "remark-preset-lint-recommended",
+    ["remark-lint-list-item-indent", "tab"]
   ]
 }
