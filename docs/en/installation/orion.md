@@ -15,10 +15,11 @@
 
 You can specify configurations by editing the `config.sh` file.
 
-| Variable name       | Description                           | Default value |
-| ------------------- | ------------------------------------- | ------------- |
-| ORION               | A sub-domain name of Orion.           | orion         | 
-| ORION\_EXPOSE\_PORT | Expose port 1026. (none, local, all)  | none          |
+| Variable name       | Description                                 | Default value |
+| ------------------- | ------------------------------------------- | ------------- |
+| ORION               | A sub-domain name of Orion.                 | orion         |
+| ORION\_EXPOSE\_PORT | Expose port 1026. (none, local, all)        | none          |
+| ORION\_CORS         | Enable cross-origin resource sharing (CORS) | false         |
 
 ## How to setup
 

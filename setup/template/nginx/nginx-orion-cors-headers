@@ -1,0 +1,6 @@
+  # Add CORS Headers
+  add_header 'Access-Control-Allow-Origin' '*' always;
+  add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS, DELETE, PUT, PATCH' always;
+  add_header 'Access-Control-Allow-Headers' 'Origin, Content-Type, Accept, Authorization, X-Requested-With, fiware-service, fiware-servicepath' always;
+  add_header 'Access-Control-Expose-Headers' 'location, fiware-correlator' always;
+

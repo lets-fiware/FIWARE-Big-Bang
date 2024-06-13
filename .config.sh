@@ -48,6 +48,9 @@ ORION=orion
 # Expose port 1026 (none, local, all) Default: none
 ORION_EXPOSE_PORT=
 
+# Enable cross-origin resource sharing (CORS) Default: false
+ORION_CORS=
+
 # Docker image for Orion
 IMAGE_ORION=telefonicaiot/fiware-orion:4.0.0
 

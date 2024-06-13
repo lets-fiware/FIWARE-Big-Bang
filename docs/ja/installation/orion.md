@@ -21,6 +21,7 @@
 | ------------------- | ---------------------------------------------------- | ------ |
 | ORION               | Orion のサブドメイン名                               | orion  | 
 | ORION\_EXPOSE\_PORT | Orion のポート 1026 を公開。(none, local または all) | none   |
+| ORION\_CORS         | Cross-origin resource sharing (CORS) を有効化        | false  |
 
 <a name="how-to-setup"></a>
 
