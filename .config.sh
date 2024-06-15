@@ -52,7 +52,7 @@ ORION_EXPOSE_PORT=
 ORION_CORS=
 
 # Set Access-Control-Allow-Origin header for CORS
-#   Default: *
+#   Default: '*'
 set -f
 ORION_ACCESS_CONTROL_ALLOW_ORIGIN=
 set +f
