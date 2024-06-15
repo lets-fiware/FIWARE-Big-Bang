@@ -1963,8 +1963,27 @@ EOF
   create_nginx_conf "${ORION}" "nginx-orion"
 
   if "${ORION_CORS}"; then
-    sed -i "/__NGINX_ORION_CORS_HEADERS__/r ${SETUP_DIR}/template/nginx/nginx-orion-cors-headers" "${NGINX_SITES}/${ORION}"
-    sed -i "/__NGINX_ORION_CORS_REQUEST_METHOD__/r ${SETUP_DIR}/template/nginx/nginx-orion-cors-request-method" "${NGINX_SITES}/${ORION}"
+    set -f
+    if [ -z ${ORION_ACCESS_CONTROL_ALLOW_ORIGIN} ]; then
+      ORION_ACCESS_CONTROL_ALLOW_ORIGIN="'*'"
+    fi
+    : ${ORION_ACCESS_CONTROL_ALLOW_METHODS:="'GET, POST, OPTIONS, DELETE, PUT, PATCH'"}
+    : ${ORION_ACCESS_CONTROL_ALLOW_HEADERS:="'Origin, Content-Type, Accept, Authorization, X-Requested-With, fiware-service, fiware-servicepath'"}
+    : ${ORION_CONTROL_EXPOSE_HEADERS:="'location, fiware-correlator'"}
+    : ${ORION_ACCESS_CONTROL_MAX_AGE:=7200}
+
+    sed -i \
+        -e "/__NGINX_ORION_CORS_HEADERS__/r ${SETUP_DIR}/template/nginx/nginx-orion-cors-headers" \
+        -e "/__NGINX_ORION_CORS_REQUEST_METHOD__/r ${SETUP_DIR}/template/nginx/nginx-orion-cors-request-method" \
+        "${NGINX_SITES}/${ORION}"
+    sed -i \
+        -e "s/ORION_ACCESS_CONTROL_ALLOW_ORIGIN/${ORION_ACCESS_CONTROL_ALLOW_ORIGIN}/" \
+        -e "s/ORION_ACCESS_CONTROL_ALLOW_METHODS/${ORION_ACCESS_CONTROL_ALLOW_METHODS}/" \
+        -e "s/ORION_ACCESS_CONTROL_ALLOW_HEADERS/${ORION_ACCESS_CONTROL_ALLOW_HEADERS}/" \
+        -e "s/ORION_CONTROL_EXPOSE_HEADERS/${ORION_CONTROL_EXPOSE_HEADERS}/" \
+        -e "s/ORION_ACCESS_CONTROL_MAX_AGE/${ORION_ACCESS_CONTROL_MAX_AGE}/" \
+        "${NGINX_SITES}/${ORION}"
+    set +f
   fi
 
   add_nginx_depends_on "orion"

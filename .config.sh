@@ -51,6 +51,28 @@ ORION_EXPOSE_PORT=
 # Enable cross-origin resource sharing (CORS) Default: false
 ORION_CORS=
 
+# Set Access-Control-Allow-Origin header for CORS
+#   Default: *
+set -f
+ORION_ACCESS_CONTROL_ALLOW_ORIGIN=
+set +f
+
+# Set Access-Control-Allow-Methods header for CORS
+#   Default: 'GET, POST, OPTIONS, DELETE, PUT, PATCH'
+ORION_ACCESS_CONTROL_ALLOW_METHODS=
+
+# Set Access-Control-Allow-Headers header for CORS
+#   Default: 'Origin, Content-Type, Accept, Authorization, X-Requested-With, fiware-service, fiware-servicepath'
+ORION_ACCESS_CONTROL_ALLOW_HEADERS=
+
+# Set Access-Control-Expose-Headers header for CORS
+#   Default: 'location, fiware-correlator'
+ORION_CONTROL_EXPOSE_HEADERS=
+
+# Set Access-Control-Max-Age header for CORS
+#   Default: 7200
+ORION_ACCESS_CONTROL_MAX_AGE=
+
 # Docker image for Orion
 IMAGE_ORION=telefonicaiot/fiware-orion:4.0.0
 

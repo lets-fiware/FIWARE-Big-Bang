@@ -1,9 +1,9 @@
     if ($request_method = 'OPTIONS') {
-      add_header 'Access-Control-Allow-Origin' '*' always;
-      add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS, DELETE, PUT, PATCH' always;
-      add_header 'Access-Control-Allow-Headers' 'Origin, Content-Type, Accept, Authorization, X-Requested-With, fiware-service, fiware-servicepath' always;
-      add_header 'Access-Control-Expose-Headers' 'location, fiware-correlator' always;
-      add_header 'Access-Control-Max-Age' 1728000;
+      add_header 'Access-Control-Allow-Origin' ORION_ACCESS_CONTROL_ALLOW_ORIGIN;
+      add_header 'Access-Control-Allow-Methods' ORION_ACCESS_CONTROL_ALLOW_METHODS;
+      add_header 'Access-Control-Allow-Headers' ORION_ACCESS_CONTROL_ALLOW_HEADERS;
+      add_header 'Access-Control-Expose-Headers' ORION_CONTROL_EXPOSE_HEADERS;
+      add_header 'Access-Control-Max-Age' ORION_ACCESS_CONTROL_MAX_AGE;
       add_header 'Content-Type' 'text/plain charset=UTF-8';
       add_header 'Content-Length' 0;
       return 204;

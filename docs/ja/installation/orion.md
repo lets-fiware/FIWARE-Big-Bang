@@ -17,11 +17,16 @@
 
 `config.sh` ファイルを編集して構成を指定できます。
 
-| 変数名              | 説明                                                 | 既定値 |
-| ------------------- | ---------------------------------------------------- | ------ |
-| ORION               | Orion のサブドメイン名                               | orion  | 
-| ORION\_EXPOSE\_PORT | Orion のポート 1026 を公開。(none, local または all) | none   |
-| ORION\_CORS         | Cross-origin resource sharing (CORS) を有効化        | false  |
+| 変数名                                 | 説明                                                 | 既定値                                                                                              |
+| -------------------------------------- | ---------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| ORION                                  | Orion のサブドメイン名                               | orion                                                                                               |
+| ORION\_EXPOSE\_PORT                    | Orion のポート 1026 を公開。(none, local または all) | none                                                                                                |
+| ORION\_CORS                            | Cross-origin resource sharing (CORS) を有効化        | false                                                                                               |
+| ORION\_ACCESS\_CONTROL\_ALLOW\_ORIGIN  | CORS の Access-Control-Allow-Origin ヘッダを設定     | '\*'                                                                                                |
+| ORION\_ACCESS\_CONTROL\_ALLOW\_METHODS | CORS の Access-Control-Allow-Methods ヘッダを設定    | 'GET, POST, OPTIONS, DELETE, PUT, PATCH'                                                            |
+| ORION\_ACCESS\_CONTROL\_ALLOW\_HEADERS | CORS の Access-Control-Allow-Headers ヘッダを設定    | 'Origin, Content-Type, Accept, Authorization, X-Requested-With, fiware-service, fiware-servicepath' |
+| ORION\_CONTROL\_EXPOSE\_HEADERS        | CORS の Access-Control-Expose-Headers ヘッダを設定   | 'location, fiware-correlator'                                                                       |
+| ORION\_ACCESS\_CONTROL\_MAX\_AGE       | CORS の Access-Control-Max-Age header ヘッダを設定   | 7200                                                                                                |
 
 <a name="how-to-setup"></a>
 
