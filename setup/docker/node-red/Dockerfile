@@ -1,4 +1,4 @@
-FROM nodered/node-red:3.1.9
+FROM nodered/node-red:4.0.0
 
 #
 # Add node modules for Node-RED
