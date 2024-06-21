@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.39.0-next
 
+-   Add cross-origin resource sharing for Orion (#394)
 -   Fix maintenance script (#393)
 
 ## FIWARE Big Bang v0.39.0 - 09 June, 2024

@@ -253,6 +253,7 @@ install_test1() {
   sudo apt remove -y rsyslog
 
   sed -i -e "s/^\(ORION_EXPOSE_PORT=\).*/\1local/" config.sh
+  sed -i -e "s/^\(ORION_CORS=\).*/\1true/" config.sh
   sed -i -e "s/^\(CYGNUS=\).*/\1cygnus/" config.sh
   sed -i -e "s/^\(COMET=\).*/\1comet/" config.sh
   sed -i -e "s/^\(QUANTUMLEAP=\).*/\1quantumleap/" config.sh
