@@ -1,5 +1,6 @@
 ## FIWARE Big Bang v0.39.0-next
 
+-   Update Node-RED to 4.0.0 (#395)
 -   Add cross-origin resource sharing for Orion (#394)
 -   Fix maintenance script (#393)
 
