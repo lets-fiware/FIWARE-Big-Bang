@@ -1,4 +1,4 @@
-## FIWARE Big Bang v0.39.0-next
+## FIWARE Big Bang v0.40.0 - 21 June, 2024
 
 -   Update Node-RED to 4.0.0 (#395)
 -   Add cross-origin resource sharing for Orion (#394)
