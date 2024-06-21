@@ -15,10 +15,16 @@
 
 You can specify configurations by editing the `config.sh` file.
 
-| Variable name       | Description                           | Default value |
-| ------------------- | ------------------------------------- | ------------- |
-| ORION               | A sub-domain name of Orion.           | orion         | 
-| ORION\_EXPOSE\_PORT | Expose port 1026. (none, local, all)  | none          |
+| Variable name                          | Description                                       | Default value                                                                                       |
+| -------------------------------------- | ------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| ORION                                  | A sub-domain name of Orion.                       | orion                                                                                               |
+| ORION\_EXPOSE\_PORT                    | Expose port 1026. (none, local, all)              | none                                                                                                |
+| ORION\_CORS                            | Enable cross-origin resource sharing (CORS)       | false                                                                                               |
+| ORION\_ACCESS\_CONTROL\_ALLOW\_ORIGIN  | Set Access-Control-Allow-Origin header for CORS   | '\*'                                                                                                |
+| ORION\_ACCESS\_CONTROL\_ALLOW\_METHODS | Set Access-Control-Allow-Methods header for CORS  | 'GET, POST, OPTIONS, DELETE, PUT, PATCH'                                                            |
+| ORION\_ACCESS\_CONTROL\_ALLOW\_HEADERS | Set Access-Control-Allow-Headers header for CORS  | 'Origin, Content-Type, Accept, Authorization, X-Requested-With, fiware-service, fiware-servicepath' |
+| ORION\_CONTROL\_EXPOSE\_HEADERS        | Set Access-Control-Expose-Headers header for CORS | 'location, fiware-correlator'                                                                       |
+| ORION\_ACCESS\_CONTROL\_MAX\_AGE       | Set Access-Control-Max-Age header for CORS        | 7200                                                                                                |
 
 ## How to setup
 

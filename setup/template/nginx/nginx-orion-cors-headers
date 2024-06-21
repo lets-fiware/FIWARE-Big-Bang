@@ -1,0 +1,6 @@
+  # Add CORS Headers
+  add_header 'Access-Control-Allow-Origin' ORION_ACCESS_CONTROL_ALLOW_ORIGIN;
+  add_header 'Access-Control-Allow-Methods' ORION_ACCESS_CONTROL_ALLOW_METHODS;
+  add_header 'Access-Control-Allow-Headers' ORION_ACCESS_CONTROL_ALLOW_HEADERS;
+  add_header 'Access-Control-Expose-Headers' ORION_CONTROL_EXPOSE_HEADERS;
+

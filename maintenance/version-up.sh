@@ -30,6 +30,8 @@ version_up() {
   sed -i -e "s/${OLD}-next/${NEW}-next/" "${FIBB_HOME}/.github/pull_request_template.md"
   sed -i -e "s/${OLD}-next/${NEW}-next/" "${FIBB_HOME}/CONTRIBUTING.md"
   sed -i -e "s/${OLD}/${NEW}/" "${FIBB_HOME}/SECURITY.md"
+
+  cp -a "${FIBB_HOME}/config.sh" "${FIBB_HOME}/.config.sh"
   
   git add .
   git commit -m "Bump: ${OLD}-next -> ${NEW}"
@@ -61,6 +63,8 @@ next_version() {
   sed -i -e "s/zeppelin:${VER}/zeppelin:${VER}-next/" "${FIBB_HOME}/config.sh"
   sed -i -e "s/pwgen:${VER}/pwgen:${VER}-next/" "${FIBB_HOME}/config.sh"
   
+  cp -a "${FIBB_HOME}/config.sh" "${FIBB_HOME}/.config.sh"
+
   git add .
   git commit -m "Bump: ${VER} -> ${VER}-next"
   git push origin "${BRANCH}"

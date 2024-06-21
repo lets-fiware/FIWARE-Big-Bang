@@ -31,7 +31,9 @@ server {
   add_header              Front-End-Https   on;
   add_header              Strict-Transport-Security 'max-age=15768000; includeSubdomains; always';
 
+  # __NGINX_ORION_CORS_HEADERS__
   location / {
+    # __NGINX_ORION_CORS_REQUEST_METHOD__
     set $req_uri "$uri";
     auth_request /_check_oauth2_token;
 

@@ -27,7 +27,7 @@ IDM_DEBUG=false
 IMAGE_KEYROCK=letsfiware/fiware-idm:8.4.0
 
 # Docker image for Postfix
-IMAGE_POSTFIX=letsfiware/postfix:0.39.0
+IMAGE_POSTFIX=letsfiware/postfix:0.40.0
 
 #
 # Wilma
@@ -47,6 +47,31 @@ ORION=orion
 
 # Expose port 1026 (none, local, all) Default: none
 ORION_EXPOSE_PORT=
+
+# Enable cross-origin resource sharing (CORS) Default: false
+ORION_CORS=
+
+# Set Access-Control-Allow-Origin header for CORS
+#   Default: '*'
+set -f
+ORION_ACCESS_CONTROL_ALLOW_ORIGIN=
+set +f
+
+# Set Access-Control-Allow-Methods header for CORS
+#   Default: 'GET, POST, OPTIONS, DELETE, PUT, PATCH'
+ORION_ACCESS_CONTROL_ALLOW_METHODS=
+
+# Set Access-Control-Allow-Headers header for CORS
+#   Default: 'Origin, Content-Type, Accept, Authorization, X-Requested-With, fiware-service, fiware-servicepath'
+ORION_ACCESS_CONTROL_ALLOW_HEADERS=
+
+# Set Access-Control-Expose-Headers header for CORS
+#   Default: 'location, fiware-correlator'
+ORION_CONTROL_EXPOSE_HEADERS=
+
+# Set Access-Control-Max-Age header for CORS
+#   Default: 7200
+ORION_ACCESS_CONTROL_MAX_AGE=
 
 # Docker image for Orion
 IMAGE_ORION=telefonicaiot/fiware-orion:4.0.0
@@ -338,7 +363,7 @@ NODE_RED_LOGGING_METRICS=
 NODE_RED_LOGGING_AUDIT=
 
 # Docker image for Node-RED
-IMAGE_NODE_RED=letsfiware/node-red:0.39.0
+IMAGE_NODE_RED=letsfiware/node-red:0.40.0
 
 #
 # Grafana
@@ -364,7 +389,7 @@ ZEPPELIN=
 ZEPPELIN_DEBUG=
 
 # Docker image for Zeppelin
-IMAGE_ZEPPELIN=letsfiware/zeppelin:0.39.0
+IMAGE_ZEPPELIN=letsfiware/zeppelin:0.40.0
 
 #
 # Queryproxy
@@ -376,7 +401,7 @@ QUERYPROXY=
 QUERYPROXY_LOGLEVEL=info
 
 # Docker image for Queryproxy
-IMAGE_QUERYPROXY=letsfiware/queryproxy:0.39.0
+IMAGE_QUERYPROXY=letsfiware/queryproxy:0.40.0
 
 #
 # Tokenproxy
@@ -388,7 +413,7 @@ TOKENPROXY_LOGLEVEL=info
 TOKENPROXY_VERBOSE=
 
 # Docker image for Tokenproxy
-IMAGE_TOKENPROXY=letsfiware/tokenproxy:0.39.0
+IMAGE_TOKENPROXY=letsfiware/tokenproxy:0.40.0
 
 #
 # Regproxy
@@ -427,7 +452,7 @@ REGPROXY_LOGLEVEL=info
 REGPROXY_VERBOSE=false
 
 # Docker image for Regproxy
-IMAGE_REGPROXY=letsfiware/regproxy:0.39.0
+IMAGE_REGPROXY=letsfiware/regproxy:0.40.0
 
 #
 # MongoDB
@@ -463,7 +488,7 @@ IMAGE_POSTGRES=postgres:15
 IMAGE_NGINX=nginx:1.26
 
 # Docker image for pwgen
-IMAGE_PWGEN=letsfiware/pwgen:0.39.0
+IMAGE_PWGEN=letsfiware/pwgen:0.40.0
 
 #
 # Firewall (firewalld)
